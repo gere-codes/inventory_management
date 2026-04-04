@@ -1,7 +1,5 @@
 import { z } from 'zod';
-import { sanitized } from '@core/validation/sanitized.js';
-
-const passwordRules = sanitized(z.string().min(6).max(60)).transform((p) => p.trim());
+import { passwordRules, sanitized } from '@core/validation/sanitized.js';
 
 export const registerSchema = z
 	.object({
@@ -15,4 +13,7 @@ export const registerSchema = z
 		path: ['confirmPassword'],
 	});
 
-export type TRegister = z.infer<typeof registerSchema>;
+export const loginSchema = z.object({
+	email: sanitized(z.email()).transform((e) => e.toLowerCase().trim()),
+	password: passwordRules,
+});

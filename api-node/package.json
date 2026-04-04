@@ -8,7 +8,6 @@
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"dev": "tsx watch src/index.ts",
 		"build": "tsc && tsc-alias",
-		"prestart": "npm run build",
 		"start": "npm run db:migrate && node dist/index.js",
 		"db:generate": "drizzle-kit generate",
 		"db:push": "drizzle-kit push",

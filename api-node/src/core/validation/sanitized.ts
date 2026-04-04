@@ -10,4 +10,6 @@ export const sanitized = (schema: z.ZodString | z.ZodEmail) =>
 		return clean.trim();
 	});
 
+export const passwordRules = sanitized(z.string().min(6).max(60)).transform((p) => p.trim());
+
 export const sanitizedPhone = sanitized(z.string().regex(/^[0-9+\-()/\s]+$/));

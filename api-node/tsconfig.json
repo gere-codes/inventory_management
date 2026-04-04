@@ -46,11 +46,13 @@
 		"baseUrl": ".",
 		"paths": {
 			"@src/*": ["src/*"],
+
 			"@config/*": ["src/config/*"],
-			"@controllers/*": ["src/controllers/*"],
-			"@repositories/*": ["src/repositories/*"],
-			"@services/*": ["src/services/*"],
-			"@utils/*": ["src/utils/*"]
+			"@core/*": ["src/core/*"],
+			"@db/*": ["src/db/*"],
+			"@modules/*": ["src/modules/*"],
+
+			"@utils/*": ["src/core/utils/*"]
 		}
 	},
 	"include": ["src/**/*"]

@@ -34,13 +34,24 @@
 
 		// Recommended Options
 		"strict": true,
-		"jsx": "react-jsx",
+		// "jsx": "react-jsx",
 		"verbatimModuleSyntax": true,
 		"isolatedModules": true,
 		"noUncheckedSideEffectImports": true,
 		"moduleDetection": "force",
 		"esModuleInterop": true,
-		"skipLibCheck": true
+		"skipLibCheck": true,
+
+		// Paths
+		"baseUrl": ".",
+		"paths": {
+			"@src/*": ["src/*"],
+			"@config/*": ["src/config/*"],
+			"@controllers/*": ["src/controllers/*"],
+			"@repositories/*": ["src/repositories/*"],
+			"@services/*": ["src/services/*"],
+			"@utils/*": ["src/utils/*"]
+		}
 	},
 	"include": ["src/**/*"]
 }

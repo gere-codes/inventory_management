@@ -8,6 +8,7 @@ import { env } from '@config/env.js';
 import { db, closeConnection } from '@db/index.js';
 import { sql } from 'drizzle-orm';
 
+import apiRoutes from '@routes/index.js';
 import { globalErrorHandler } from '@middlewares/index.js';
 
 const app = express();
@@ -20,6 +21,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get('/health', (req, res) => res.send('OK'));
+
+app.use('/api', apiRoutes);
 
 // global error handler
 app.use(globalErrorHandler);

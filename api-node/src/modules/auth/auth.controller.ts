@@ -5,7 +5,7 @@ import { authService } from './auth.service.js';
 import { EAuth } from './auth.enum.js';
 import { env } from '@src/config/env.js';
 
-export class AuthController {
+class AuthController {
 	private repo = authService;
 	private readonly cookieOptions = {
 		httpOnly: true,
@@ -28,3 +28,5 @@ export class AuthController {
 		return res.status(201).json({ user, accessToken });
 	});
 }
+
+export const authConroller = new AuthController();

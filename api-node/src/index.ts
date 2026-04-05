@@ -8,6 +8,8 @@ import { env } from '@config/env.js';
 import { db, closeConnection } from '@db/index.js';
 import { sql } from 'drizzle-orm';
 
+import { globalErrorHandler } from '@middlewares/index.js';
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -18,6 +20,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get('/health', (req, res) => res.send('OK'));
+
+// global error handler
+app.use(globalErrorHandler);
 
 async function startServer() {
 	try {

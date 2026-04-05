@@ -52,7 +52,8 @@
 			"@db/*": ["src/db/*"],
 			"@modules/*": ["src/modules/*"],
 
-			"@utils/*": ["src/core/utils/*"]
+			"@utils/*": ["src/core/utils/*"],
+			"@middlewares/*": ["src/core/middlewares/*"]
 		}
 	},
 	"include": ["src/**/*"]

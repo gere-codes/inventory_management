@@ -7,6 +7,8 @@ const envSchema = z.object({
 		.default('5000')
 		.transform((val) => parseInt(val, 10)),
 	NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+	ACCESS_TOKEN_KEY: z.string(),
+	REFRESH_TOKEN_KEY: z.string(),
 });
 
 const envServer = envSchema.safeParse(process.env);

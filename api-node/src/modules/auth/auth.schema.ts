@@ -17,3 +17,6 @@ export const loginSchema = z.object({
 	email: sanitized(z.email()).transform((e) => e.toLowerCase().trim()),
 	password: passwordRules,
 });
+
+export type TRegisterInput = z.infer<typeof registerSchema>;
+export type TLoginInput = z.infer<typeof loginSchema>;

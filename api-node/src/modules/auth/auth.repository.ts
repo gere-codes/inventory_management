@@ -2,8 +2,9 @@ import { AppError } from '@src/core/utils/index.js';
 import { users, db } from '@src/db/index.js';
 import type { TUser, TUserInsert, TUserResponse } from '@src/db/schema/user.js';
 import { userSchema } from '@src/modules/user/index.js';
+import { eq } from 'drizzle-orm';
 
-export class AuthRepository {
+class AuthRepository {
 	protected format(record: TUser): TUserResponse {
 		return {
 			id: record.id,
@@ -17,8 +18,15 @@ export class AuthRepository {
 	public async register(userData: TUserInsert): Promise<TUserResponse> {
 		const [user] = await db.insert(users).values(userData).returning();
 
-		if (!user) throw new AppError(400, 'Registration failed: User already exists or database rejected insert.');
+		if (!user) throw new AppError(400, 'Registration failed: User already exists.');
 
 		return userSchema.parse(this.format(user));
 	}
+
+	async findByEmail(email: string): Promise<TUser | null> {
+		const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+		return user || null;
+	}
 }
+
+export const authRepository = new AuthRepository();

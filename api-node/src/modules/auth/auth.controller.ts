@@ -34,6 +34,13 @@ class AuthController {
 		res.cookie(EAuth.REFRESH_TOKEN, refreshToken, this.cookieOptions);
 		return res.status(200).json({ accessToken });
 	});
+
+	public logout = catchAsync(async (req: Request, res: Response) => {
+		res.clearCookie(EAuth.REFRESH_TOKEN, {
+			...this.cookieOptions,
+			maxAge: 0,
+		});
+	});
 }
 
 export const authConroller = new AuthController();

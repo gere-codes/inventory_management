@@ -1,5 +1,5 @@
 import type { TUser, TUserResponse } from '@src/db/schema/user.js';
-import { registerSchema, type TRegisterInput } from './auth.schema.js';
+import { loginSchema, registerSchema, type TLoginInput, type TRegisterInput } from './auth.schema.js';
 import { authRepository } from './auth.repository.js';
 import { AppError } from '@src/core/utils/app-error.util.js';
 import jwt from 'jsonwebtoken';
@@ -23,7 +23,7 @@ class AuthService {
 		const hashedPassword = await bcrypt.hash(validatedUser.password, 12);
 
 		// register user
-		const user = await this.repo.register({
+		const user = await this.repo.create({
 			name: validatedUser.name,
 			email: validatedUser.email,
 			password: hashedPassword,
@@ -33,6 +33,40 @@ class AuthService {
 			user,
 			accessToken: this.generateAccessToken(user.id),
 			refreshToken: this.generateRefreshToken(user.id),
+		};
+	}
+
+	async login(userData: TLoginInput): Promise<{
+		user: TUserResponse;
+		accessToken: string;
+		refreshToken: string;
+	}> {
+		const DUMMY_HASH = '$2b$10$K9RP.S9f0jNo9NfS9NfS9Oe9Oe9Oe9Oe9Oe9Oe9Oe9Oe9Oe9Oe9Oe';
+
+		// Validate  user data
+		const validatedUser = loginSchema.parse(userData);
+
+		// Check if the user exists
+		const existingUser = await this.repo.findByEmail(validatedUser.email);
+		const hashedPassword = existingUser ? existingUser.password : DUMMY_HASH;
+
+		// Compare the hashed password
+		const validUser = await bcrypt.compare(validatedUser.password, hashedPassword);
+
+		// return error if user is not valid
+		if (!validUser || !existingUser) throw new AppError(401, 'Invalid email or password');
+
+		const user: TUserResponse = {
+			id: existingUser.id,
+			name: existingUser.name,
+			email: existingUser.email,
+			updatedAt: existingUser.updatedAt,
+		};
+
+		return {
+			user,
+			accessToken: this.generateAccessToken(existingUser.id),
+			refreshToken: this.generateRefreshToken(existingUser.id),
 		};
 	}
 

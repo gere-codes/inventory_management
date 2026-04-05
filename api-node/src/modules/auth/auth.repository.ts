@@ -10,12 +10,11 @@ class AuthRepository {
 			id: record.id,
 			name: record.name,
 			email: record.email,
-			createdAt: record.createdAt,
 			updatedAt: record.updatedAt,
 		};
 	}
 
-	public async register(userData: TUserInsert): Promise<TUserResponse> {
+	public async create(userData: TUserInsert): Promise<TUserResponse> {
 		const [user] = await db.insert(users).values(userData).returning();
 
 		if (!user) throw new AppError(400, 'Registration failed: User already exists.');

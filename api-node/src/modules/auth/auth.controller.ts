@@ -20,4 +20,11 @@ export class AuthController {
 		res.cookie(EAuth.REFRESH_TOKEN, refreshToken, this.cookieOptions);
 		return res.status(201).json({ user, accessToken });
 	});
+
+	public login = catchAsync(async (req: Request, res: Response) => {
+		const { user, accessToken, refreshToken } = await this.repo.login(req.body);
+
+		res.cookie(EAuth.REFRESH_TOKEN, refreshToken, this.cookieOptions);
+		return res.status(201).json({ user, accessToken });
+	});
 }

@@ -27,6 +27,13 @@ class AuthController {
 		res.cookie(EAuth.REFRESH_TOKEN, refreshToken, this.cookieOptions);
 		return res.status(201).json({ user, accessToken });
 	});
+
+	public refresh = catchAsync(async (req: Request, res: Response) => {
+		const { accessToken, refreshToken } = await this.repo.refresh(req.user.id);
+
+		res.cookie(EAuth.REFRESH_TOKEN, refreshToken, this.cookieOptions);
+		return res.status(200).json({ accessToken });
+	});
 }
 
 export const authConroller = new AuthController();

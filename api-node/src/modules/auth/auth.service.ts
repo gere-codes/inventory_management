@@ -70,7 +70,12 @@ class AuthService {
 		};
 	}
 
-	async refresh(userId: string) {}
+	async refresh(userId: string) {
+		if (!userId) throw new AppError(401, 'Unauthorized');
+		const accessToken = this.generateAccessToken(userId);
+		const refreshToken = this.generateRefreshToken(userId);
+		return { accessToken, refreshToken };
+	}
 
 	private generateAccessToken(userId: string): string {
 		return jwt.sign({ sub: userId }, env.ACCESS_TOKEN_KEY, { expiresIn: '15m' });

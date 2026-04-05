@@ -3,28 +3,32 @@ import type { Request, Response, NextFunction } from 'express';
 import type { JwtPayload } from 'jsonwebtoken';
 import { authRepository } from './auth.repository.js';
 import jwt from 'jsonwebtoken';
+import { AppError } from '@src/core/utils/app-error.util.js';
+import { catchAsync } from '@src/core/utils/catch-async.util.js';
+import { EAuth } from './auth.enum.js';
 
-export const verifyRefreshToken = async (req: Request, res: Response, next: NextFunction) => {
-	const token = req.cookies?.refreshToken;
-	if (!token) return res.status(401).json({ message: 'No refresh token' });
+export const verifyRefreshToken = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+	const token = req.cookies?.[EAuth.REFRESH_TOKEN];
 
-	try {
-		const refreshToken = req.cookies?.refreshToken;
-		if (!refreshToken) return res.status(401).json({ message: 'Not authorized' });
-
-		const decodedToken = jwt.verify(refreshToken, env.REFRESH_TOKEN_KEY);
-		if (!decodedToken) return res.status(401).json({ message: 'Not authorized' });
-
-		const { sub } = decodedToken as JwtPayload;
-
-		const userId = sub as string;
-		const user = await authRepository.findById(userId);
-
-		if (!user) return res.status(401).json({ message: 'User not found' });
-		req.user = { id: userId };
-
-		next();
-	} catch (err) {
-		return res.status(403).json({ message: 'Refresh token expired or invalid' });
+	// Check if token exists
+	if (!token) {
+		throw new AppError(401, 'No refresh token provided');
 	}
-};
+
+	// Verify Token
+	const decoded = jwt.verify(token, env.REFRESH_TOKEN_KEY) as JwtPayload;
+
+	if (!decoded.sub) {
+		throw new AppError(401, 'Invalid token payload');
+	}
+
+	// check if the user exists
+	const user = await authRepository.findById(decoded.sub);
+	if (!user) {
+		throw new AppError(401, 'User no longer exists');
+	}
+
+	req.user = { id: user.id };
+
+	next();
+});

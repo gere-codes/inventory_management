@@ -6,7 +6,9 @@ function App() {
 
 	return (
 		<>
-			<h1 className="font-bold uppercase">home</h1>
+			<Routes>
+				<Route path="/" element={<h1>Home</h1>} />
+			</Routes>
 		</>
 	);
 }

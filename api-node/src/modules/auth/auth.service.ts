@@ -70,6 +70,8 @@ class AuthService {
 		};
 	}
 
+	async refresh(userId: string) {}
+
 	private generateAccessToken(userId: string): string {
 		return jwt.sign({ sub: userId }, env.ACCESS_TOKEN_KEY, { expiresIn: '15m' });
 	}

@@ -26,6 +26,13 @@ class AuthRepository {
 		const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
 		return user || null;
 	}
+
+	async findById(id: string): Promise<TUserResponse | null> {
+		const [user] = await db.select().from(users).where(eq(users.id, id)).limit(1);
+		if (!user) return null;
+
+		return userSchema.parse(this.format(user));
+	}
 }
 
 export const authRepository = new AuthRepository();

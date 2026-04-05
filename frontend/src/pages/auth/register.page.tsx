@@ -1,5 +1,5 @@
 import { useForm } from 'react-hook-form';
-import { Button, InputField } from '@ui/index';
+import { Button, InputField } from '@/shared/components/ui/index';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type TRegisterFormData, registerchema } from '@/features/auth/auth.schema';
 import { Link } from 'react-router';

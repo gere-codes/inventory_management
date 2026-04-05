@@ -2,6 +2,7 @@ import { useForm } from 'react-hook-form';
 import { Button, InputField } from '@ui/index';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type TRegisterFormData, registerchema } from '@/features/auth/auth.schema';
+import { Link } from 'react-router';
 
 export const RegisterPage = () => {
 	const {
@@ -23,7 +24,7 @@ export const RegisterPage = () => {
 			onSubmit={handleSubmit(onSubmit)}
 			className="max-w-md mx-auto p-6 flex items-center justify-center h-screen"
 		>
-			<div className="flex flex-col gap-4 w-full">
+			<div className="flex flex-col gap-6 w-full">
 				<h2 className="font-bold text-4xl text-center">Register</h2>
 				<InputField
 					{...register('name')}
@@ -58,9 +59,17 @@ export const RegisterPage = () => {
 					placeholder="........"
 					error={errors.confirmPassword?.message as string}
 				/>
-				<Button variant="primary" type="submit">
-					Register
-				</Button>
+				<div>
+					<Button variant="primary" type="submit">
+						Register
+					</Button>
+					<small className="text-sm m-2 text-center  flex justify-center">
+						Already have an account?
+						<Link className="underline underline-offset-4 ml-1" to="/login">
+							Login
+						</Link>
+					</small>
+				</div>
 			</div>
 		</form>
 	);

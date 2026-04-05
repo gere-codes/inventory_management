@@ -9,6 +9,7 @@ const envSchema = z.object({
 	NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
 	ACCESS_TOKEN_KEY: z.string(),
 	REFRESH_TOKEN_KEY: z.string(),
+	allowedOrigins: z.string().transform((val) => val.split(',').map((s) => s.trim())),
 });
 
 const envServer = envSchema.safeParse(process.env);

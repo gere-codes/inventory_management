@@ -10,15 +10,23 @@ import { sql } from 'drizzle-orm';
 
 import apiRoutes from '@routes/index.js';
 import { globalErrorHandler } from '@middlewares/index.js';
+import { apiLimiter, corsOptions } from '@config/index.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors());
-app.use(helmet());
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(
+	helmet({
+		xPoweredBy: false,
+		frameguard: { action: 'deny' },
+	}),
+);
+
+app.use(apiLimiter);
 
 app.get('/health', (req, res) => res.send('OK'));
 

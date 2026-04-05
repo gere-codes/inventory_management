@@ -7,6 +7,6 @@ export const userSchema = object({
 	email: sanitized(z.email('Please enter a valid email address').max(50, 'Email is too long')).transform((email) =>
 		email.trim().toLowerCase(),
 	),
-	createdAt: z.date(),
-	updatedAt: z.date(),
+	createdAt: z.coerce.date().optional(),
+	updatedAt: z.coerce.date(),
 });

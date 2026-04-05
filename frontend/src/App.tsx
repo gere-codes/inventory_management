@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Route, Routes } from 'react-router';
-import { LoginPage } from '@pages/index';
+import { LoginPage, RegisterPage } from '@pages/index';
 
 function App() {
 	const [count, setCount] = useState(0);
@@ -10,6 +10,7 @@ function App() {
 			<Routes>
 				<Route path="/" element={<h1>home</h1>} />
 				<Route path="/login" element={<LoginPage />} />
+				<Route path="/register" element={<RegisterPage />} />
 			</Routes>
 		</>
 	);

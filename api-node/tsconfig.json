@@ -51,6 +51,7 @@
 			"@core/*": ["src/core/*"],
 			"@db/*": ["src/db/*"],
 			"@modules/*": ["src/modules/*"],
+			"@routes/*": ["src/routes/*"],
 
 			"@utils/*": ["src/core/utils/*"],
 			"@middlewares/*": ["src/core/middlewares/*"]

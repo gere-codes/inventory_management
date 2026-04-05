@@ -14,4 +14,5 @@ export const users = pgTable('users', {
 });
 
 export type TUser = typeof users.$inferSelect;
-export type TuserInsert = typeof users.$inferInsert;
+export type TUserResponse = Omit<typeof users.$inferSelect, 'password'>;
+export type TUserInsert = typeof users.$inferInsert;

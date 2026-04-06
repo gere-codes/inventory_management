@@ -6,7 +6,7 @@ export const products = pgTable('products', {
 	id: uuid('id').primaryKey().defaultRandom(),
 	userId: uuid('user_id').references(() => users.id),
 	name: varchar('name', { length: 100 }).notNull(),
-	description: varchar('description', { length: 255 }),
+	description: varchar('description', { length: 1000 }),
 	sku: varchar('sku', { length: 36 }).unique().notNull(),
 	price: decimal('price').default('0.00').notNull(),
 	quantity: integer('quantity').default(1),
@@ -18,4 +18,4 @@ export const products = pgTable('products', {
 });
 
 export type TProduct = typeof products.$inferSelect;
-export type TProductCreate = typeof products.$inferSelect;
+export type TProductCreate = typeof products.$inferInsert;

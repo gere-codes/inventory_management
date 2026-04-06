@@ -7,7 +7,7 @@ export const categories = pgTable('categories', {
 		.references(() => users.id)
 		.notNull(),
 	name: varchar('name', { length: 10 }).notNull(),
-	description: varchar('description', { length: 100 }),
+	description: varchar('description', { length: 225 }),
 	createdAt: timestamp('created_at').defaultNow().notNull(),
 	updatedAt: timestamp('updated_at')
 		.defaultNow()
@@ -15,5 +15,5 @@ export const categories = pgTable('categories', {
 		.$onUpdate(() => new Date()),
 });
 
-export type TCategoryCreate = typeof categories.$inferInsert;
 export type TCategory = typeof categories.$inferSelect;
+export type TCategoryCreate = typeof categories.$inferInsert;

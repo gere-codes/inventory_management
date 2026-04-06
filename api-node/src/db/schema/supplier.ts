@@ -7,7 +7,7 @@ export const suppliers = pgTable('suppliers', {
 	name: varchar('name', { length: 100 }).notNull(),
 	phone: varchar('phone', { length: 36 }),
 	address: varchar('address', { length: 225 }),
-	description: varchar('description', { length: 225 }),
+	description: varchar('description', { length: 1000 }),
 	createdAt: timestamp('created_at').defaultNow().notNull(),
 	updatedAt: timestamp('updated_at')
 		.defaultNow()

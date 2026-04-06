@@ -59,6 +59,26 @@ export const authSlice = createSlice({
 					state.error = 'Login failed';
 				}
 			})
+
+			// logout
+			.addCase(authThunk.logout.pending, (state) => {
+				state.status = 'loading';
+			})
+			.addCase(authThunk.logout.fulfilled, (state) => {
+				state.status = 'succeeded';
+				state.isAuthenticated = false;
+				state.user = {} as TUser;
+			})
+			.addCase(authThunk.logout.rejected, (state, action) => {
+				state.status = 'failed';
+				state.isAuthenticated = false;
+				state.user = {} as TUser;
+
+				if (action.error.message) {
+					state.error = action.payload as string;
+				} else {
+					state.error = 'Logout failed';
+				}
 			});
 	},
 });

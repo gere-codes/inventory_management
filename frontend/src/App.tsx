@@ -13,6 +13,7 @@ function App() {
 					<Route path="/register" element={<RegisterPage />} />
 				</Route>
 
+				{/* Private Routes */}
 				<Route element={<ProtectedRoute />}>
 					<Route path="/" element={<h1>home</h1>} />
 				</Route>

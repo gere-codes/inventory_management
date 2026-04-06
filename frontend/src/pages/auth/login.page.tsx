@@ -3,8 +3,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Link } from 'react-router';
 import { Button, InputField } from '@ui/index';
 import { type TLoginFormData, loginSchema } from '@auth/auth.schema';
-import { useAppDispatch } from '@hooks/index';
+import { useAppDispatch, useAppSelector } from '@hooks/index';
 import { authThunk } from '@auth/store/auth.thunks';
+import { selectAuth } from '@auth/store/auth.selectors';
+import { clearError } from '@auth/store/auth.slice';
 
 export const LoginPage = () => {
 	const {
@@ -17,6 +19,14 @@ export const LoginPage = () => {
 	});
 
 	const dispatch = useAppDispatch();
+
+	const { error: serverError, status } = useAppSelector(selectAuth);
+
+	const handleInputChange = () => {
+		if (serverError) {
+			dispatch(clearError());
+		}
+	};
 
 	const onSubmit = (data: TLoginFormData) => {
 		dispatch(authThunk.login(data));
@@ -36,6 +46,7 @@ export const LoginPage = () => {
 					type="email"
 					placeholder="your@mail.com"
 					error={errors.email?.message as string}
+					onChange={handleInputChange}
 				/>
 
 				<InputField
@@ -45,12 +56,20 @@ export const LoginPage = () => {
 					type="password"
 					placeholder="........"
 					error={errors.password?.message as string}
+					onChange={handleInputChange}
 				/>
 				<div>
-					<Button variant="primary" type="submit">
-						Login
-					</Button>
-					<small className="text-sm m-2 text-center  flex justify-center">
+					<div className="relative">
+						<Button variant="primary" type="submit">
+							Login
+						</Button>
+						{serverError && (
+							<small className="text-red-600 absolute -bottom-4 left-0 text-center w-full">
+								{serverError.message}
+							</small>
+						)}
+					</div>
+					<small className="text-sm m-2 text-center  flex justify-center mt-4">
 						Don't have an account?
 						<Link className="underline underline-offset-4 ml-1" to="/register">
 							Register

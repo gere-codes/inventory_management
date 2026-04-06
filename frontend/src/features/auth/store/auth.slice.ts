@@ -6,7 +6,7 @@ export type AuthState = {
 	user: TUser;
 	isAuthenticated: boolean;
 	status: 'idle' | 'loading' | 'succeeded' | 'failed';
-	error: string | null;
+	error: any;
 };
 
 const initialState: AuthState = {
@@ -19,7 +19,11 @@ const initialState: AuthState = {
 export const authSlice = createSlice({
 	name: 'auth',
 	initialState,
-	reducers: {},
+	reducers: {
+		clearError: (state) => {
+			state.error = null;
+		},
+	},
 	extraReducers: (builder) => {
 		builder
 			// register
@@ -49,6 +53,7 @@ export const authSlice = createSlice({
 				state.user = action.payload;
 				state.isAuthenticated = true;
 				state.status = 'succeeded';
+				state.error = null;
 			})
 			.addCase(authThunk.login.rejected, (state, action) => {
 				state.status = 'failed';
@@ -82,3 +87,5 @@ export const authSlice = createSlice({
 			});
 	},
 });
+
+export const { clearError } = authSlice.actions;

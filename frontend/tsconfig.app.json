@@ -25,19 +25,25 @@
 		"noUncheckedSideEffectImports": true,
 
 		/* Alias paths */
-		"baseUrl": ".",
+		"baseUrl": "./src",
 		"paths": {
-			"@/*": ["./src/*"],
-			"@pages/*": ["./src/pages/*"],
+			// Root
+			"@/*": ["./*"],
+
+			// Pages
+			"@pages/*": ["./pages/*"],
 
 			// Shared
-			"@shared/*": ["./src/shared/*"],
-			"@ui/*": ["./src/shared/components/ui/*"],
-			"@common/*": ["./src/shared/components/common/*"],
-			"@api/*": ["./src/shared/api/*"],
+			"@ui/*": ["./shared/components/ui/*"],
+			"@common/*": ["./shared/components/common/*"],
+			"@api/*": ["./shared/api/*"],
+			"@hooks/*": ["./shared/hooks/*"],
+			"@utils/*": ["./shared/utils/*"],
 
 			// Features
-			"@features/*": ["./src/features/*"]
+			"@auth/*": ["./features/auth/*"],
+			"@user/*": ["./features/user/*"],
+			"@dashboard/*": ["./features/dashboard/*"]
 		}
 	},
 	"include": ["src"]

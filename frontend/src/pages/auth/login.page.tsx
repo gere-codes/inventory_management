@@ -1,8 +1,10 @@
 import { useForm } from 'react-hook-form';
-import { Button, InputField } from '@/shared/components/ui/index';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { type TLoginFormData, loginSchema } from '@/features/auth/auth.schema';
 import { Link } from 'react-router';
+import { Button, InputField } from '@ui/index';
+import { type TLoginFormData, loginSchema } from '@auth/auth.schema';
+import { useAppDispatch } from '@hooks/index';
+import { authThunk } from '@auth/store/auth.thunks';
 
 export const LoginPage = () => {
 	const {
@@ -14,7 +16,11 @@ export const LoginPage = () => {
 		mode: 'all',
 	});
 
-	const onSubmit = (data: TLoginFormData) => {};
+	const dispatch = useAppDispatch();
+
+	const onSubmit = (data: TLoginFormData) => {
+		dispatch(authThunk.login(data));
+	};
 
 	return (
 		<form

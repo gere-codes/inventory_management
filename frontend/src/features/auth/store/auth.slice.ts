@@ -39,6 +39,26 @@ export const authSlice = createSlice({
 				} else {
 					state.error = 'Register failed';
 				}
+			})
+
+			// login
+			.addCase(authThunk.login.pending, (state) => {
+				state.status = 'loading';
+			})
+			.addCase(authThunk.login.fulfilled, (state, action) => {
+				state.user = action.payload;
+				state.isAuthenticated = true;
+				state.status = 'succeeded';
+			})
+			.addCase(authThunk.login.rejected, (state, action) => {
+				state.status = 'failed';
+				state.isAuthenticated = false;
+				if (action.error.message) {
+					state.error = action.payload as string;
+				} else {
+					state.error = 'Login failed';
+				}
+			})
 			});
 	},
 });

@@ -14,10 +14,7 @@ export const LoginPage = () => {
 		mode: 'all',
 	});
 
-	console.log(errors);
-	const onSubmit = (data: TLoginFormData) => {
-		console.log('Form data:', data);
-	};
+	const onSubmit = (data: TLoginFormData) => {};
 
 	return (
 		<form

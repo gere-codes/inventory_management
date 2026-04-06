@@ -43,7 +43,10 @@
 			// Features
 			"@auth/*": ["./features/auth/*"],
 			"@user/*": ["./features/user/*"],
-			"@dashboard/*": ["./features/dashboard/*"]
+			"@dashboard/*": ["./features/dashboard/*"],
+
+			// Store
+			"@store/*": ["./store/*"]
 		}
 	},
 	"include": ["src"]

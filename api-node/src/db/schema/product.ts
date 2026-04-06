@@ -9,8 +9,10 @@ export const products = pgTable('products', {
 	description: varchar('description', { length: 1000 }),
 	sku: varchar('sku', { length: 36 }).unique().notNull(),
 	price: decimal('price').default('0.00').notNull(),
-	quantity: integer('quantity').default(1),
-	categoryId: uuid('category_id').references(() => categories.id),
+	quantity: integer('quantity').default(1).notNull(),
+	categoryId: uuid('category_id')
+		.references(() => categories.id)
+		.notNull(),
 	createdAt: timestamp('created_at').defaultNow().notNull(),
 	updatedAt: timestamp('updated_at')
 		.defaultNow()

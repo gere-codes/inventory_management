@@ -14,3 +14,6 @@ export const suppliers = pgTable('suppliers', {
 		.notNull()
 		.$onUpdate(() => new Date()),
 });
+
+export type TSupplier = typeof suppliers.$inferSelect;
+export type TSupplierCreate = typeof suppliers.$inferInsert;

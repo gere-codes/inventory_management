@@ -28,9 +28,15 @@
 		"baseUrl": ".",
 		"paths": {
 			"@/*": ["./src/*"],
-			"@ui/*": ["src/shared/components/ui/*"],
-			"@common/*": ["src/shared/components/common/*"],
 			"@pages/*": ["./src/pages/*"],
+
+			// Shared
+			"@shared/*": ["./src/shared/*"],
+			"@ui/*": ["./src/shared/components/ui/*"],
+			"@common/*": ["./src/shared/components/common/*"],
+			"@api/*": ["./src/shared/api/*"],
+
+			// Features
 			"@features/*": ["./src/features/*"]
 		}
 	},

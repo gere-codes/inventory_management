@@ -3,6 +3,8 @@ import { Button, InputField } from '@/shared/components/ui/index';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type TRegisterFormData, registerchema } from '@/features/auth/auth.schema';
 import { Link } from 'react-router';
+import { useAppDispatch } from '@hooks/index';
+import { authThunk } from '@auth/store/auth.thunks';
 
 export const RegisterPage = () => {
 	const {
@@ -14,9 +16,10 @@ export const RegisterPage = () => {
 		mode: 'all',
 	});
 
-	console.log(errors);
+	const dispatch = useAppDispatch();
+
 	const onSubmit = (data: TRegisterFormData) => {
-		console.log('Form data:', data);
+		dispatch(authThunk.register(data));
 	};
 
 	return (

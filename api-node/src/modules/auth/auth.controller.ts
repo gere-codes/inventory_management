@@ -9,7 +9,7 @@ class AuthController {
 	private repo = authService;
 	private readonly cookieOptions = {
 		httpOnly: true,
-		secure: env.NODE_ENV === 'production',
+		secure: true,
 		sameSite: 'none' as const,
 		maxAge: 365 * 24 * 60 * 60 * 1000,
 	};

@@ -1,16 +1,21 @@
-import { useState } from 'react';
 import { Route, Routes } from 'react-router';
 import { LoginPage, RegisterPage } from '@pages/index';
+import { ProtectedRoute } from './shared/routes/protected.route';
+import { PublicRoute } from './shared/routes/public.route';
 
 function App() {
-	const [count, setCount] = useState(0);
-
 	return (
 		<>
 			<Routes>
-				<Route path="/" element={<h1>home</h1>} />
-				<Route path="/login" element={<LoginPage />} />
-				<Route path="/register" element={<RegisterPage />} />
+				{/* Public Routes */}
+				<Route element={<PublicRoute />}>
+					<Route path="/login" element={<LoginPage />} />
+					<Route path="/register" element={<RegisterPage />} />
+				</Route>
+
+				<Route element={<ProtectedRoute />}>
+					<Route path="/" element={<h1>home</h1>} />
+				</Route>
 			</Routes>
 		</>
 	);

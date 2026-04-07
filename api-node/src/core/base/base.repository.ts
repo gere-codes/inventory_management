@@ -56,17 +56,18 @@ export abstract class BaseRepository<T, TCreate, TUpdate, TTable extends TableWi
 		return results;
 	}
 
-	async getById(userId: string, id: string): Promise<T | null> {
-		const record = await this.db
+	async getById(userId: string, id: string): Promise<T> {
+		const [record] = await this.db
 			.select()
 			.from(this.table as AnyPgTable)
 			.where(and(eq(this.table.id, id), eq(this.table.userId, userId)))
 			.limit(1);
 
-		if (record.length === 0) return null;
+		if (!record) {
+			throw new AppError(404, 'Item not found');
+		}
 
-		const formattedRecord = this.format(record[0]);
-		return this.schema.parse(formattedRecord);
+		return record as T;
 	}
 
 	async create(userId: string, data: TCreate): Promise<T | null> {

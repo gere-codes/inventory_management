@@ -7,6 +7,7 @@ import z, { record } from 'zod';
 export interface IBaseRepository<T, TCreate, TUpdate> {
 	findAll(userId: string): Promise<T[]>;
 	findById(userId: string, id: string): Promise<T | null>;
+	create(userId: string, data: TCreate): Promise<T | null>;
 }
 
 type AnyUserIdColumn = PgColumn<ColumnBaseConfig<'string', string>>;
@@ -61,5 +62,16 @@ export abstract class BaseRepository<T, TCreate, TUpdate, TTable extends TableWi
 
 		const formattedRecord = this.format(record[0]);
 		return this.schema.parse(formattedRecord);
+	}
+
+	async create(userId: string, data: TCreate): Promise<T | null> {
+		const values = { ...data, userId };
+		const [record] = await this.db
+			.insert(this.table as AnyPgTable)
+			.values({ values })
+			.returning();
+
+		if (!record) return null;
+		return this.schema.parse(record);
 	}
 }

@@ -1,8 +1,9 @@
-import { and, eq, type AnyTable, type ColumnBaseConfig } from 'drizzle-orm';
+import { and, desc, eq, sql, type AnyTable, type ColumnBaseConfig } from 'drizzle-orm';
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import type { AnyPgTable, PgColumn, PgTable, PgTableWithColumns } from 'drizzle-orm/pg-core';
 import z from 'zod';
 import { AppError } from '@utils/index.js';
+import type { PaginatedResult } from '../types/general.js';
 
 export interface IBaseRepository<T, TCreate, TUpdate> {
 	findAll(userId: string): Promise<T[]>;
@@ -10,11 +11,14 @@ export interface IBaseRepository<T, TCreate, TUpdate> {
 	create(userId: string, data: TCreate): Promise<T | null>;
 	update(userId: string, id: string, data: TUpdate): Promise<T>;
 	delete(userId: string, id: string): Promise<void>;
+	search(userId: string, term: string, page: number, limit: number): Promise<PaginatedResult<T>>;
+	paginate(userId: string, page?: number, limit?: number): Promise<PaginatedResult<T>>;
 }
 
 type AnyUserIdColumn = PgColumn<ColumnBaseConfig<'string', string>>;
 type AnyIdColumn = PgColumn<ColumnBaseConfig<'string', string>>;
-type TableWithUserId = PgTable<any> & { userId: AnyUserIdColumn; id: AnyIdColumn };
+type AnyCreatedAtColumn = PgColumn<ColumnBaseConfig<'date', string>>;
+type TableWithUserId = PgTable<any> & { userId: AnyUserIdColumn; id: AnyIdColumn; createdAt: AnyCreatedAtColumn };
 
 export abstract class BaseRepository<T, TCreate, TUpdate, TTable extends TableWithUserId> implements IBaseRepository<
 	T,
@@ -42,6 +46,7 @@ export abstract class BaseRepository<T, TCreate, TUpdate, TTable extends TableWi
 	}
 
 	protected abstract format(record: any): T;
+	public abstract search(userId: string, term: string, page: number, limit: number): Promise<PaginatedResult<T>>;
 
 	async findAll(userId: string): Promise<T[]> {
 		const records = (await this.db
@@ -97,5 +102,35 @@ export abstract class BaseRepository<T, TCreate, TUpdate, TTable extends TableWi
 		if (result.length === 0) {
 			throw new AppError(400, 'Item was not found');
 		}
+	}
+
+	async paginate(userId: string, page: number = 1, limit: number = 10): Promise<PaginatedResult<T>> {
+		const offset = (page - 1) * limit;
+
+		const results = await this.db
+			.select()
+			.from(this.table as AnyPgTable)
+			.where(eq(this.table.userId, userId))
+			.orderBy(desc(this.table.createdAt))
+			.limit(limit)
+			.offset(offset);
+
+		const countResult = await this.db
+			.select({ count: sql<number>`count(*)` })
+			.from(this.table as AnyPgTable)
+			.where(eq(this.table.userId, userId));
+
+		const total = countResult[0]?.count ?? 0;
+		const parsedResults = results.map((result) => this.schema.parse(result));
+
+		return {
+			data: parsedResults,
+			pagination: {
+				totalItems: total,
+				currentPage: page,
+				totalPages: Math.ceil(total / limit),
+				itemsPerPage: limit,
+			},
+		};
 	}
 }

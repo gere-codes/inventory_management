@@ -89,7 +89,7 @@ export abstract class BaseRepository<T, TCreate, TUpdate, TTable extends TableWi
 			.returning();
 
 		if (!record) throw new AppError(400, 'Item was not updated');
-		return this.schema.parse(record);
+		return record as T;
 	}
 
 	async delete(userId: string, id: string): Promise<T> {
@@ -125,7 +125,7 @@ export abstract class BaseRepository<T, TCreate, TUpdate, TTable extends TableWi
 		const parsedResults = results.map((result) => this.schema.parse(result));
 
 		return {
-			data: parsedResults,
+			data: results as T[],
 			pagination: {
 				totalItems: total,
 				currentPage: page,

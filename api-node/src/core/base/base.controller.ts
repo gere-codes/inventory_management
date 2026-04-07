@@ -68,4 +68,17 @@ export abstract class BaseController<T, TCreate, TUpdate> implements IBaseContro
 			success: true,
 		});
 	});
+
+	paginate = catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+		const userId = req.user.id;
+		const page: number = Number(req.query.page);
+		const limit = Number(req.query.limit);
+
+		const result = await this.service.paginate(userId, page as number, limit as number);
+
+		res.status(200).json({
+			success: true,
+			data: result,
+		});
+	});
 }

@@ -1,5 +1,6 @@
 import type { IBaseRepository } from './base.repository.js';
 import z from 'zod';
+import type { PaginatedResult } from '../types/general.js';
 
 export interface IBaseService<T, TCreate, TUpdate> {
 	getAll(userId: string): Promise<T[]>;
@@ -57,5 +58,16 @@ export abstract class BaseService<T, TCreate, TUpdate> implements IBaseService<T
 		const deletedItem = await this.repository.delete(userId, id);
 
 		return this.schema.parse(this.format(deletedItem));
+	}
+
+	async paginate(userId: string, page: number, limit: number): Promise<PaginatedResult<T>> {
+		const { data, pagination } = await this.repository.paginate(userId, page, limit);
+		const formattedData = data.map((item) => this.format(item));
+		const responseData = z.array(this.schema).parse(formattedData);
+
+		return {
+			data: responseData,
+			pagination,
+		};
 	}
 }

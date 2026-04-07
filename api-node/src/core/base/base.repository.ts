@@ -10,7 +10,7 @@ export interface IBaseRepository<T, TCreate, TUpdate> {
 	getById(userId: string, id: string): Promise<T | null>;
 	create(userId: string, data: TCreate): Promise<T | null>;
 	update(userId: string, id: string, data: TUpdate): Promise<T>;
-	delete(userId: string, id: string): Promise<void>;
+	delete(userId: string, id: string): Promise<T>;
 	search(userId: string, term: string, page: number, limit: number): Promise<PaginatedResult<T>>;
 	paginate(userId: string, page?: number, limit?: number): Promise<PaginatedResult<T>>;
 }
@@ -92,7 +92,7 @@ export abstract class BaseRepository<T, TCreate, TUpdate, TTable extends TableWi
 		return this.schema.parse(record);
 	}
 
-	async delete(userId: string, id: string): Promise<void> {
+	async delete(userId: string, id: string): Promise<T> {
 		const result = await this.db
 			.delete(this.table as AnyPgTable)
 			.where(and(eq(this.table.userId, userId), eq(this.table.id, id)))
@@ -101,6 +101,8 @@ export abstract class BaseRepository<T, TCreate, TUpdate, TTable extends TableWi
 		if (result.length === 0) {
 			throw new AppError(400, 'Item was not found');
 		}
+
+		return result[0] as T;
 	}
 
 	async paginate(userId: string, page: number = 1, limit: number = 10): Promise<PaginatedResult<T>> {

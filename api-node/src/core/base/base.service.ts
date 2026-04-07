@@ -5,6 +5,8 @@ export interface IBaseService<T, TCreate, TUpdate> {
 	getAll(userId: string): Promise<T[]>;
 	getById(userId: string, id: string): Promise<T>;
 	create(userId: string, data: TCreate): Promise<T>;
+	update(userId: string, id: string, data: TUpdate): Promise<T>;
+	delete(userId: string, id: string): Promise<T>;
 }
 export abstract class BaseService<T, TCreate, TUpdate> implements IBaseService<T, TCreate, TUpdate> {
 	protected repository: IBaseRepository<T, TCreate, TUpdate>;
@@ -49,5 +51,11 @@ export abstract class BaseService<T, TCreate, TUpdate> implements IBaseService<T
 	async update(id: string, userId: string, data: TUpdate): Promise<T> {
 		const result = await this.repository.update(id, userId, data);
 		return this.schema.parse(this.format(result));
+	}
+
+	async delete(userId: string, id: string): Promise<T> {
+		const deletedItem = await this.repository.delete(userId, id);
+
+		return this.schema.parse(this.format(deletedItem));
 	}
 }

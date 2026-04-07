@@ -6,6 +6,8 @@ export interface IBaseController<T, TCreate, TUpdate> {
 	getAll(req: Request, res: Response, next: NextFunction): void;
 	getById(req: Request, res: Response, next: NextFunction): void;
 	create(req: Request, res: Response, next: NextFunction): void;
+	update(req: Request, res: Response, next: NextFunction): void;
+	delete(req: Request, res: Response, next: NextFunction): void;
 }
 
 export abstract class BaseController<T, TCreate, TUpdate> implements IBaseController<T, TCreate, TUpdate> {
@@ -54,6 +56,16 @@ export abstract class BaseController<T, TCreate, TUpdate> implements IBaseContro
 		res.status(201).json({
 			success: true,
 			data: result,
+		});
+	});
+
+	delete = catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+		const userId = req.user.id;
+		const id = req.params?.id as string;
+		await this.service.delete(userId, id);
+
+		res.status(200).json({
+			success: true,
 		});
 	});
 }

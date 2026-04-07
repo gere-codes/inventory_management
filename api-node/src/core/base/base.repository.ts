@@ -6,8 +6,8 @@ import { AppError } from '@utils/index.js';
 import type { PaginatedResult } from '../types/general.js';
 
 export interface IBaseRepository<T, TCreate, TUpdate> {
-	findAll(userId: string): Promise<T[]>;
-	findById(userId: string, id: string): Promise<T | null>;
+	getAll(userId: string): Promise<T[]>;
+	getById(userId: string, id: string): Promise<T | null>;
 	create(userId: string, data: TCreate): Promise<T | null>;
 	update(userId: string, id: string, data: TUpdate): Promise<T>;
 	delete(userId: string, id: string): Promise<void>;
@@ -48,17 +48,15 @@ export abstract class BaseRepository<T, TCreate, TUpdate, TTable extends TableWi
 	protected abstract format(record: any): T;
 	public abstract search(userId: string, term: string, page: number, limit: number): Promise<PaginatedResult<T>>;
 
-	async findAll(userId: string): Promise<T[]> {
-		const records = (await this.db
+	async getAll(userId: string): Promise<T[]> {
+		const results = (await this.db
 			.select()
 			.from(this.table as AnyPgTable)
 			.where(eq(this.table.userId, userId))) as T[];
-
-		const formattedRecords = records.map((rec) => this.format(rec));
-		return z.array(this.schema).parse(formattedRecords);
+		return results;
 	}
 
-	async findById(userId: string, id: string): Promise<T | null> {
+	async getById(userId: string, id: string): Promise<T | null> {
 		const record = await this.db
 			.select()
 			.from(this.table as AnyPgTable)

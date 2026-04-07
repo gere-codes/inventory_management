@@ -45,4 +45,9 @@ export abstract class BaseService<T, TCreate, TUpdate> implements IBaseService<T
 
 		return this.schema.parse(this.format(result));
 	}
+
+	async update(id: string, userId: string, data: TUpdate): Promise<T> {
+		const result = await this.repository.update(id, userId, data);
+		return this.schema.parse(this.format(result));
+	}
 }

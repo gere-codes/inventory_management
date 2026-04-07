@@ -43,4 +43,17 @@ export abstract class BaseController<T, TCreate, TUpdate> implements IBaseContro
 			data: result,
 		});
 	});
+
+	update = catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+		const userId = req.user.id;
+		const id = req.params?.id as string;
+		const { body } = req;
+
+		const result = await this.service.update(userId, id, body);
+
+		res.status(201).json({
+			success: true,
+			data: result,
+		});
+	});
 }

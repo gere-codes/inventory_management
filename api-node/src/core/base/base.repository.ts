@@ -9,6 +9,7 @@ export interface IBaseRepository<T, TCreate, TUpdate> {
 	findById(userId: string, id: string): Promise<T | null>;
 	create(userId: string, data: TCreate): Promise<T | null>;
 	update(userId: string, id: string, data: TUpdate): Promise<T>;
+	delete(userId: string, id: string): Promise<void>;
 }
 
 type AnyUserIdColumn = PgColumn<ColumnBaseConfig<'string', string>>;
@@ -85,5 +86,16 @@ export abstract class BaseRepository<T, TCreate, TUpdate, TTable extends TableWi
 
 		if (!record) throw new AppError(400, 'Item was not updated');
 		return this.schema.parse(record);
+	}
+
+	async delete(userId: string, id: string): Promise<void> {
+		const result = await this.db
+			.delete(this.table as AnyPgTable)
+			.where(and(eq(this.table.userId, userId), eq(this.table.id, id)))
+			.returning();
+
+		if (result.length === 0) {
+			throw new AppError(400, 'Item was not found');
+		}
 	}
 }

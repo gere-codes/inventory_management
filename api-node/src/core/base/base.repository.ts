@@ -1,13 +1,14 @@
-import type { PaginatedResult } from '@core/types/index.js';
 import { and, eq, type AnyTable, type ColumnBaseConfig } from 'drizzle-orm';
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import type { AnyPgTable, PgColumn, PgTable, PgTableWithColumns } from 'drizzle-orm/pg-core';
-import z, { record } from 'zod';
+import z from 'zod';
+import { AppError } from '@utils/index.js';
 
 export interface IBaseRepository<T, TCreate, TUpdate> {
 	findAll(userId: string): Promise<T[]>;
 	findById(userId: string, id: string): Promise<T | null>;
 	create(userId: string, data: TCreate): Promise<T | null>;
+	update(userId: string, id: string, data: TUpdate): Promise<T>;
 }
 
 type AnyUserIdColumn = PgColumn<ColumnBaseConfig<'string', string>>;
@@ -71,7 +72,18 @@ export abstract class BaseRepository<T, TCreate, TUpdate, TTable extends TableWi
 			.values({ values })
 			.returning();
 
-		if (!record) return null;
+		if (!record) throw new AppError(400, 'Item was not created');
+		return this.schema.parse(record);
+	}
+
+	async update(userId: string, id: string, data: TUpdate): Promise<T> {
+		const [record] = await this.db
+			.update(this.table as AnyPgTable)
+			.set(data as any)
+			.where(and(eq(this.table.userId, userId), eq(this.table.id, id)))
+			.returning();
+
+		if (!record) throw new AppError(400, 'Item was not updated');
 		return this.schema.parse(record);
 	}
 }

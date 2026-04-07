@@ -5,6 +5,7 @@ import { catchAsync } from '@utils/index.js';
 export interface IBaseController<T, TCreate, TUpdate> {
 	getAll(req: Request, res: Response, next: NextFunction): void;
 	getById(req: Request, res: Response, next: NextFunction): void;
+	create(req: Request, res: Response, next: NextFunction): void;
 }
 
 export abstract class BaseController<T, TCreate, TUpdate> implements IBaseController<T, TCreate, TUpdate> {
@@ -26,6 +27,18 @@ export abstract class BaseController<T, TCreate, TUpdate> implements IBaseContro
 		const result = await this.service.getById(id as string, userId);
 
 		res.status(200).json({
+			success: true,
+			data: result,
+		});
+	});
+
+	create = catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+		const userId = req.user.id;
+		const { body } = req;
+
+		const result = await this.service.create(userId, body);
+
+		res.status(201).json({
 			success: true,
 			data: result,
 		});

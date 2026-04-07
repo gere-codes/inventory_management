@@ -78,7 +78,7 @@ export abstract class BaseRepository<T, TCreate, TUpdate, TTable extends TableWi
 			.returning();
 
 		if (!record) throw new AppError(400, 'Item was not created');
-		return this.schema.parse(record);
+		return record as T;
 	}
 
 	async update(userId: string, id: string, data: TUpdate): Promise<T> {

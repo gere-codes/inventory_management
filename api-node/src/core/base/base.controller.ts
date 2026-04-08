@@ -64,17 +64,18 @@ export abstract class BaseController<T, TCreate, TUpdate> implements IBaseContro
 	delete = catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 		const userId = req.user.id;
 		const id = req.params?.id as string;
-		await this.service.delete(userId, id);
+		const deletedProduct = await this.service.delete(userId, id);
 
 		res.status(200).json({
 			success: true,
+			data: deletedProduct,
 		});
 	});
 
 	paginate = catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-		const userId = req.user.id;
-		const page: number = Number(req.query.page);
-		const limit = Number(req.query.limit);
+		const userId = req.user?.id;
+		const page = Number(req.query.page) || 1;
+		const limit = Number(req.query.limit) || 10;
 
 		const result = await this.service.paginate(userId, page as number, limit as number);
 
@@ -85,12 +86,13 @@ export abstract class BaseController<T, TCreate, TUpdate> implements IBaseContro
 	});
 
 	search = catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-		const userId = req.query.id as string;
-		const page = Number(req.query.page);
-		const limit = Number(req.query.limit);
-		const term = req.query.term as string;
+		const userId = req.user?.id;
+		const page = Number(req.query.page) || 1;
+		const limit = Number(req.query.limit) || 10;
+		const term = (req.query.term as string) || '';
 
 		const result = await this.service.search(userId, term, limit, page);
+
 		res.status(200).json({
 			success: true,
 			data: result,

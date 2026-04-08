@@ -6,8 +6,8 @@ import type { PaginatedResult } from '@src/core/types/general.js';
 import { and, desc, eq, ilike, or, SQL, sql } from 'drizzle-orm';
 import { EProductStatus } from './product.enum.js';
 
-export class ProductRespository extends BaseRepository<TProduct, TProductCreate, TProductUpdate, typeof products> {
-	constructor(db: NodePgDatabase) {
+export class ProductRepository extends BaseRepository<TProduct, TProductCreate, TProductUpdate, typeof products> {
+	constructor(db: NodePgDatabase<any>) {
 		super(products, db);
 	}
 

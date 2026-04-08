@@ -28,20 +28,16 @@ export abstract class BaseService<T, TCreate, TUpdate> implements IBaseService<T
 		this.updateSchema = updateSchema;
 	}
 
-	protected abstract format(record: any): T;
-
 	async getAll(userId: string): Promise<T[]> {
 		const result = await this.repository.getAll(userId);
 
-		const formattedResults = result.map((item) => this.format(item));
-		return z.array(this.schema).parse(formattedResults);
+		return z.array(this.schema).parse(result);
 	}
 
 	async getById(id: string, userId: string): Promise<T> {
 		const result = await this.repository.getById(id, userId);
 
-		const formattedRecord = this.format(result);
-		return this.schema.parse(formattedRecord);
+		return this.schema.parse(result);
 	}
 
 	async create(userId: string, data: TCreate): Promise<T> {
@@ -49,7 +45,7 @@ export abstract class BaseService<T, TCreate, TUpdate> implements IBaseService<T
 
 		const result = await this.repository.create(userId, parsedData);
 
-		return this.schema.parse(this.format(result));
+		return this.schema.parse(result);
 	}
 
 	async update(id: string, userId: string, data: TUpdate): Promise<T> {
@@ -57,19 +53,18 @@ export abstract class BaseService<T, TCreate, TUpdate> implements IBaseService<T
 
 		const result = await this.repository.update(id, userId, parsedData);
 
-		return this.schema.parse(this.format(result));
+		return this.schema.parse(result);
 	}
 
 	async delete(userId: string, id: string): Promise<T> {
 		const deletedItem = await this.repository.delete(userId, id);
 
-		return this.schema.parse(this.format(deletedItem));
+		return this.schema.parse(deletedItem);
 	}
 
 	async paginate(userId: string, page: number, limit: number): Promise<PaginatedResult<T>> {
 		const { data, pagination } = await this.repository.paginate(userId, page, limit);
-		const formattedData = data.map((item) => this.format(item));
-		const responseData = z.array(this.schema).parse(formattedData);
+		const responseData = z.array(this.schema).parse(data);
 
 		return {
 			data: responseData,
@@ -80,8 +75,7 @@ export abstract class BaseService<T, TCreate, TUpdate> implements IBaseService<T
 	async search(userId: string, term: string, page: number, limit: number) {
 		const { data, pagination } = await this.repository.search(userId, term, page, limit);
 
-		const formattedData = data.map((item) => this.format(item));
-		const responseData = z.array(this.schema).parse(formattedData);
+		const responseData = z.array(this.schema).parse(data);
 
 		return {
 			data: responseData,

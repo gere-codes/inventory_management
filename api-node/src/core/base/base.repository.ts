@@ -18,41 +18,36 @@ export interface IBaseRepository<T, TCreate, TUpdate> {
 type AnyUserIdColumn = PgColumn<ColumnBaseConfig<'string', string>>;
 type AnyIdColumn = PgColumn<ColumnBaseConfig<'string', string>>;
 type AnyCreatedAtColumn = PgColumn<ColumnBaseConfig<'date', string>>;
-type TableWithUserId = PgTable<any> & { userId: AnyUserIdColumn; id: AnyIdColumn; createdAt: AnyCreatedAtColumn };
+type TableWithOtherProperties = PgTable<any> & {
+	userId: AnyUserIdColumn;
+	id: AnyIdColumn;
+	createdAt: AnyCreatedAtColumn;
+};
 
-export abstract class BaseRepository<T, TCreate, TUpdate, TTable extends TableWithUserId> implements IBaseRepository<
+export abstract class BaseRepository<
 	T,
 	TCreate,
-	TUpdate
-> {
+	TUpdate,
+	TTable extends TableWithOtherProperties,
+> implements IBaseRepository<T, TCreate, TUpdate> {
 	protected table: TTable;
-	protected schema: z.ZodSchema<T>;
-	protected createSchema: z.ZodSchema<TCreate>;
-	protected updateSchema: z.ZodSchema<TUpdate | Partial<T>>;
 	protected db: NodePgDatabase;
 
-	constructor(
-		table: TTable,
-		schema: z.ZodSchema<T>,
-		createSchema: z.ZodSchema<TCreate>,
-		updateSchema: z.ZodSchema<TUpdate | Partial<T>>,
-		db: NodePgDatabase,
-	) {
+	constructor(table: TTable, db: NodePgDatabase) {
 		this.table = table;
-		this.schema = schema;
-		this.createSchema = createSchema;
-		this.updateSchema = updateSchema;
 		this.db = db;
 	}
 
 	public abstract search(userId: string, term: string, page: number, limit: number): Promise<PaginatedResult<T>>;
+
+	protected abstract format(record: any): T;
 
 	async getAll(userId: string): Promise<T[]> {
 		const results = (await this.db
 			.select()
 			.from(this.table as AnyPgTable)
 			.where(eq(this.table.userId, userId))) as T[];
-		return results;
+		return results.map((result) => this.format(result));
 	}
 
 	async getById(userId: string, id: string): Promise<T> {
@@ -66,7 +61,7 @@ export abstract class BaseRepository<T, TCreate, TUpdate, TTable extends TableWi
 			throw new AppError(404, 'Item not found');
 		}
 
-		return record as T;
+		return this.format(record);
 	}
 
 	async create(userId: string, data: TCreate): Promise<T | null> {
@@ -77,7 +72,7 @@ export abstract class BaseRepository<T, TCreate, TUpdate, TTable extends TableWi
 			.returning();
 
 		if (!record) throw new AppError(400, 'Item was not created');
-		return record as T;
+		return this.format(record);
 	}
 
 	async update(userId: string, id: string, data: TUpdate): Promise<T> {
@@ -92,16 +87,16 @@ export abstract class BaseRepository<T, TCreate, TUpdate, TTable extends TableWi
 	}
 
 	async delete(userId: string, id: string): Promise<T> {
-		const result = await this.db
+		const [result] = await this.db
 			.delete(this.table as AnyPgTable)
 			.where(and(eq(this.table.userId, userId), eq(this.table.id, id)))
 			.returning();
 
-		if (result.length === 0) {
+		if (!result) {
 			throw new AppError(400, 'Item was not found');
 		}
 
-		return result[0] as T;
+		return this.format(result);
 	}
 
 	async paginate(userId: string, page: number = 1, limit: number = 10): Promise<PaginatedResult<T>> {
@@ -121,10 +116,9 @@ export abstract class BaseRepository<T, TCreate, TUpdate, TTable extends TableWi
 			.where(eq(this.table.userId, userId));
 
 		const total = countResult[0]?.count ?? 0;
-		const parsedResults = results.map((result) => this.schema.parse(result));
 
 		return {
-			data: results as T[],
+			data: results.map((result) => this.format(result)),
 			pagination: {
 				totalItems: total,
 				currentPage: page,

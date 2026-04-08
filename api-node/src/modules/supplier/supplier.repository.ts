@@ -1,0 +1,22 @@
+import { BaseRepository } from '@src/core/base/base.repository.js';
+import type { TSupplier, TSupplierCreate, TSupplierUpdate } from './supplier.schema.js';
+import { suppliers } from '@src/db/index.js';
+import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
+
+export class SupplierRepository extends BaseRepository<TSupplier, TSupplierCreate, TSupplierUpdate, typeof suppliers> {
+	constructor(db: NodePgDatabase<any>) {
+		super(suppliers, db);
+	}
+
+	protected format(record: any): TSupplier {
+		return {
+			id: record.id,
+			name: record.name,
+			phone: record.phone,
+			description: record.description,
+			address: record.address,
+			updatedAt: record.updated_at,
+			createdAt: record.created_at,
+		};
+	}
+}

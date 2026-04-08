@@ -19,47 +19,4 @@ export class CategoryRepository extends BaseRepository<TCategory, TCategoryCreat
 			updatedAt: record.updatedAt,
 		};
 	}
-
-	public async search(
-		userId: string,
-		term: string,
-		page: number,
-		limit: number,
-	): Promise<PaginatedResult<TCategory>> {
-		const offset = (page - 1) * limit;
-
-		const conditions: (SQL | undefined)[] = [eq(this.table.userId, userId)];
-
-		const trimmedTerm = term.trim();
-		if (term?.trim()) {
-			conditions.push(ilike(this.table.name, `%${trimmedTerm}%`));
-		}
-
-		const whereConditions = and(...conditions);
-
-		const rows = await this.db
-			.select()
-			.from(this.table)
-			.where(whereConditions)
-			.orderBy(desc(this.table.createdAt))
-			.limit(limit)
-			.offset(offset);
-
-		const countResult = await this.db
-			.select({ count: sql<number>`cast(count(*) as integer)` })
-			.from(this.table)
-			.where(whereConditions);
-
-		const total = countResult[0]?.count ?? 0;
-
-		return {
-			data: rows.map((row) => this.format(row)),
-			pagination: {
-				totalItems: total,
-				currentPage: page,
-				totalPages: Math.ceil(total / limit),
-				itemsPerPage: limit,
-			},
-		};
-	}
 }

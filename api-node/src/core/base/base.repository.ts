@@ -1,4 +1,4 @@
-import { and, desc, eq, sql, type AnyTable, type ColumnBaseConfig } from 'drizzle-orm';
+import { and, desc, eq, ilike, SQL, sql, type AnyTable, type ColumnBaseConfig } from 'drizzle-orm';
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import type { AnyPgTable, PgColumn, PgTable, PgTableWithColumns } from 'drizzle-orm/pg-core';
 import z from 'zod';
@@ -18,10 +18,13 @@ export interface IBaseRepository<T, TCreate, TUpdate> {
 type AnyUserIdColumn = PgColumn<ColumnBaseConfig<'string', string>>;
 type AnyIdColumn = PgColumn<ColumnBaseConfig<'string', string>>;
 type AnyCreatedAtColumn = PgColumn<ColumnBaseConfig<'date', string>>;
+type AnyNameColumn = PgColumn<ColumnBaseConfig<'string', string>>;
+
 type TableWithOtherProperties = PgTable<any> & {
 	userId: AnyUserIdColumn;
 	id: AnyIdColumn;
 	createdAt: AnyCreatedAtColumn;
+	name: AnyNameColumn;
 };
 
 export abstract class BaseRepository<
@@ -38,15 +41,14 @@ export abstract class BaseRepository<
 		this.db = db;
 	}
 
-	public abstract search(userId: string, term: string, page: number, limit: number): Promise<PaginatedResult<T>>;
-
 	protected abstract format(record: any): T;
 
 	async getAll(userId: string): Promise<T[]> {
-		const results = (await this.db
+		const results = await this.db
 			.select()
 			.from(this.table as AnyPgTable)
-			.where(eq(this.table.userId, userId))) as T[];
+			.where(eq(this.table.userId, userId));
+
 		return results.map((result) => this.format(result));
 	}
 
@@ -119,6 +121,44 @@ export abstract class BaseRepository<
 
 		return {
 			data: results.map((result) => this.format(result)),
+			pagination: {
+				totalItems: total,
+				currentPage: page,
+				totalPages: Math.ceil(total / limit),
+				itemsPerPage: limit,
+			},
+		};
+	}
+
+	public async search(userId: string, term: string, page: number, limit: number): Promise<PaginatedResult<T>> {
+		const offset = (page - 1) * limit;
+
+		const conditions: (SQL | undefined)[] = [eq(this.table.userId, userId)];
+
+		const trimmedTerm = term.trim();
+		if (term?.trim()) {
+			conditions.push(ilike(this.table.name, `%${trimmedTerm}%`));
+		}
+
+		const whereConditions = and(...conditions);
+
+		const rows = await this.db
+			.select()
+			.from(this.table as AnyPgTable)
+			.where(whereConditions)
+			.orderBy(desc(this.table.createdAt))
+			.limit(limit)
+			.offset(offset);
+
+		const countResult = await this.db
+			.select({ count: sql<number>`cast(count(*) as integer)` })
+			.from(this.table as AnyPgTable)
+			.where(whereConditions);
+
+		const total = countResult[0]?.count ?? 0;
+
+		return {
+			data: rows.map((row) => this.format(row)),
 			pagination: {
 				totalItems: total,
 				currentPage: page,

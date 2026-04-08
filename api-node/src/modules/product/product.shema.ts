@@ -18,4 +18,8 @@ export const productSchema = productCreateSchema.extend({
 	createdAt: z.coerce.date(),
 	updatedAt: z.coerce.date(),
 });
-export const productUpdateSchema = productCreateSchema.partial;
+export const productUpdateSchema = productCreateSchema.partial();
+
+export type TProduct = z.infer<typeof productSchema>;
+export type TProductCreate = z.infer<typeof productCreateSchema>;
+export type TProductUpdate = z.infer<typeof productUpdateSchema>;

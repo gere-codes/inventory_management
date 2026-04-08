@@ -18,6 +18,3 @@ export const products = pgTable('products', {
 		.defaultNow()
 		.$onUpdate(() => new Date()),
 });
-
-export type TProduct = typeof products.$inferSelect;
-export type TProductCreate = typeof products.$inferInsert;

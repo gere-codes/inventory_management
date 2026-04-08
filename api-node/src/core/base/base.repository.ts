@@ -45,7 +45,6 @@ export abstract class BaseRepository<T, TCreate, TUpdate, TTable extends TableWi
 		this.db = db;
 	}
 
-	protected abstract format(record: any): T;
 	public abstract search(userId: string, term: string, page: number, limit: number): Promise<PaginatedResult<T>>;
 
 	async getAll(userId: string): Promise<T[]> {

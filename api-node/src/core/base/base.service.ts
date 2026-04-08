@@ -14,13 +14,13 @@ export abstract class BaseService<T, TCreate, TUpdate> implements IBaseService<T
 	protected repository: IBaseRepository<T, TCreate, TUpdate>;
 	protected schema: z.ZodSchema<T>;
 	protected createSchema: z.ZodSchema<TCreate>;
-	protected updateSchema: z.ZodSchema<TUpdate | Partial<T>>;
+	protected updateSchema: z.ZodSchema<TUpdate>;
 
 	constructor(
 		repository: IBaseRepository<T, TCreate, TUpdate>,
 		schema: z.ZodSchema<T>,
 		createSchema: z.ZodSchema<TCreate>,
-		updateSchema: z.ZodSchema<TUpdate | Partial<T>>,
+		updateSchema: z.ZodSchema<TUpdate>,
 	) {
 		this.repository = repository;
 		this.schema = schema;
@@ -45,13 +45,18 @@ export abstract class BaseService<T, TCreate, TUpdate> implements IBaseService<T
 	}
 
 	async create(userId: string, data: TCreate): Promise<T> {
-		const result = await this.repository.create(userId, data);
+		const parsedData = await this.createSchema.parseAsync(data);
+
+		const result = await this.repository.create(userId, parsedData);
 
 		return this.schema.parse(this.format(result));
 	}
 
 	async update(id: string, userId: string, data: TUpdate): Promise<T> {
-		const result = await this.repository.update(id, userId, data);
+		const parsedData = await this.updateSchema.parseAsync(data);
+
+		const result = await this.repository.update(id, userId, parsedData);
+
 		return this.schema.parse(this.format(result));
 	}
 

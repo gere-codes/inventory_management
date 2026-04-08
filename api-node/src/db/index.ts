@@ -3,7 +3,6 @@ import pkg from 'pg';
 const { Pool } = pkg;
 import schema from './schema/index.js';
 
-// import * as schema from './schema.js';
 import { env } from '@config/env.js';
 
 const pool = new Pool({

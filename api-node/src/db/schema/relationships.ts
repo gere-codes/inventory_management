@@ -35,3 +35,6 @@ export const supplierRelations = relations(suppliers, ({ one, many }) => ({
 		references: [users.id],
 	}),
 }));
+
+const relationships = { userRelations, productRelations, supplierRelations, categoryRelations };
+export default relationships;

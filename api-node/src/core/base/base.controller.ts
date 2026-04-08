@@ -8,6 +8,8 @@ export interface IBaseController<T, TCreate, TUpdate> {
 	create(req: Request, res: Response, next: NextFunction): void;
 	update(req: Request, res: Response, next: NextFunction): void;
 	delete(req: Request, res: Response, next: NextFunction): void;
+	paginate(req: Request, res: Response, next: NextFunction): void;
+	search(req: Request, res: Response, next: NextFunction): void;
 }
 
 export abstract class BaseController<T, TCreate, TUpdate> implements IBaseController<T, TCreate, TUpdate> {
@@ -76,6 +78,19 @@ export abstract class BaseController<T, TCreate, TUpdate> implements IBaseContro
 
 		const result = await this.service.paginate(userId, page as number, limit as number);
 
+		res.status(200).json({
+			success: true,
+			data: result,
+		});
+	});
+
+	search = catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+		const userId = req.query.id as string;
+		const page = Number(req.query.page);
+		const limit = Number(req.query.limit);
+		const term = req.query.term as string;
+
+		const result = await this.service.search(userId, term, limit, page);
 		res.status(200).json({
 			success: true,
 			data: result,

@@ -8,6 +8,7 @@ export interface IBaseService<T, TCreate, TUpdate> {
 	create(userId: string, data: TCreate): Promise<T>;
 	update(userId: string, id: string, data: TUpdate): Promise<T>;
 	delete(userId: string, id: string): Promise<T>;
+	paginate(userId: string, page: number, limit: number): Promise<PaginatedResult<T>>;
 }
 export abstract class BaseService<T, TCreate, TUpdate> implements IBaseService<T, TCreate, TUpdate> {
 	protected repository: IBaseRepository<T, TCreate, TUpdate>;
@@ -62,6 +63,18 @@ export abstract class BaseService<T, TCreate, TUpdate> implements IBaseService<T
 
 	async paginate(userId: string, page: number, limit: number): Promise<PaginatedResult<T>> {
 		const { data, pagination } = await this.repository.paginate(userId, page, limit);
+		const formattedData = data.map((item) => this.format(item));
+		const responseData = z.array(this.schema).parse(formattedData);
+
+		return {
+			data: responseData,
+			pagination,
+		};
+	}
+
+	async search(userId: string, term: string, page: number, limit: number) {
+		const { data, pagination } = await this.repository.search(userId, term, page, limit);
+
 		const formattedData = data.map((item) => this.format(item));
 		const responseData = z.array(this.schema).parse(formattedData);
 

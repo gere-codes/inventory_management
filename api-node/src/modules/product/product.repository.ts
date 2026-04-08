@@ -35,12 +35,14 @@ export class ProductRepository extends BaseRepository<TProduct, TProductCreate, 
 
 	public async search(userId: string, term: string, page: number, limit: number): Promise<PaginatedResult<TProduct>> {
 		const offset = (page - 1) * limit;
-		let whereConditions = eq(this.table.userId, userId);
 
-		if (term && term.trim() !== '') {
-			const searchConditions = or(ilike(this.table.name, `%${term}%`), ilike(this.table.sku, `%${term}%`));
-			whereConditions = and(whereConditions, searchConditions) as SQL;
+		const conditions: (SQL | undefined)[] = [eq(this.table.userId, userId)];
+
+		if (term?.trim()) {
+			conditions.push(or(ilike(this.table.name, `%${term}%`), ilike(this.table.sku, `%${term}%`)));
 		}
+
+		const whereConditions = and(...conditions);
 
 		const rows = await this.db
 			.select()
@@ -57,9 +59,9 @@ export class ProductRepository extends BaseRepository<TProduct, TProductCreate, 
 			.where(whereConditions);
 
 		const total = countResult[0]?.count ?? 0;
-		const data = rows.map((row) => this.format(row));
+
 		return {
-			data,
+			data: rows.map((row) => this.format(row)),
 			pagination: {
 				totalItems: total,
 				currentPage: page,

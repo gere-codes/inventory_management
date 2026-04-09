@@ -3,24 +3,38 @@ import { Button, InputField } from '@/shared/components/ui/index';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type TRegisterFormData, registerchema } from '@/features/auth/auth.schema';
 import { Link } from 'react-router';
-import { useAppDispatch } from '@hooks/index';
+import { useAppDispatch, useAppSelector } from '@hooks/index';
 import { authThunk } from '@auth/store/auth.thunks';
+import { useEffect } from 'react';
+import { selectAuth } from '@/features/auth/store/auth.selectors';
+import { clearError } from '@/features/auth/store/auth.slice';
 
 export const RegisterPage = () => {
 	const {
 		register,
 		handleSubmit,
 		formState: { errors },
+		watch,
 	} = useForm<TRegisterFormData>({
 		resolver: zodResolver(registerchema),
 		mode: 'all',
 	});
+
+	const { error: serverError, status } = useAppSelector(selectAuth);
 
 	const dispatch = useAppDispatch();
 
 	const onSubmit = (data: TRegisterFormData) => {
 		dispatch(authThunk.register(data));
 	};
+
+	const values = watch();
+
+	useEffect(() => {
+		if (serverError) {
+			dispatch(clearError());
+		}
+	}, [values.email, values.password, values.confirmPassword, values.name]);
 
 	return (
 		<form

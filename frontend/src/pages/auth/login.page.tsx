@@ -1,4 +1,5 @@
-import { useForm } from 'react-hook-form';
+import { useEffect } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link } from 'react-router';
 import { Button, InputField } from '@ui/index';
@@ -12,6 +13,7 @@ export const LoginPage = () => {
 	const {
 		register,
 		handleSubmit,
+		watch,
 		formState: { errors },
 	} = useForm<TLoginFormData>({
 		resolver: zodResolver(loginSchema),
@@ -22,15 +24,17 @@ export const LoginPage = () => {
 
 	const { error: serverError, status } = useAppSelector(selectAuth);
 
-	const handleInputChange = () => {
-		if (serverError) {
-			dispatch(clearError());
-		}
-	};
-
 	const onSubmit = (data: TLoginFormData) => {
 		dispatch(authThunk.login(data));
 	};
+
+	const values = watch();
+
+	useEffect(() => {
+		if (serverError) {
+			dispatch(clearError());
+		}
+	}, [values.email, values.password]);
 
 	return (
 		<form
@@ -46,7 +50,6 @@ export const LoginPage = () => {
 					type="email"
 					placeholder="your@mail.com"
 					error={errors.email?.message as string}
-					onChange={handleInputChange}
 				/>
 
 				<InputField
@@ -56,7 +59,6 @@ export const LoginPage = () => {
 					type="password"
 					placeholder="........"
 					error={errors.password?.message as string}
-					onChange={handleInputChange}
 				/>
 				<div>
 					<div className="relative">

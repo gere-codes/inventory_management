@@ -3,6 +3,7 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
 
 import { env } from '@config/env.js';
 import { db, closeConnection } from '@db/index.js';
@@ -25,6 +26,7 @@ app.use(
 		frameguard: { action: 'deny' },
 	}),
 );
+app.use(cookieParser());
 
 app.use(apiLimiter);
 

@@ -18,8 +18,8 @@ export const ProductsPage = () => {
 		fetchCategories();
 	}, []);
 	return (
-		<div>
+		<section>
 			<h1>Home page</h1>
-		</div>
+		</section>
 	);
 };

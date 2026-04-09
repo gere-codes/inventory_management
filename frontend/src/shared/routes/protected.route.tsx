@@ -1,6 +1,7 @@
 import { Navigate, Outlet } from 'react-router';
 import { useAppSelector } from '@hooks/index';
 import { selectAuth } from '@auth/store/auth.selectors';
+import { MainLayout } from '@common/index';
 
 export const ProtectedRoute = () => {
 	const { isAuthenticated, user, status } = useAppSelector(selectAuth);
@@ -16,8 +17,8 @@ export const ProtectedRoute = () => {
 
 	// if authenticated, render the child routes
 	return (
-		<>
+		<MainLayout>
 			<Outlet />
-		</>
+		</MainLayout>
 	);
 };

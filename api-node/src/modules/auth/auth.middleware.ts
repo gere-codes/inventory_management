@@ -33,7 +33,7 @@ export const verifyRefreshToken = catchAsync(async (req: Request, res: Response,
 });
 
 // a middleware that authenticate a user
-export const protect = async (req: Request, res: Response, next: NextFunction) => {
+export const protect = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 	const authHeader = req.headers.authorization;
 
 	if (!authHeader || !authHeader.startsWith('Bearer')) {
@@ -63,4 +63,4 @@ export const protect = async (req: Request, res: Response, next: NextFunction) =
 	req.user = { id: userId };
 
 	next();
-};
+});

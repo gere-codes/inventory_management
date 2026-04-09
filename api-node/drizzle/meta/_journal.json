@@ -15,6 +15,13 @@
       "when": 1775504380027,
       "tag": "0001_cute_union_jack",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1775761850731,
+      "tag": "0002_certain_mesmero",
+      "breakpoints": true
     }
   ]
 }

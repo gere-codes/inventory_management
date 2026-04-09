@@ -8,7 +8,7 @@ export const ProductsPage = () => {
 	useEffect(() => {
 		const fetchCategories = async () => {
 			try {
-				const { data } = await privateInstance.get('/category');
+				const { data } = await privateInstance.get('/product');
 				console.log(data?.data, 'categories');
 			} catch (error) {
 				console.log(error);

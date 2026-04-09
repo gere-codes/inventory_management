@@ -3,6 +3,7 @@ import { productController } from './product.controller.js';
 
 const productRoutes = Router();
 
+productRoutes.get('/', productController.getAll);
 productRoutes.get('/paginate', productController.paginate);
 productRoutes.post('/', productController.create);
 productRoutes.put('/:id', productController.update);

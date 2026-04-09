@@ -11,3 +11,5 @@ class CategoryController extends BaseController<TCategory, TCategoryCreate, TCat
 		super(service);
 	}
 }
+
+export const categoryController = new CategoryController();

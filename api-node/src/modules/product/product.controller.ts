@@ -12,3 +12,5 @@ class ProductController extends BaseController<TProduct, TProductCreate, TProduc
 		super(productService);
 	}
 }
+
+export const productController = new ProductController();

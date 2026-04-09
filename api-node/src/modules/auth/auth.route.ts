@@ -7,5 +7,5 @@ export const authRoutes = Router();
 
 authRoutes.post('/register', authLimiter, authConroller.register);
 authRoutes.post('/login', authLimiter, authConroller.login);
-authRoutes.get('/refresh', verifyRefreshToken, authConroller.refresh);
+authRoutes.post('/refresh', verifyRefreshToken, authConroller.refresh);
 authRoutes.post('/logout', authConroller.logout);

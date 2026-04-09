@@ -1,5 +1,5 @@
 import { Route, Routes } from 'react-router';
-import { LoginPage, RegisterPage } from '@pages/index';
+import { ProductsPage, LoginPage, RegisterPage } from '@pages/index';
 import { ProtectedRoute } from './shared/routes/protected.route';
 import { PublicRoute } from './shared/routes/public.route';
 
@@ -15,7 +15,7 @@ function App() {
 
 				{/* Private Routes */}
 				<Route element={<ProtectedRoute />}>
-					<Route path="/" element={<h1>home</h1>} />
+					<Route path="/" element={<ProductsPage />} />
 				</Route>
 			</Routes>
 		</>

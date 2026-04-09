@@ -6,7 +6,7 @@ export const categories = pgTable('categories', {
 	userId: uuid('user_id')
 		.references(() => users.id)
 		.notNull(),
-	name: varchar('name', { length: 10 }).notNull(),
+	name: varchar('name', { length: 100 }).notNull(),
 	description: varchar('description', { length: 225 }),
 	createdAt: timestamp('created_at').defaultNow().notNull(),
 	updatedAt: timestamp('updated_at')

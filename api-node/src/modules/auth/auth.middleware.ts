@@ -1,11 +1,10 @@
-import { env } from '@src/config/env.js';
+import { env } from '@config/env.js';
 import type { Request, Response, NextFunction } from 'express';
 import type { JwtPayload } from 'jsonwebtoken';
 import { authRepository } from './auth.repository.js';
 import jwt from 'jsonwebtoken';
-import { AppError } from '@src/core/utils/app-error.util.js';
-import { catchAsync } from '@src/core/utils/catch-async.util.js';
 import { EAuth } from './auth.enum.js';
+import { validateUUID, AppError, catchAsync } from '@utils/index.js';
 
 export const verifyRefreshToken = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 	const token = req.cookies?.[EAuth.REFRESH_TOKEN];
@@ -32,3 +31,36 @@ export const verifyRefreshToken = catchAsync(async (req: Request, res: Response,
 
 	next();
 });
+
+// a middleware that authenticate a user
+export const protect = async (req: Request, res: Response, next: NextFunction) => {
+	const authHeader = req.headers.authorization;
+
+	if (!authHeader || !authHeader.startsWith('Bearer')) {
+		throw new AppError(401, 'authorized');
+	}
+
+	const token = authHeader.split(' ')[1];
+
+	if (!token) {
+		throw new AppError(401, 'authorized: invalid token');
+	}
+
+	const decoded = jwt.verify(token, env.ACCESS_TOKEN_KEY) as JwtPayload;
+
+	if (!decoded.sub) {
+		throw new AppError(401, 'authorized');
+	}
+
+	const userIdValidation = validateUUID(decoded.sub);
+
+	if (!userIdValidation.success) {
+		throw new AppError(401, 'authorized: not valid user');
+	}
+
+	const userId = decoded.sub;
+
+	req.user = { id: userId };
+
+	next();
+};

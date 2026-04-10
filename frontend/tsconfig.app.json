@@ -39,6 +39,7 @@
 			"@api/*": ["./shared/api/*"],
 			"@hooks/*": ["./shared/hooks/*"],
 			"@utils/*": ["./shared/utils/*"],
+			"@sharedTypes/*": ["./shared/types/*"],
 
 			// Features
 			"@auth/*": ["./features/auth/*"],

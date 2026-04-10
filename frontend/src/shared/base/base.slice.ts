@@ -81,6 +81,22 @@ export const createBaseSlice = <T, TCreate, TUpdate, Reducers extends SliceCaseR
 					state.error = (action.payload as string) || 'An error occurred';
 				})
 
+				// create
+				.addCase(thunks.create.pending, (state) => {
+					state.loading = true;
+					state.error = null;
+				})
+				.addCase(thunks.create.fulfilled, (state, action: PayloadAction<T>) => {
+					state.loading = false;
+					state.error = null;
+					const item = action.payload as (typeof state.items)[0];
+					state.items.unshift(item);
+				})
+				.addCase(thunks.create.rejected, (state, action) => {
+					state.loading = false;
+					state.error = (action.payload as string) || 'An error occurred';
+				})
+
 				// Get paginated
 				.addCase(thunks.paginate.pending, (state) => {
 					state.loading = true;

@@ -16,6 +16,7 @@ interface Pagination {
 }
 export interface BaseState<T> {
 	items: T[];
+	item: T | null;
 	loading: boolean;
 	error: string | null;
 	pagination: Pagination;
@@ -28,6 +29,7 @@ export const createBaseSlice = <T, TCreate, TUpdate, Reducers extends SliceCaseR
 ) => {
 	const initialState: BaseState<T> = {
 		items: [],
+		item: null,
 		loading: false,
 		error: null,
 		pagination: {
@@ -49,6 +51,7 @@ export const createBaseSlice = <T, TCreate, TUpdate, Reducers extends SliceCaseR
 		extraReducers: (builder) => {
 			builder
 
+				// Get all
 				.addCase(thunks.getAll.pending, (state) => {
 					state.loading = true;
 					state.error = null;
@@ -63,6 +66,22 @@ export const createBaseSlice = <T, TCreate, TUpdate, Reducers extends SliceCaseR
 					state.error = (action.payload as string) || 'An error occurred';
 				})
 
+				// Get by Id
+				.addCase(thunks.getById.pending, (state) => {
+					state.loading = true;
+					state.error = null;
+				})
+				.addCase(thunks.getById.fulfilled, (state, action: PayloadAction<T>) => {
+					state.loading = false;
+					state.error = null;
+					state.item = action.payload as typeof state.item;
+				})
+				.addCase(thunks.getById.rejected, (state, action) => {
+					state.loading = false;
+					state.error = (action.payload as string) || 'An error occurred';
+				})
+
+				// Get paginated
 				.addCase(thunks.paginate.pending, (state) => {
 					state.loading = true;
 					state.error = null;

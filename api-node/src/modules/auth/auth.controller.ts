@@ -36,9 +36,13 @@ class AuthController {
 	});
 
 	public logout = catchAsync(async (req: Request, res: Response) => {
+		console.log('logout requested');
 		res.clearCookie(EAuth.REFRESH_TOKEN, {
 			...this.cookieOptions,
 			maxAge: 0,
+		});
+		return res.status(200).json({
+			success: true,
 		});
 	});
 }

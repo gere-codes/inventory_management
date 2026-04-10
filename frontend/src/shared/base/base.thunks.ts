@@ -7,7 +7,7 @@ export abstract class BaseThunks<T, TCreate, TUpdate> {
 	protected service: IBaseService<T, TCreate, TUpdate>;
 	readonly resource: string;
 	public getAll: AsyncThunk<T[], void, {}>;
-	public paginated: AsyncThunk<PaginatedResult<T>, { page: number; limit: number }, {}>;
+	public paginate: AsyncThunk<PaginatedResult<T>, { page: number; limit: number }, {}>;
 
 	constructor(service: IBaseService<T, TCreate, TUpdate>, resource: string) {
 		this.service = service;
@@ -20,6 +20,17 @@ export abstract class BaseThunks<T, TCreate, TUpdate> {
 				return rejectWithValue(this.handleError(error, `Error occurred while fetching ${resource}`));
 			}
 		});
+
+		this.paginate = createAsyncThunk<PaginatedResult<T>, { page: number; limit: number }>(
+			`${resource}/getAll`,
+			async ({ page, limit }, { rejectWithValue }) => {
+				try {
+					return await service.paginate(page, limit);
+				} catch (error) {
+					return rejectWithValue(this.handleError(error, `Error occurred while fetching ${resource}`));
+				}
+			},
+		);
 	}
 
 	handleError = (error: any, defaultMessage: string) => {

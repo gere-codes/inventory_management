@@ -7,6 +7,7 @@ import {
 } from '@reduxjs/toolkit';
 import type { BaseThunks } from './base.thunks';
 import type { PaginatedResult } from '../types';
+import { castDraft } from 'immer';
 
 interface Pagination {
 	currentPage: number;
@@ -22,7 +23,12 @@ export interface BaseState<T> {
 	pagination: Pagination;
 }
 
-export const createBaseSlice = <T, TCreate, TUpdate, Reducers extends SliceCaseReducers<BaseState<T>>>(
+export const baseSlice = <
+	T extends { id: string | number },
+	TCreate extends object,
+	TUpdate extends object,
+	Reducers extends SliceCaseReducers<BaseState<T>>,
+>(
 	name: string,
 	thunks: BaseThunks<T, TCreate, TUpdate>,
 	extraReducers: Reducers,
@@ -59,7 +65,7 @@ export const createBaseSlice = <T, TCreate, TUpdate, Reducers extends SliceCaseR
 				.addCase(thunks.getAll.fulfilled, (state, action: PayloadAction<T[]>) => {
 					state.loading = false;
 					state.error = null;
-					state.items = action.payload as typeof state.items;
+					state.items = castDraft(action.payload);
 				})
 				.addCase(thunks.getAll.rejected, (state, action) => {
 					state.loading = false;
@@ -89,10 +95,29 @@ export const createBaseSlice = <T, TCreate, TUpdate, Reducers extends SliceCaseR
 				.addCase(thunks.create.fulfilled, (state, action: PayloadAction<T>) => {
 					state.loading = false;
 					state.error = null;
-					const item = action.payload as (typeof state.items)[0];
+					const item = castDraft(action.payload);
 					state.items.unshift(item);
 				})
 				.addCase(thunks.create.rejected, (state, action) => {
+					state.loading = false;
+					state.error = (action.payload as string) || 'An error occurred';
+				})
+				// update
+				.addCase(thunks.update.pending, (state) => {
+					state.loading = true;
+					state.error = null;
+				})
+				.addCase(thunks.update.fulfilled, (state, action: PayloadAction<T>) => {
+					state.loading = false;
+					state.error = null;
+					const item = castDraft(action.payload);
+					const itemIndex = state.items.findIndex((i) => i.id === item.id);
+
+					if (itemIndex !== -1) {
+						state.items[itemIndex] = item;
+					}
+				})
+				.addCase(thunks.update.rejected, (state, action) => {
 					state.loading = false;
 					state.error = (action.payload as string) || 'An error occurred';
 				})

@@ -14,8 +14,8 @@ export const productSchema = productCreateSchema.extend({
 	id: z.uuid(),
 	category: z.string(),
 	status: z.enum([EProductStatus.IN_STOCK, EProductStatus.LOW_STOCK, EProductStatus.OUT_OF_STOCK]),
-	createdAt: z.coerce.date(),
-	updatedAt: z.coerce.date(),
+	createdAt: z.string(),
+	updatedAt: z.string(),
 });
 export const productUpdateSchema = productCreateSchema.partial();
 

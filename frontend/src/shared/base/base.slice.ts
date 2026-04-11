@@ -140,6 +140,20 @@ export const baseSlice = <
 					state.error = (action.payload as string) || 'An error occurred';
 				})
 
+				// search
+				.addCase(thunks.search.pending, (state) => {
+					state.loading = true;
+				})
+				.addCase(thunks.search.fulfilled, (state, action: PayloadAction<PaginatedResult<T>>) => {
+					state.loading = false;
+					state.error = null;
+					state.items = castDraft(action.payload.data);
+				})
+				.addCase(thunks.search.rejected, (state, action) => {
+					state.loading = false;
+					state.error = (action.payload as string) || 'An error occurred';
+				})
+
 				// Get paginated
 				.addCase(thunks.paginate.pending, (state) => {
 					state.loading = true;

@@ -12,6 +12,7 @@ export abstract class BaseThunks<T, TCreate, TUpdate> {
 	public update: AsyncThunk<T, { id: string; body: TUpdate }, {}>;
 	public delete: AsyncThunk<T, string, {}>;
 	public paginate: AsyncThunk<PaginatedResult<T>, { page: number; limit: number }, {}>;
+	public search: AsyncThunk<PaginatedResult<T>, { term: string; page: number; limit: number }, {}>;
 
 	constructor(service: IBaseService<T, TCreate, TUpdate>, resource: string) {
 		this.service = service;
@@ -65,15 +66,24 @@ export abstract class BaseThunks<T, TCreate, TUpdate> {
 			}
 		});
 
+		this.search = createAsyncThunk<PaginatedResult<T>, { term: string; page: number; limit: number }>(
+			`${resource}/search`,
+			async ({ term, page, limit }, { rejectWithValue }) => {
+				try {
+					return await service.search(term, page, limit);
+				} catch (error) {
+					return rejectWithValue(this.handleError(error, `Error occurred while serarching for ${resource}`));
+				}
+			},
+		);
+
 		this.paginate = createAsyncThunk<PaginatedResult<T>, { page: number; limit: number }>(
 			`${resource}/paginate`,
 			async ({ page, limit }, { rejectWithValue }) => {
 				try {
 					return await service.paginate(page, limit);
 				} catch (error) {
-					return rejectWithValue(
-						this.handleError(error, `Error occurred while fetching paginated ${resource}`),
-					);
+					return rejectWithValue(this.handleError(error, `Error occurred while paginating ${resource}`));
 				}
 			},
 		);

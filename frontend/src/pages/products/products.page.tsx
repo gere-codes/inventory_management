@@ -1,22 +1,20 @@
+import { selectProducts, selectProductsPagination } from '@products/product.selectors';
 import { privateInstance } from '@/shared/api/instance.api';
-import { useAppDispatch } from '@/shared/hooks';
+import { useAppDispatch, useAppSelector } from '@/shared/hooks';
 import { useEffect } from 'react';
+import { productThunk } from '@products/product.thunk';
 
 export const ProductsPage = () => {
 	const dispatch = useAppDispatch();
+	const products = useAppSelector(selectProducts);
+	const { currentPage, totalItems, itemsPerPage } = useAppSelector(selectProductsPagination);
+
+	console.log(products);
 
 	useEffect(() => {
-		const fetchCategories = async () => {
-			try {
-				const { data } = await privateInstance.get('/product');
-				console.log(data?.data, 'categories');
-			} catch (error) {
-				console.log(error);
-			}
-		};
+		dispatch(productThunk.paginate({ page: currentPage, limit: itemsPerPage }));
+	}, [dispatch, currentPage, itemsPerPage, totalItems]);
 
-		fetchCategories();
-	}, []);
 	return (
 		<section>
 			<h1>Home page</h1>

@@ -14,9 +14,9 @@ export abstract class BaseThunks<T, TCreate, TUpdate> {
 	public paginate: AsyncThunk<PaginatedResult<T>, { page: number; limit: number }, {}>;
 	public search: AsyncThunk<PaginatedResult<T>, { term: string; page: number; limit: number }, {}>;
 
-	constructor(service: IBaseService<T, TCreate, TUpdate>, resource: string) {
-		this.service = service;
+	constructor(resource: string, service: IBaseService<T, TCreate, TUpdate>) {
 		this.resource = resource;
+		this.service = service;
 
 		this.getAll = createAsyncThunk<T[], void>(`${resource}/getAll`, async (_, { rejectWithValue }) => {
 			try {

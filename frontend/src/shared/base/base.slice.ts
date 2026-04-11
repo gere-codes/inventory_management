@@ -4,6 +4,8 @@ import {
 	type ValidateSliceCaseReducers,
 	type CaseReducer,
 	type SliceCaseReducers,
+	type ActionReducerMapBuilder,
+	type Reducer,
 } from '@reduxjs/toolkit';
 import type { BaseThunks } from './base.thunks';
 import type { PaginatedResult } from '../types';
@@ -24,14 +26,15 @@ export interface BaseState<T> {
 }
 
 export const baseSlice = <
-	T extends { id: string | number },
+	T extends { id: string },
 	TCreate extends object,
 	TUpdate extends object,
-	Reducers extends SliceCaseReducers<BaseState<T>>,
+	CustomeReducers extends SliceCaseReducers<BaseState<T>>,
 >(
 	name: string,
 	thunks: BaseThunks<T, TCreate, TUpdate>,
-	extraReducers: Reducers,
+	customerReducers?: CustomeReducers,
+	customExtraReducers?: (builder: ActionReducerMapBuilder<BaseState<T>>) => void,
 ) => {
 	const initialState: BaseState<T> = {
 		items: [],
@@ -53,6 +56,7 @@ export const baseSlice = <
 			resetError: (state) => {
 				state.error = null;
 			},
+			...customerReducers,
 		},
 		extraReducers: (builder) => {
 			builder
@@ -169,6 +173,10 @@ export const baseSlice = <
 					state.loading = false;
 					state.error = (action.payload as string) || 'An error occurred';
 				});
+
+			if (customExtraReducers) {
+				customExtraReducers(builder);
+			}
 		},
 	});
 };

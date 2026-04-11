@@ -12,7 +12,7 @@ export interface IBaseService<T, TCreate, TUpdate> {
 	search(term: string, page: number, limit: number): Promise<PaginatedResult<T>>;
 }
 export abstract class BaseService<T, TCreate, TUpdate> implements IBaseService<T, TCreate, TUpdate> {
-	protected resource: string;
+	protected readonly resource: string;
 	protected schema: z.ZodSchema<T>;
 	protected createSchema: z.ZodSchema<TCreate>;
 	protected updateSchema: z.ZodSchema<TUpdate>;

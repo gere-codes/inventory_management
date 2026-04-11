@@ -36,6 +36,7 @@
 			// Shared
 			"@ui/*": ["./shared/components/ui/*"],
 			"@common/*": ["./shared/components/common/*"],
+			"@base/*": ["./shared/base/*"],
 			"@api/*": ["./shared/api/*"],
 			"@hooks/*": ["./shared/hooks/*"],
 			"@utils/*": ["./shared/utils/*"],
@@ -43,6 +44,7 @@
 
 			// Features
 			"@auth/*": ["./features/auth/*"],
+			"@products/*": ["./features/products/*"],
 			"@user/*": ["./features/user/*"],
 			"@dashboard/*": ["./features/dashboard/*"],
 

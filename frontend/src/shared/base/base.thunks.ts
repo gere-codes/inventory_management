@@ -10,6 +10,7 @@ export abstract class BaseThunks<T, TCreate, TUpdate> {
 	public getById: AsyncThunk<T, string, {}>;
 	public create: AsyncThunk<T, TCreate, {}>;
 	public update: AsyncThunk<T, { id: string; body: TUpdate }, {}>;
+	public delete: AsyncThunk<T, string, {}>;
 	public paginate: AsyncThunk<PaginatedResult<T>, { page: number; limit: number }, {}>;
 
 	constructor(service: IBaseService<T, TCreate, TUpdate>, resource: string) {
@@ -29,7 +30,7 @@ export abstract class BaseThunks<T, TCreate, TUpdate> {
 				return await service.getById(id);
 			} catch (error) {
 				return rejectWithValue(
-					this.handleError(error, `Error occurred while fetching ${resource} by id ${id}`),
+					this.handleError(error, `Error occurred while fetching  an item id ${id} of type ${resource}`),
 				);
 			}
 		});
@@ -38,7 +39,7 @@ export abstract class BaseThunks<T, TCreate, TUpdate> {
 			try {
 				return await service.create(body);
 			} catch (error) {
-				return rejectWithValue(this.handleError(error, `Error occurred while creating ${resource}`));
+				return rejectWithValue(this.handleError(error, `Error occurred while adding an item to ${resource}`));
 			}
 		});
 		this.update = createAsyncThunk<T, { id: string; body: TUpdate }>(
@@ -47,10 +48,22 @@ export abstract class BaseThunks<T, TCreate, TUpdate> {
 				try {
 					return await service.update(id, body);
 				} catch (error) {
-					return rejectWithValue(this.handleError(error, `Error occurred while creating ${resource}`));
+					return rejectWithValue(
+						this.handleError(error, `Error occurred while updating an item id ${id} of ${resource}`),
+					);
 				}
 			},
 		);
+
+		this.delete = createAsyncThunk<T, string>(`${resource}/delete`, async (id, { rejectWithValue }) => {
+			try {
+				return await service.delete(id);
+			} catch (error) {
+				return rejectWithValue(
+					this.handleError(error, `Error occurred while deleting an item id ${id} of ${resource}`),
+				);
+			}
+		});
 
 		this.paginate = createAsyncThunk<PaginatedResult<T>, { page: number; limit: number }>(
 			`${resource}/paginate`,

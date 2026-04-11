@@ -97,6 +97,7 @@ export const baseSlice = <
 					state.error = null;
 					const item = castDraft(action.payload);
 					state.items.unshift(item);
+					state.pagination.totalItems += 1;
 				})
 				.addCase(thunks.create.rejected, (state, action) => {
 					state.loading = false;
@@ -118,6 +119,23 @@ export const baseSlice = <
 					}
 				})
 				.addCase(thunks.update.rejected, (state, action) => {
+					state.loading = false;
+					state.error = (action.payload as string) || 'An error occurred';
+				})
+
+				// delete
+				.addCase(thunks.delete.pending, (state) => {
+					state.loading = true;
+				})
+				.addCase(thunks.delete.fulfilled, (state, action: PayloadAction<T>) => {
+					state.loading = false;
+					const itemIndex = state.items.findIndex((i) => i.id === action.payload.id);
+					if (itemIndex !== -1) {
+						state.items.splice(itemIndex, 1);
+						state.pagination.totalItems -= 1;
+					}
+				})
+				.addCase(thunks.delete.rejected, (state, action) => {
 					state.loading = false;
 					state.error = (action.payload as string) || 'An error occurred';
 				})

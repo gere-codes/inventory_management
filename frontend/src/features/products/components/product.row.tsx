@@ -26,17 +26,17 @@ export const ProductItem = memo(({ product, onEdit, onDelete, onOrder }: Props) 
 			<TableItemData item={'$' + Number(product.price).toFixed(2)} />
 			<TableItemData item={product.category} />
 			<TableItemData item={product.quantity} />
-			<td className="p-4 whitespace-nowrap text-sm font-medium w-1/7">
-				<span
-					className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusStyles[product.status]}`}
-				>
+			<td className="px-4 py-4  w-1/7 text-ellipsis overflow-hidden">
+				<span className={`p-2 text-sm truncate font-medium rounded-full ${statusStyles[product.status]}`}>
 					{product.status}
 				</span>
 			</td>
-			<td className="px-4 py-4 whitespace-nowrap text-sm font-medium flex gap-3 w-1/7">
-				<TableActionButton handleClick={() => onEdit(product)} Icon={AiFillEdit} />
-				<TableActionButton handleClick={() => onDelete(product)} Icon={MdDelete} />
-				<TableActionButton handleClick={() => onOrder(product)} Icon={IoBagHandleSharp} />
+			<td className="px-4 py-4  w-1/7 text-ellipsis overflow-hidden">
+				<span className="flex gap-3 truncate ">
+					<TableActionButton handleClick={() => onEdit(product)} Icon={AiFillEdit} />
+					<TableActionButton handleClick={() => onDelete(product)} Icon={MdDelete} />
+					<TableActionButton handleClick={() => onOrder(product)} Icon={IoBagHandleSharp} />
+				</span>
 			</td>
 		</tr>
 	);
@@ -57,7 +57,7 @@ const TableActionButton = ({ handleClick, Icon }: { handleClick: () => void; Ico
 				e.stopPropagation();
 				handleClick();
 			}}
-			className="text-gray-500 shrink-0"
+			className="text-gray-500 "
 		>
 			<Icon size={20} />
 		</button>

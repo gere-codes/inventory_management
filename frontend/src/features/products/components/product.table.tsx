@@ -9,7 +9,7 @@ interface Props {
 	onOrder: (product: TProduct) => void;
 }
 export const ProductTable = memo(({ products, onDelete, onEdit, onOrder }: Props) => {
-	const tableHeaders = ['sku', 'name', 'price', 'category', 'quantity', 'status', 'action'];
+	const tableHeaders = ['sku', 'name', 'price', 'category', 'quantity', 'status', 'actions'];
 
 	return (
 		<section className="bg-white rounded-lg border border-gray-200 overflow-hidden relative mt-4">

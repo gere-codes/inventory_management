@@ -1,5 +1,5 @@
 import { Route, Routes } from 'react-router';
-import { ProductsPage, LoginPage, RegisterPage } from '@pages/index';
+import { ProductsPage, LoginPage, RegisterPage, SuppliersPage, CategoriesPage } from '@pages/index';
 import { ProtectedRoute } from './shared/routes/protected.route';
 import { PublicRoute } from './shared/routes/public.route';
 
@@ -16,6 +16,8 @@ function App() {
 				{/* Private Routes */}
 				<Route element={<ProtectedRoute />}>
 					<Route path="/" element={<ProductsPage />} />
+					<Route path="/suppliers" element={<SuppliersPage />} />
+					<Route path="/categories" element={<CategoriesPage />} />
 				</Route>
 			</Routes>
 		</>

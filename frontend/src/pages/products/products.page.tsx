@@ -1,12 +1,10 @@
 import { selectProducts, selectProductsPagination } from '@products/product.selectors';
-import { privateInstance } from '@/shared/api/instance.api';
 import { useAppDispatch, useAppSelector } from '@/shared/hooks';
 import { useEffect, useState } from 'react';
 import { productThunk } from '@products/product.thunk';
 import { SearchBar } from '@common/search-bar.common';
-import { InputField } from '@/shared/components/ui';
-import type { TProduct } from '@/features/products/product.schema';
-import { ProductTable } from '@/features/products/components/product.table';
+import type { TProduct } from '@products/product.schema';
+import { ProductTable } from '@products/components/product.table';
 
 export const ProductsPage = () => {
 	const [term, setTerm] = useState<string>('');

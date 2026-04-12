@@ -1,11 +1,12 @@
 import { InputField } from '@ui/index';
-
-export const SearchBar: React.FC<{
+import { memo } from 'react';
+interface Props {
 	value: string;
 	onSearch: (term: string) => void;
 	name?: string;
 	placeholder: string;
-}> = ({ value, onSearch, name, placeholder }) => {
+}
+export const SearchBar: React.FC<Props> = memo(({ value, onSearch, name, placeholder }: Props) => {
 	return (
 		<>
 			<InputField
@@ -18,4 +19,6 @@ export const SearchBar: React.FC<{
 			/>
 		</>
 	);
-};
+});
+
+SearchBar.displayName = 'Search Bar';

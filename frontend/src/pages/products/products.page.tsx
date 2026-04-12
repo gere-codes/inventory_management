@@ -2,7 +2,7 @@ import { selectProducts, selectProductsPagination } from '@products/product.sele
 import { useAppDispatch, useAppSelector } from '@/shared/hooks';
 import { useEffect, useState } from 'react';
 import { productThunk } from '@products/product.thunk';
-import { SearchBar } from '@common/search-bar.common';
+import { SearchBar, Pagination } from '@common/index';
 import type { TProduct } from '@products/product.schema';
 import { ProductTable } from '@products/components/product.table';
 
@@ -11,7 +11,7 @@ export const ProductsPage = () => {
 
 	const dispatch = useAppDispatch();
 	const products = useAppSelector(selectProducts);
-	const { currentPage, itemsPerPage } = useAppSelector(selectProductsPagination);
+	const { currentPage, itemsPerPage, totalItems, totalPages } = useAppSelector(selectProductsPagination);
 
 	useEffect(() => {
 		dispatch(productThunk.paginate({ page: currentPage, limit: itemsPerPage }));
@@ -21,10 +21,20 @@ export const ProductsPage = () => {
 	const handleOrder = async (product: TProduct) => {};
 	const handleEdit = async (product: TProduct) => {};
 
+	const handlePage = () => {};
+	const handlePerpage = () => {};
+
 	return (
 		<section>
 			<SearchBar value={term} onSearch={(newValue) => setTerm(newValue)} placeholder="Search Product..." />
 			<ProductTable products={products} onDelete={handleDelete} onEdit={handleEdit} onOrder={handleOrder} />
+			<Pagination
+				currentPage={currentPage}
+				totalPages={totalPages}
+				itemsPerPage={itemsPerPage}
+				onPageChange={handlePage}
+				onPerPageChange={handlePerpage}
+			/>
 		</section>
 	);
 };

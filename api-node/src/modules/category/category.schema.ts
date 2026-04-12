@@ -8,8 +8,8 @@ export const categoryCreateSchema = z.object({
 
 export const categorySchema = categoryCreateSchema.extend({
 	id: z.uuid(),
-	createdAt: z.coerce.date(),
-	updatedAt: z.coerce.date(),
+	createdAt: z.coerce.date().transform((v) => v.toISOString()),
+	updatedAt: z.coerce.date().transform((v) => v.toISOString()),
 });
 
 export const categoryUpdateSchema = categoryCreateSchema.partial();

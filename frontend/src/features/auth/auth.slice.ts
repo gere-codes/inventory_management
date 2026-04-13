@@ -1,6 +1,6 @@
 import type { TUser } from '@/shared/schema';
 import { createSlice } from '@reduxjs/toolkit';
-import { authThunk } from '@auth/store/auth.thunks';
+import { authThunk } from '@/features/auth/auth.thunks';
 
 export type AuthState = {
 	user: TUser;

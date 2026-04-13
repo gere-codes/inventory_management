@@ -1,5 +1,5 @@
 import { BaseThunks } from '@/shared/base';
-import type { TCategory, TCategoryCreate, TCategoryUpdate } from './cateogry.schema';
+import type { TCategory, TCategoryCreate, TCategoryUpdate } from './category.schema';
 import { cateogryService } from './category.service';
 
 class CategoryThunk extends BaseThunks<TCategory, TCategoryCreate, TCategoryUpdate> {

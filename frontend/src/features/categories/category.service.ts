@@ -6,7 +6,7 @@ import {
 	type TCategory,
 	type TCategoryCreate,
 	type TCategoryUpdate,
-} from './cateogry.schema';
+} from './category.schema';
 
 export class CategoryService extends BaseService<TCategory, TCategoryCreate, TCategoryUpdate> {
 	constructor(resource: string) {

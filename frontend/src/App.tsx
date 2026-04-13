@@ -1,7 +1,6 @@
 import { Route, Routes } from 'react-router';
-import { ProductsPage, LoginPage, RegisterPage, SuppliersPage, CategoriesPage } from '@pages/index';
-import { ProtectedRoute } from './shared/routes/protected.route';
-import { PublicRoute } from './shared/routes/public.route';
+import { ProductsPage, LoginPage, RegisterPage, SuppliersPage, CategoriesPage } from '@pages';
+import { ProtectedRoute, PublicRoute } from '@routes';
 
 function App() {
 	return (

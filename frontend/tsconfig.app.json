@@ -53,6 +53,9 @@
 			"@utils": ["shared/utils/index"],
 			"@utils/*": ["shared/utils/*"],
 
+			"@routes": ["shared/routes/index"],
+			"@routes/*": ["shared/routes/*"],
+
 			"@sharedTypes": ["shared/types/index"],
 			"@sharedTypes/*": ["shared/types/*"],
 

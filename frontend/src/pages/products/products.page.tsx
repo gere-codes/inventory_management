@@ -1,10 +1,7 @@
-import { selectProducts, selectProductsPagination } from '@products/product.selectors';
-import { useAppDispatch, useAppSelector } from '@/shared/hooks';
 import { useEffect, useState } from 'react';
-import { productThunk } from '@products/product.thunk';
-import { SearchBar, Pagination } from '@common/index';
-import type { TProduct } from '@products/product.schema';
-import { ProductTable } from '@products/components/product.table';
+import { useAppDispatch, useAppSelector } from '@hooks';
+import { SearchBar, Pagination } from '@common';
+import { selectProducts, selectProductsPagination, ProductTable, productThunk, type TProduct } from '@products';
 
 export const ProductsPage = () => {
 	const [term, setTerm] = useState<string>('');

@@ -1,4 +1,4 @@
-import { BaseThunks } from '@/shared/base';
+import { BaseThunks } from '@base';
 import type { TProduct, TProductCreate, TProductUpdate } from './product.schema';
 import { productService } from './product.service';
 

@@ -1,4 +1,4 @@
-import { BaseThunks } from '@/shared/base';
+import { BaseThunks } from '@base';
 import type { TCategory, TCategoryCreate, TCategoryUpdate } from './category.schema';
 import { cateogryService } from './category.service';
 

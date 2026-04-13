@@ -1,4 +1,4 @@
-import { BaseService } from '@/shared/base';
+import { BaseService } from '@base';
 import {
 	productCreateSchema,
 	productSchema,

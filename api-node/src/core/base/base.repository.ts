@@ -122,7 +122,7 @@ export abstract class BaseRepository<
 		return {
 			data: results.map((result) => this.format(result)),
 			pagination: {
-				totalItems: total,
+				totalItems: Number(total),
 				currentPage: page,
 				totalPages: Math.ceil(total / limit),
 				itemsPerPage: limit,

@@ -45,6 +45,7 @@
 			// Features
 			"@auth/*": ["./features/auth/*"],
 			"@products/*": ["./features/products/*"],
+			"@categories/*": ["./features/categories/*"],
 			"@user/*": ["./features/user/*"],
 			"@dashboard/*": ["./features/dashboard/*"],
 

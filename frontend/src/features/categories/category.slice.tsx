@@ -1,4 +1,4 @@
 import { baseSlice } from '@/shared/base';
-import { productThunk } from '../products/product.thunk';
+import { categoryThunk } from './category.thunk';
 
-export const categorySlice = baseSlice('category', productThunk, {});
+export const categorySlice = baseSlice('category', categoryThunk, {});

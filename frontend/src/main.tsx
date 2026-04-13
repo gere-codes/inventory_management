@@ -4,11 +4,10 @@ import './index.css';
 import App from './App.tsx';
 import { BrowserRouter } from 'react-router';
 import { Provider } from 'react-redux';
-import { store, persistor } from '@store/index.ts';
 import { PersistGate } from 'redux-persist/integration/react';
-import { privateInstance, refreshClient } from './shared/api/instance.api.ts';
-import { authServices } from './features/auth/auth.service.ts';
-import { authThunk } from './features/auth/store/auth.thunks.ts';
+import { privateInstance, refreshClient } from '@api';
+import { authThunk, authServices } from '@auth';
+import { store, persistor } from '@store';
 
 createRoot(document.getElementById('root')!).render(
 	<StrictMode>

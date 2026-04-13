@@ -1,9 +1,9 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist';
 import storage from 'redux-persist/es/storage';
-import { authSlice } from '@auth/store/auth.slice';
-import { productSlice } from '@products/product.slice';
-import { categorySlice } from '@categories/category.slice';
+import { authSlice } from '@auth';
+import { productSlice } from '@products';
+import { categorySlice } from '@categories';
 
 const persistConfig = {
 	key: 'root',

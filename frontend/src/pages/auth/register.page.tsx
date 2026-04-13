@@ -1,13 +1,10 @@
-import { useForm } from 'react-hook-form';
-import { Button, InputField } from '@/shared/components/ui/index';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { type TRegisterFormData, registerchema } from '@/features/auth/auth.schema';
-import { Link } from 'react-router';
-import { useAppDispatch, useAppSelector } from '@hooks/index';
-import { authThunk } from '@auth/store/auth.thunks';
 import { useEffect } from 'react';
-import { selectAuth } from '@/features/auth/store/auth.selectors';
-import { clearError } from '@/features/auth/store/auth.slice';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Link } from 'react-router';
+import { useAppDispatch, useAppSelector } from '@hooks';
+import { Button, InputField } from '@ui';
+import { authThunk, selectAuth, clearError, registerchema, type TRegisterFormData } from '@auth';
 
 export const RegisterPage = () => {
 	const {

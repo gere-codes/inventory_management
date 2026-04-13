@@ -1,6 +1,6 @@
 import { Navigate, Outlet } from 'react-router';
-import { useAppSelector } from '@hooks/index';
-import { selectAuth } from '@auth/store/auth.selectors';
+import { useAppSelector } from '@hooks';
+import { selectAuth } from '@auth';
 
 export const PublicRoute = () => {
 	const { isAuthenticated, user, status } = useAppSelector(selectAuth);

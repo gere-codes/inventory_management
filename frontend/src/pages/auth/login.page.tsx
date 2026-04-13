@@ -5,9 +5,9 @@ import { Link } from 'react-router';
 import { Button, InputField } from '@ui/index';
 import { type TLoginFormData, loginSchema } from '@auth/auth.schema';
 import { useAppDispatch, useAppSelector } from '@hooks/index';
-import { authThunk } from '@auth/store/auth.thunks';
-import { selectAuth } from '@auth/store/auth.selectors';
-import { clearError } from '@auth/store/auth.slice';
+import { authThunk } from '@/features/auth/auth.thunks';
+import { selectAuth } from '@/features/auth/auth.selectors';
+import { clearError } from '@/features/auth/auth.slice';
 
 export const LoginPage = () => {
 	const {

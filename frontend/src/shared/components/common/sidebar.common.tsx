@@ -1,14 +1,13 @@
-import { authThunk } from '@/features/auth/store/auth.thunks';
-import { useAppDispatch } from '@/shared/hooks';
 import { useEffect, useState } from 'react';
 import type { IconType } from 'react-icons';
-import { BiSolidReport } from 'react-icons/bi';
 import { FaShoppingBag } from 'react-icons/fa';
 import { IoIosLogOut } from 'react-icons/io';
 import { MdCategory, MdHomeRepairService } from 'react-icons/md';
 import { RiAlignItemRightFill } from 'react-icons/ri';
 import { SiGoogletagmanager } from 'react-icons/si';
 import { Link, useLocation } from 'react-router';
+import { authThunk } from '@auth';
+import { useAppDispatch } from '@hooks';
 
 export const SideBar = () => {
 	const [currentPath, setCurrentPath] = useState<string>('products');

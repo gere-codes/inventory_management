@@ -31,29 +31,44 @@
 			"@/*": ["./*"],
 
 			// Pages
-			"@pages/*": ["./pages/*"],
+			"@pages": ["pages/index"],
+			"@pages/*": ["pages/*"],
 
 			// Shared
-			"@ui/*": ["./shared/components/ui/*"],
-			"@common/*": ["./shared/components/common/*"],
-			"@base/*": ["./shared/base/*"],
-			"@api/*": ["./shared/api/*"],
-			"@hooks/*": ["./shared/hooks/*"],
-			"@utils/*": ["./shared/utils/*"],
-			"@sharedTypes/*": ["./shared/types/*"],
+			"@base": ["shared/base/index"],
+			"@base/*": ["shared/base/*"],
+
+			"@api": ["shared/api/index"],
+			"@api/*": ["shared/api/*"],
+
+			"@ui": ["shared/components/ui/index"],
+			"@ui/*": ["shared/components/ui/*"],
+
+			"@common": ["shared/components/common/index"],
+			"@common/*": ["shared/components/common/*"],
+
+			"@hooks": ["shared/hooks/index"],
+			"@hooks/*": ["shared/hooks/*"],
+
+			"@utils": ["shared/utils/index"],
+			"@utils/*": ["shared/utils/*"],
+
+			"@sharedTypes": ["shared/types/index"],
+			"@sharedTypes/*": ["shared/types/*"],
 
 			// Features
-			"@auth/*": ["./features/auth/*"],
-			"@products/*": ["./features/products/*"],
+			"@auth": ["features/auth/index"],
+			"@auth/*": ["features/auth/*"],
+
+			"@products": ["features/products/index"],
+			"@products/*": ["features/products/*"],
 
 			"@categories": ["features/categories/index"],
 			"@categories/*": ["features/categories/*"],
 
-			"@user/*": ["./features/user/*"],
-			"@dashboard/*": ["./features/dashboard/*"],
-
 			// Store
-			"@store/*": ["./store/*"]
+			"@store": ["store/index"],
+			"@store/*": ["store/*"]
 		}
 	},
 	"include": ["src"]

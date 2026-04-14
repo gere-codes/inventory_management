@@ -1,17 +1,16 @@
-import { sanitized, sanitizedPhone } from '@src/core/validation/sanitized.js';
 import z from 'zod';
 
 export const supplierCreateSchema = z.object({
-	name: sanitized(z.string().min(1).max(100)),
-	phone: sanitizedPhone,
-	address: sanitized(z.string()).optional().nullable(),
-	description: sanitized(z.string()),
+	name: z.string().min(1).max(100),
+	phone: z.string().regex(/^[0-9+\-()/\s]+$/),
+	address: z.string().optional().nullable(),
+	description: z.string(),
 });
 
 export const supplierSchema = supplierCreateSchema.extend({
 	id: z.uuid(),
-	createdAt: z.coerce.date().transform((v) => v.toISOString()),
-	updatedAt: z.coerce.date().transform((v) => v.toISOString()),
+	createdAt: z.string(),
+	updatedAt: z.string(),
 });
 
 export const supplierUpdateSchema = supplierCreateSchema.partial();

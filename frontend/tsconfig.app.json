@@ -69,6 +69,9 @@
 			"@categories": ["features/categories/index"],
 			"@categories/*": ["features/categories/*"],
 
+			"@suppliers": ["features/suppliers/index"],
+			"@suppliers/*": ["features/suppliers/*"],
+
 			// Store
 			"@store": ["store/index"],
 			"@store/*": ["store/*"]

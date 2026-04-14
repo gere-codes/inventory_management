@@ -5,7 +5,7 @@ export const supplierCreateSchema = z.object({
 	name: sanitized(z.string().min(1).max(100)),
 	phone: sanitizedPhone,
 	address: sanitized(z.string()).optional().nullable(),
-	description: sanitized(z.string()),
+	description: sanitized(z.string()).optional().nullable(),
 });
 
 export const supplierSchema = supplierCreateSchema.extend({

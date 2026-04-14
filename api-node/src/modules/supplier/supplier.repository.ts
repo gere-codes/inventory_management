@@ -15,8 +15,8 @@ export class SupplierRepository extends BaseRepository<TSupplier, TSupplierCreat
 			phone: record.phone,
 			description: record.description,
 			address: record.address,
-			updatedAt: record.updated_at,
-			createdAt: record.created_at,
+			updatedAt: record.updatedAt,
+			createdAt: record.createdAt,
 		};
 	}
 }

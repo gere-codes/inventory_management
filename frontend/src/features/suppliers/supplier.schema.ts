@@ -4,7 +4,7 @@ export const supplierCreateSchema = z.object({
 	name: z.string().min(1).max(100),
 	phone: z.string().regex(/^[0-9+\-()/\s]+$/),
 	address: z.string().optional().nullable(),
-	description: z.string(),
+	description: z.string().optional().nullable(),
 });
 
 export const supplierSchema = supplierCreateSchema.extend({

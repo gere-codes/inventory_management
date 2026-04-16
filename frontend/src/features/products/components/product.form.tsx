@@ -1,8 +1,8 @@
+import { useEffect, useState } from 'react';
 import { closeModal, EModalMode } from '@common';
 import { Button, InputField, TextareaField } from '@ui';
 import type { TProduct } from '../product.schema';
-import { useEffect, useState } from 'react';
-import { useAppDispatch, useAppSelector } from '@/shared/hooks';
+import { useAppDispatch, useAppSelector } from '@hooks';
 import { categoryThunk, selectCategories } from '@categories';
 
 interface Props {

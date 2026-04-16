@@ -6,3 +6,4 @@ export * from './product.service';
 export { productSlice, setCurrentPage, setItemsPerPage } from './product.slice';
 export { productThunk } from './product.thunk';
 export { ProductTable } from './components/product.table';
+export { ProductForm } from './components/product.form';

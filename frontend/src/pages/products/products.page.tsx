@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@hooks';
-import { SearchBar, Pagination } from '@common';
+import { SearchBar, Pagination, openModal, EModalType, EModalMode } from '@common';
 import {
 	selectProducts,
 	selectProductsPagination,
@@ -42,7 +42,10 @@ export const ProductsPage = () => {
 
 	const handleDelete = async (product: TProduct) => {};
 	const handleOrder = async (product: TProduct) => {};
-	const handleEdit = async (product: TProduct) => {};
+
+	const handleEdit = async (product: TProduct) => {
+		dispatch(openModal({ data: product, type: EModalType.PRODUCT, mode: EModalMode.EDIT }));
+	};
 
 	const handlePageChange = (pageNum: number) => {
 		dispatch(setCurrentPage(pageNum));

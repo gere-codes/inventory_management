@@ -36,15 +36,11 @@ export class ProductRepository extends BaseRepository<TProduct, TProductCreate, 
 	public async paginate(userId: string, page: number, limit: number) {
 		const offset = (page - 1) * limit;
 
-		const conditions: (SQL | undefined)[] = [eq(this.table.userId, userId)];
-
-		const whereConditions = and(...conditions);
-
 		const rows = await this.db
 			.select()
 			.from(this.table)
 			.leftJoin(categories, eq(this.table.categoryId, categories.id))
-			.where(whereConditions)
+			.where(eq(this.table.userId, userId))
 			.orderBy(desc(this.table.createdAt))
 			.limit(limit)
 			.offset(offset);
@@ -52,7 +48,7 @@ export class ProductRepository extends BaseRepository<TProduct, TProductCreate, 
 		const countResult = await this.db
 			.select({ count: sql<number>`cast(count(*) as integer)` })
 			.from(this.table)
-			.where(whereConditions);
+			.where(eq(this.table.userId, userId));
 
 		const total = countResult[0]?.count ?? 0;
 
@@ -66,22 +62,19 @@ export class ProductRepository extends BaseRepository<TProduct, TProductCreate, 
 			},
 		};
 	}
-	public async search(userId: string, term: string, page: number, limit: number): Promise<PaginatedResult<TProduct>> {
+
+	public async search(userId: string, term: string, page: number, limit: number) {
 		const offset = (page - 1) * limit;
 
-		const conditions: (SQL | undefined)[] = [eq(this.table.userId, userId)];
-
-		if (term?.trim()) {
-			conditions.push(or(ilike(this.table.name, `%${term}%`), ilike(this.table.sku, `%${term}%`)));
-		}
-
-		const whereConditions = and(...conditions);
+		const pattern = `%${term.trim()}%`;
 
 		const rows = await this.db
 			.select()
 			.from(this.table)
 			.leftJoin(categories, eq(this.table.categoryId, categories.id))
-			.where(whereConditions)
+			.where(
+				and(eq(this.table.userId, userId), or(ilike(this.table.name, pattern), ilike(this.table.sku, pattern))),
+			)
 			.orderBy(desc(this.table.createdAt))
 			.limit(limit)
 			.offset(offset);
@@ -89,7 +82,7 @@ export class ProductRepository extends BaseRepository<TProduct, TProductCreate, 
 		const countResult = await this.db
 			.select({ count: sql<number>`cast(count(*) as integer)` })
 			.from(this.table)
-			.where(whereConditions);
+			.where(eq(this.table.userId, userId));
 
 		const total = countResult[0]?.count ?? 0;
 

@@ -1,6 +1,7 @@
 import { Route, Routes } from 'react-router';
 import { ProductsPage, LoginPage, RegisterPage, SuppliersPage, CategoriesPage } from '@pages';
 import { ProtectedRoute, PublicRoute } from '@routes';
+import { ModalContainer } from '@common';
 
 function App() {
 	return (
@@ -19,6 +20,9 @@ function App() {
 					<Route path="/categories" element={<CategoriesPage />} />
 				</Route>
 			</Routes>
+
+			{/* Modal */}
+			<ModalContainer />
 		</>
 	);
 }

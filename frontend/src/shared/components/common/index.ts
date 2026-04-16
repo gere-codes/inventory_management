@@ -6,4 +6,4 @@ export * from './search-bar.common';
 export { EModalMode, EModalType } from './modal/modal.enum';
 export { modalSlice, closeModal, openModal } from './modal/modal.slice';
 export * from './modal/moda.selector';
-export { Modal } from './modal/modal.common';
+export { ModalContainer } from './modal/modal-container.common';

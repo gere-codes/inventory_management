@@ -27,7 +27,7 @@ export const ProductItem = memo(({ product, onEdit, onDelete, onOrder }: Props) 
 			<TableItemData item={product.category} />
 			<TableItemData item={`${product.quantity} pcs`} />
 			<td className="px-4 py-4  w-1/7 text-ellipsis overflow-hidden">
-				<span className={`p-2 text-xs truncate font-medium rounded ${statusStyles[product.status]}`}>
+				<span className={`px-3 py-1.5 text-xs truncate font-medium rounded ${statusStyles[product.status]}`}>
 					{product.status}
 				</span>
 			</td>

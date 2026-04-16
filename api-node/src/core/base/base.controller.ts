@@ -91,7 +91,7 @@ export abstract class BaseController<T, TCreate, TUpdate> implements IBaseContro
 		const limit = Number(req.query.limit) || 10;
 		const term = (req.query.term as string) || '';
 
-		const result = await this.service.search(userId, term, limit, page);
+		const result = await this.service.search(userId, term, page, limit);
 
 		res.status(200).json({
 			success: true,

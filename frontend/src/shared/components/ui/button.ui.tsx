@@ -8,7 +8,7 @@ export const Button: React.FC<ButtonProps> = ({ children, variant = 'primary', c
 	const baseClasses = 'w-full py-2 px-4 rounded focus:outline-none focus:shadow-outline';
 
 	const variantClasses = {
-		primary: 'bg-primary hover:bg-tertiary text-white',
+		primary: 'bg-primary hover:bg-primary/90 text-white',
 		secondary: 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-100',
 	};
 

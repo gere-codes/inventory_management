@@ -23,17 +23,17 @@ export const SideBar = () => {
 		setPathName();
 	}, [location.pathname]);
 	return (
-		<aside className="flex flex-col gap-2  py-2 min-w-[250px] bg-primary rounded">
+		<aside className="flex flex-col gap-2 py-2 min-w-[270px] bg-gray-50/20 rounded shadow">
 			{/* Logo */}
 			<section className="pl-6 h-16 flex items-center">
-				<Link to={'/'} className="text-white h-fit w-fit ">
+				<Link to={'/'} className="text-black h-fit w-fit ">
 					<SiGoogletagmanager size={35} />
 				</Link>
 			</section>
 
 			{/* Navs */}
 
-			<nav className="flex-1  flex flex-col justify-between">
+			<nav className="flex-1  flex flex-col justify-between **:">
 				{/* Navs */}
 				<ul className="flex flex-col gap-1  w-full ">
 					<NavLink lable="Products" pathName="/" currentPath={currentPath} Icon={RiAlignItemRightFill} />
@@ -72,7 +72,7 @@ const NavLink = ({
 }) => {
 	return (
 		<li
-			className={`w-full hover:bg-secondary  text-gray-400 z-10 pl-6  ${currentPath === pathName ? 'bg-secondary text-white' : ''}`}
+			className={`w-full hover:bg-gray-100/40  z-10 pl-6  ${currentPath === pathName ? 'bg-gray-100/60 text-primary' : 'text-gray-600'}`}
 		>
 			<Link className={`pl-1 py-4 flex items-center gap-3 text-lg`} to={pathName}>
 				<Icon size={25} />

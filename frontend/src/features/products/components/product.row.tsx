@@ -25,7 +25,7 @@ export const ProductItem = memo(({ product, onEdit, onDelete, onOrder }: Props) 
 			<TableItemData item={product.name} />
 			<TableItemData item={'$' + Number(product.price).toFixed(2)} />
 			<TableItemData item={product.category} />
-			<TableItemData item={product.quantity} />
+			<TableItemData item={`${product.quantity} pcs`} />
 			<td className="px-4 py-4  w-1/7 text-ellipsis overflow-hidden">
 				<span className={`p-2 text-sm truncate font-medium rounded-full ${statusStyles[product.status]}`}>
 					{product.status}

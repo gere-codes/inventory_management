@@ -1,9 +1,17 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@hooks';
 import { SearchBar, Pagination } from '@common';
-import { selectProducts, selectProductsPagination, ProductTable, productThunk, type TProduct } from '@products';
+import {
+	selectProducts,
+	selectProductsPagination,
+	ProductTable,
+	productThunk,
+	type TProduct,
+	setItemsPerPage,
+} from '@products';
 import { Button } from '@ui';
 import { debounce } from '@utils';
+import { setCurrentPage } from '@products';
 export const ProductsPage = () => {
 	const FIRST_PAGE = 1;
 
@@ -13,6 +21,7 @@ export const ProductsPage = () => {
 	const products = useAppSelector(selectProducts);
 	const { currentPage, itemsPerPage, totalItems, totalPages } = useAppSelector(selectProductsPagination);
 
+	console.log(currentPage);
 	useEffect(() => {
 		dispatch(productThunk.paginate({ page: currentPage, limit: itemsPerPage }));
 	}, [dispatch, currentPage, itemsPerPage]);
@@ -35,8 +44,14 @@ export const ProductsPage = () => {
 	const handleOrder = async (product: TProduct) => {};
 	const handleEdit = async (product: TProduct) => {};
 
-	const handlePage = () => {};
-	const handlePerpage = () => {};
+	const handlePageChange = (pageNum: number) => {
+		dispatch(setCurrentPage(pageNum));
+	};
+
+	const handlePerPageChange = (perPage: number) => {
+		dispatch(setItemsPerPage(perPage));
+		dispatch(setCurrentPage(currentPage));
+	};
 
 	return (
 		<section className="py-2">
@@ -69,8 +84,8 @@ export const ProductsPage = () => {
 				currentPage={currentPage}
 				totalPages={totalPages}
 				itemsPerPage={itemsPerPage}
-				onPageChange={handlePage}
-				onPerPageChange={handlePerpage}
+				onPageChange={handlePageChange}
+				onPerPageChange={handlePerPageChange}
 			/>
 		</section>
 	);

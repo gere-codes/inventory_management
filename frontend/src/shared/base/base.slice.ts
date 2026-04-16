@@ -56,6 +56,12 @@ export const baseSlice = <
 			resetError: (state) => {
 				state.error = null;
 			},
+			setCurrentPage: (state, action) => {
+				state.pagination.currentPage = action.payload;
+			},
+			setItemsPerPage: (state, action) => {
+				state.pagination.itemsPerPage = action.payload;
+			},
 			...customerReducers,
 		},
 		extraReducers: (builder) => {

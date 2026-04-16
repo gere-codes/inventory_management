@@ -74,8 +74,8 @@ export abstract class BaseController<T, TCreate, TUpdate> implements IBaseContro
 
 	paginate = catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 		const userId = req.user?.id;
-		const page = Number(req.query.page) || 1;
-		const limit = Number(req.query.limit) || 10;
+		const page = Number(req.query.currentPage) || 1;
+		const limit = Number(req.query.itemsPerPage) || 10;
 
 		const result = await this.service.paginate(userId, page as number, limit as number);
 
@@ -87,8 +87,8 @@ export abstract class BaseController<T, TCreate, TUpdate> implements IBaseContro
 
 	search = catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 		const userId = req.user?.id;
-		const page = Number(req.query.page) || 1;
-		const limit = Number(req.query.limit) || 10;
+		const page = Number(req.query.currentPage) || 1;
+		const limit = Number(req.query.itemsPerPage) || 10;
 		const term = (req.query.term as string) || '';
 
 		const result = await this.service.search(userId, term, page, limit);

@@ -1,9 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@hooks';
 import { SearchBar, Pagination } from '@common';
 import { selectProducts, selectProductsPagination, ProductTable, productThunk, type TProduct } from '@products';
 import { Button } from '@ui';
+import { debounce } from '@utils';
 export const ProductsPage = () => {
+	const FIRST_PAGE = 1;
+
 	const [term, setTerm] = useState<string>('');
 
 	const dispatch = useAppDispatch();
@@ -13,6 +16,20 @@ export const ProductsPage = () => {
 	useEffect(() => {
 		dispatch(productThunk.paginate({ page: currentPage, limit: itemsPerPage }));
 	}, [dispatch, currentPage, itemsPerPage]);
+
+	const debouncedSearch = useMemo(
+		() =>
+			debounce((term) => {
+				dispatch(productThunk.search({ term, page: FIRST_PAGE, limit: itemsPerPage }));
+			}, 500),
+		[dispatch, itemsPerPage],
+	);
+
+	useEffect(() => {
+		return () => {
+			debouncedSearch.cancel();
+		};
+	}, [debouncedSearch]);
 
 	const handleDelete = async (product: TProduct) => {};
 	const handleOrder = async (product: TProduct) => {};
@@ -27,7 +44,14 @@ export const ProductsPage = () => {
 				<section className="flex flex-col gap-4 flex-1">
 					<h2 className="text-xl font-bold">Products List</h2>
 					<section>
-						<SearchBar value={term} onSearch={(newValue) => setTerm(newValue)} placeholder="Search..." />
+						<SearchBar
+							value={term}
+							onSearch={(newValue) => {
+								setTerm(newValue);
+								debouncedSearch(newValue);
+							}}
+							placeholder="Search..."
+						/>
 					</section>
 				</section>
 				<Button

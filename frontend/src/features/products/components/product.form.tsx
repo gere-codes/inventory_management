@@ -4,6 +4,7 @@ import { Button, InputField, TextareaField } from '@ui';
 import type { TProduct } from '../product.schema';
 import { useAppDispatch, useAppSelector } from '@hooks';
 import { categoryThunk, selectCategories } from '@categories';
+import { productThunk } from '../product.thunk';
 
 interface Props {
 	mode: EModalMode;
@@ -21,10 +22,37 @@ export const ProductForm = ({ mode, productData }: Props) => {
 		dispatch(categoryThunk.getAll());
 	}, [dispatch]);
 
-	const noop = () => {};
+	const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+		const { name, value } = e.target;
+
+		setProduct((prev) => {
+			const data = { ...prev };
+			if (name === 'category') {
+				data.category = value;
+				data.categoryId = categories.find((c) => c.name === value)?.id as string;
+			} else if (name === 'price' || name === 'quantity') {
+				data[name] = Number(value);
+			} else {
+				(data as Record<string, string | number | Date>)[name] = value;
+			}
+
+			return data;
+		});
+	};
+
+	const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+		e.preventDefault();
+
+		if (product.id) {
+			dispatch(productThunk.update({ id: product.id, body: product }));
+		}
+
+		dispatch(closeModal());
+		setProduct({} as TProduct);
+	};
 
 	return (
-		<form onSubmit={noop} className="bg-white p-6" data-testid="product-form">
+		<form onSubmit={handleSubmit} className="bg-white p-6" data-testid="product-form">
 			<h2 className="capitalize font-bold text-xl text-center mb-1">
 				{mode === EModalMode.EDIT ? 'update product' : 'add product'}
 			</h2>
@@ -37,7 +65,7 @@ export const ProductForm = ({ mode, productData }: Props) => {
 						id="name"
 						name="name"
 						value={product?.name}
-						onChange={noop}
+						onChange={handleChange}
 						required
 						className="w-full px-3 py-2 border border-gray-300 rounded-md "
 						placeholder="Enter product name"
@@ -53,7 +81,7 @@ export const ProductForm = ({ mode, productData }: Props) => {
 						id="price"
 						name="price"
 						value={product?.price}
-						onChange={noop}
+						onChange={handleChange}
 						required
 						min="0"
 						step="0.01"
@@ -71,7 +99,7 @@ export const ProductForm = ({ mode, productData }: Props) => {
 						id="sku"
 						name="sku"
 						value={product?.sku}
-						onChange={noop}
+						onChange={handleChange}
 						required
 						className="w-full px-3 py-2 border border-gray-300 rounded-md "
 						placeholder="Enter SKU"
@@ -88,7 +116,7 @@ export const ProductForm = ({ mode, productData }: Props) => {
 						id="quantity"
 						name="quantity"
 						value={product?.quantity}
-						onChange={noop}
+						onChange={handleChange}
 						required
 						min={mode === EModalMode.EDIT ? 0 : 1}
 						step={1}
@@ -107,7 +135,7 @@ export const ProductForm = ({ mode, productData }: Props) => {
 						id="category"
 						name="category"
 						value={product?.category}
-						onChange={noop}
+						onChange={handleChange}
 						required
 						className="w-full px-3 py-2 border border-gray-300 rounded-md h-[42px] "
 					>
@@ -131,7 +159,7 @@ export const ProductForm = ({ mode, productData }: Props) => {
 						id="description"
 						name="description"
 						value={product?.description || ''}
-						onChange={noop}
+						onChange={handleChange}
 						rows={4}
 						className="w-full px-3 py-2 border border-gray-300 rounded-md "
 						placeholder="Enter product description"

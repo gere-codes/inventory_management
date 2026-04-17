@@ -21,7 +21,6 @@ export const ProductsPage = () => {
 	const products = useAppSelector(selectProducts);
 	const { currentPage, itemsPerPage, totalItems, totalPages } = useAppSelector(selectProductsPagination);
 
-	console.log(currentPage);
 	useEffect(() => {
 		dispatch(productThunk.paginate({ page: currentPage, limit: itemsPerPage }));
 	}, [dispatch, currentPage, itemsPerPage]);

@@ -43,6 +43,18 @@ export abstract class BaseRepository<
 
 	protected abstract format(record: any): T;
 
+	protected getBaseQuery(): any {
+		return this.db.select().from(this.table as AnyPgTable);
+	}
+
+	protected async findOne(where: SQL | undefined): Promise<T> {
+		const result = await this.getBaseQuery().where(where).limit(1);
+		if (!result) {
+			throw new AppError(404, 'Item not found');
+		}
+		return this.format(result[0]);
+	}
+
 	async getAll(userId: string): Promise<T[]> {
 		const results = await this.db
 			.select()

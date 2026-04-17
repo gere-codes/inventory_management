@@ -3,7 +3,7 @@ import { EProductStatus } from './product.enum.js';
 
 export const productCreateSchema = z.object({
 	name: z.string().min(2).max(100),
-	price: z.coerce.number().positive(),
+	price: z.number().nonnegative(),
 	description: z.string().max(1000).nullable().optional(),
 	quantity: z.number().int().nonnegative(),
 	categoryId: z.uuid(),
@@ -21,4 +21,4 @@ export const productUpdateSchema = productCreateSchema.partial();
 
 export type TProduct = z.infer<typeof productSchema>;
 export type TProductCreate = z.infer<typeof productCreateSchema>;
-export type TProductUpdate = z.infer<typeof productUpdateSchema>;
+export type TProductUpdate = z.infer<typeof productSchema>;

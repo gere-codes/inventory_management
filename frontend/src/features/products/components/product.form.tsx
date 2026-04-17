@@ -1,58 +1,49 @@
 import { useEffect, useState } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { closeModal, EModalMode } from '@common';
 import { Button, InputField, TextareaField } from '@ui';
-import type { TProduct } from '../product.schema';
+import { productSchema, type TProduct } from '../product.schema';
 import { useAppDispatch, useAppSelector } from '@hooks';
 import { categoryThunk, selectCategories } from '@categories';
 import { productThunk } from '../product.thunk';
 
 interface Props {
 	mode: EModalMode;
-	productData: TProduct;
+	productData?: Partial<TProduct> | null;
 }
 
 export const ProductForm = ({ mode, productData }: Props) => {
-	const [product, setProduct] = useState<TProduct>(productData);
-	const [errors, setErrors] = useState<Record<string, string>>({});
 	const categories = useAppSelector(selectCategories);
 
 	const dispatch = useAppDispatch();
+
+	const {
+		register,
+		handleSubmit,
+		watch,
+		formState: { errors },
+	} = useForm<TProduct>({
+		resolver: zodResolver(productSchema),
+		mode: 'all',
+		defaultValues: productData || {},
+	});
 
 	useEffect(() => {
 		dispatch(categoryThunk.getAll());
 	}, [dispatch]);
 
-	const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-		const { name, value } = e.target;
-
-		setProduct((prev) => {
-			const data = { ...prev };
-			if (name === 'category') {
-				data.category = value;
-				data.categoryId = categories.find((c) => c.name === value)?.id as string;
-			} else if (name === 'price' || name === 'quantity') {
-				data[name] = Number(value);
-			} else {
-				(data as Record<string, string | number | Date>)[name] = value;
-			}
-
-			return data;
-		});
-	};
-
-	const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
-		e.preventDefault();
-
-		if (product.id) {
-			dispatch(productThunk.update({ id: product.id, body: product }));
+	const onSubmit = (data: TProduct) => {
+		if (data.id) {
+			dispatch(productThunk.update({ id: data.id, body: data }));
+		} else {
+			dispatch(productThunk.create(data));
 		}
-
 		dispatch(closeModal());
-		setProduct({} as TProduct);
 	};
 
 	return (
-		<form onSubmit={handleSubmit} className="bg-white p-6" data-testid="product-form">
+		<form onSubmit={handleSubmit(onSubmit)} className="bg-white p-6" data-testid="product-form">
 			<h2 className="capitalize font-bold text-xl text-center mb-1">
 				{mode === EModalMode.EDIT ? 'update product' : 'add product'}
 			</h2>
@@ -60,50 +51,44 @@ export const ProductForm = ({ mode, productData }: Props) => {
 				{/* Product Name */}
 				<div className="md:col-span-2">
 					<InputField
+						{...register('name')}
+						error={errors?.name?.message}
 						label="Product Name*"
 						type="text"
 						id="name"
-						name="name"
-						value={product?.name}
-						onChange={handleChange}
 						required
 						className="w-full px-3 py-2 border border-gray-300 rounded-md "
 						placeholder="Enter product name"
-						error={errors.name}
 					/>
 				</div>
 
 				{/* Price */}
 				<div>
 					<InputField
+						{...register('price', { valueAsNumber: true })}
+						error={errors?.price?.message}
 						label="Price*"
 						type="number"
 						id="price"
-						name="price"
-						value={product?.price}
-						onChange={handleChange}
 						required
 						min="0"
 						step="0.01"
 						className="w-full px-3 py-2 border border-gray-300 rounded-md "
 						placeholder="0.00"
-						error={errors.price}
 					/>
 				</div>
 
 				{/* SKU */}
 				<div>
 					<InputField
+						{...register('sku')}
+						error={errors?.sku?.message}
 						label={'SKU*'}
 						type="text"
 						id="sku"
-						name="sku"
-						value={product?.sku}
-						onChange={handleChange}
 						required
 						className="w-full px-3 py-2 border border-gray-300 rounded-md "
 						placeholder="Enter SKU"
-						error={errors.sku}
 						disabled={mode === EModalMode.EDIT}
 					/>
 				</div>
@@ -111,18 +96,16 @@ export const ProductForm = ({ mode, productData }: Props) => {
 				{/* Quantity */}
 				<div>
 					<InputField
+						{...register('quantity', { valueAsNumber: true })}
+						error={errors?.quantity?.message}
+						className="w-full px-3 py-2 border border-gray-300 rounded-md "
+						placeholder="0"
 						label="Quantity*"
 						type="number"
 						id="quantity"
-						name="quantity"
-						value={product?.quantity}
-						onChange={handleChange}
 						required
 						min={mode === EModalMode.EDIT ? 0 : 1}
 						step={1}
-						className="w-full px-3 py-2 border border-gray-300 rounded-md "
-						placeholder="0"
-						error={errors.quantity}
 					/>
 				</div>
 
@@ -132,38 +115,32 @@ export const ProductForm = ({ mode, productData }: Props) => {
 						Category*
 					</label>
 					<select
-						id="category"
-						name="category"
-						value={product?.category}
-						onChange={handleChange}
+						{...register('categoryId')} // Directly register the ID
+						id="categoryId"
 						required
-						className="w-full px-3 py-2 border border-gray-300 rounded-md h-[42px] "
+						className="w-full px-3 py-2 border border-gray-300 rounded-md h-[42px]"
 					>
 						<option value="">Select a category</option>
-						{!categories ? (
-							<option value="">Loading categories...</option>
-						) : (
-							categories?.map((category) => (
-								<option className="h-50" key={category.id} value={category.name}>
-									{category.name}
-								</option>
-							))
-						)}
+						{categories?.map((cat) => (
+							<option key={cat.id} value={cat.id}>
+								{' '}
+								{/* Value is the UUID */}
+								{cat.name} {/* Label is the Name */}
+							</option>
+						))}
 					</select>
 				</div>
 
 				{/* Description */}
 				<div className="md:col-span-2">
 					<TextareaField
+						{...register('description')}
+						error={errors?.description?.message}
 						label="Description"
 						id="description"
-						name="description"
-						value={product?.description || ''}
-						onChange={handleChange}
 						rows={4}
 						className="w-full px-3 py-2 border border-gray-300 rounded-md "
 						placeholder="Enter product description"
-						error={errors.description}
 					/>
 				</div>
 			</div>

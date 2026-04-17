@@ -32,7 +32,7 @@ export class ProductRepository extends BaseRepository<TProduct, TProductCreate, 
 		return EProductStatus.IN_STOCK;
 	}
 
-	public async paginate(userId: string, page: number, limit: number) {
+	public override async paginate(userId: string, page: number, limit: number) {
 		const offset = (page - 1) * limit;
 
 		const rows = await this.db

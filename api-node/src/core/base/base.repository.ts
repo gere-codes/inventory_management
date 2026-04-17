@@ -1,7 +1,6 @@
 import { and, desc, eq, ilike, SQL, sql, type AnyTable, type ColumnBaseConfig } from 'drizzle-orm';
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
-import type { AnyPgTable, PgColumn, PgTable, PgTableWithColumns } from 'drizzle-orm/pg-core';
-import z from 'zod';
+import type { AnyPgTable, PgColumn, PgTable } from 'drizzle-orm/pg-core';
 import { AppError } from '@utils/index.js';
 import type { PaginatedResult } from '../types/general.js';
 
@@ -65,17 +64,8 @@ export abstract class BaseRepository<
 	}
 
 	async getById(userId: string, id: string): Promise<T> {
-		const [record] = await this.db
-			.select()
-			.from(this.table as AnyPgTable)
-			.where(and(eq(this.table.id, id), eq(this.table.userId, userId)))
-			.limit(1);
-
-		if (!record) {
-			throw new AppError(404, 'Item not found');
-		}
-
-		return this.format(record);
+		const whereConditions = and(eq(this.table.id, id), eq(this.table.userId, userId));
+		return this.findOne(whereConditions);
 	}
 
 	async create(userId: string, data: TCreate): Promise<T | null> {
@@ -83,10 +73,12 @@ export abstract class BaseRepository<
 		const [record] = await this.db
 			.insert(this.table as AnyPgTable)
 			.values({ values })
-			.returning();
+			.returning({ id: this.table.id });
 
 		if (!record) throw new AppError(400, 'Item was not created');
-		return this.format(record);
+
+		const whereConditions = and(eq(this.table.id, record.id), eq(this.table.userId, userId));
+		return this.findOne(whereConditions);
 	}
 
 	async update(userId: string, id: string, data: TUpdate): Promise<T> {
@@ -94,23 +86,27 @@ export abstract class BaseRepository<
 			.update(this.table as AnyPgTable)
 			.set(data as any)
 			.where(and(eq(this.table.userId, userId), eq(this.table.id, id)))
-			.returning();
+			.returning({ id: this.table.id });
 
 		if (!record) throw new AppError(400, 'Item was not updated');
-		return record as T;
+		const whereConditions = and(eq(this.table.id, record.id), eq(this.table.userId, userId));
+
+		return this.findOne(whereConditions);
 	}
 
 	async delete(userId: string, id: string): Promise<T> {
-		const [result] = await this.db
+		const [record] = await this.db
 			.delete(this.table as AnyPgTable)
 			.where(and(eq(this.table.userId, userId), eq(this.table.id, id)))
-			.returning();
+			.returning({ id: this.table.id });
 
-		if (!result) {
+		if (!record) {
 			throw new AppError(400, 'Item was not found');
 		}
 
-		return this.format(result);
+		const whereConditions = and(eq(this.table.id, record.id), eq(this.table.userId, userId));
+
+		return this.findOne(whereConditions);
 	}
 
 	async paginate(userId: string, page: number = 1, limit: number = 10): Promise<PaginatedResult<T>> {

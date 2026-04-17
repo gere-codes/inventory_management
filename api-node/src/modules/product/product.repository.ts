@@ -2,7 +2,6 @@ import { BaseRepository } from '@src/core/base/base.repository.js';
 import type { TProduct, TProductCreate, TProductUpdate } from './product.shema.js';
 import { categories, products } from '@src/db/index.js';
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
-import type { PaginatedResult } from '@src/core/types/general.js';
 import { and, desc, eq, ilike, or, SQL, sql } from 'drizzle-orm';
 import { EProductStatus } from './product.enum.js';
 
@@ -95,5 +94,9 @@ export class ProductRepository extends BaseRepository<TProduct, TProductCreate, 
 				itemsPerPage: limit,
 			},
 		};
+	}
+
+	protected override getBaseQuery() {
+		return this.db.select().from(this.table).leftJoin(categories, eq(this.table.categoryId, categories.id));
 	}
 }

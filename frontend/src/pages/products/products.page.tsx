@@ -40,7 +40,9 @@ export const ProductsPage = () => {
 		};
 	}, [debouncedSearch]);
 
-	const handleDelete = async (product: TProduct) => {};
+	const handleDelete = async (product: TProduct) => {
+		dispatch(productThunk.delete(product.id));
+	};
 	const handleOrder = async (product: TProduct) => {};
 
 	const handleEdit = async (product: TProduct) => {

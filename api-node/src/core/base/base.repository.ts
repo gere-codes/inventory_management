@@ -65,7 +65,7 @@ export abstract class BaseRepository<
 
 	async getById(userId: string, id: string): Promise<T> {
 		const whereConditions = and(eq(this.table.id, id), eq(this.table.userId, userId));
-		return this.findOne(whereConditions);
+		return await this.findOne(whereConditions);
 	}
 
 	async create(userId: string, data: TCreate): Promise<T | null> {
@@ -75,7 +75,7 @@ export abstract class BaseRepository<
 		if (!record) throw new AppError(400, 'Item was not created');
 
 		const whereConditions = and(eq(this.table.id, record.id), eq(this.table.userId, userId));
-		return this.findOne(whereConditions);
+		return await this.findOne(whereConditions);
 	}
 
 	async update(userId: string, id: string, data: TUpdate): Promise<T> {
@@ -88,22 +88,17 @@ export abstract class BaseRepository<
 		if (!record) throw new AppError(400, 'Item was not updated');
 		const whereConditions = and(eq(this.table.id, record.id), eq(this.table.userId, userId));
 
-		return this.findOne(whereConditions);
+		return await this.findOne(whereConditions);
 	}
 
 	async delete(userId: string, id: string): Promise<T> {
-		const [record] = await this.db
-			.delete(this.table as AnyPgTable)
-			.where(and(eq(this.table.userId, userId), eq(this.table.id, id)))
-			.returning({ id: this.table.id });
+		const whereConditions = and(eq(this.table.id, id), eq(this.table.userId, userId));
 
-		if (!record) {
-			throw new AppError(400, 'Item was not found');
-		}
+		const record = await this.findOne(whereConditions);
 
-		const whereConditions = and(eq(this.table.id, record.id), eq(this.table.userId, userId));
+		await this.db.delete(this.table as AnyPgTable).where(whereConditions);
 
-		return this.findOne(whereConditions);
+		return record;
 	}
 
 	async paginate(userId: string, page: number = 1, limit: number = 10): Promise<PaginatedResult<T>> {

@@ -106,8 +106,8 @@ export const baseSlice = <
 					state.loading = false;
 					state.error = null;
 					const item = castDraft(action.payload);
-					state.items.unshift(item);
-					state.pagination.totalItems += 1;
+					// state.items.unshift(item);
+					// state.pagination.totalItems += 1;
 				})
 				.addCase(thunks.create.rejected, (state, action) => {
 					state.loading = false;

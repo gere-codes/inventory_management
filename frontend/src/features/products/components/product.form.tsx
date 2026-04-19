@@ -7,6 +7,7 @@ import { productFormSchema, type TProductFormValues } from '../product.schema';
 import { useAppDispatch, useAppSelector } from '@hooks';
 import { categoryThunk, selectCategories } from '@categories';
 import { productThunk } from '../product.thunk';
+import { selectProductsPagination } from '../product.selectors';
 
 interface Props {
 	mode: EModalMode;
@@ -15,6 +16,7 @@ interface Props {
 
 export const ProductForm = ({ mode, productData }: Props) => {
 	const categories = useAppSelector(selectCategories);
+	const { currentPage, itemsPerPage, totalItems, totalPages } = useAppSelector(selectProductsPagination);
 
 	const dispatch = useAppDispatch();
 
@@ -51,9 +53,10 @@ export const ProductForm = ({ mode, productData }: Props) => {
 			description: data.description,
 		};
 		if (data.mode === EModalMode.EDIT) {
-			dispatch(productThunk.update({ id: data.id, body }));
+			await dispatch(productThunk.update({ id: data.id, body }));
 		} else {
-			dispatch(productThunk.create(body));
+			await dispatch(productThunk.create(body));
+			await dispatch(productThunk.paginate({ page: currentPage, limit: itemsPerPage }));
 		}
 		dispatch(closeModal());
 	};

@@ -69,11 +69,8 @@ export abstract class BaseRepository<
 	}
 
 	async create(userId: string, data: TCreate): Promise<T | null> {
-		const values = { ...data, userId };
-		const [record] = await this.db
-			.insert(this.table as AnyPgTable)
-			.values({ values })
-			.returning({ id: this.table.id });
+		const payload = { ...data, userId };
+		const [record] = await this.db.insert(this.table).values(payload).returning({ id: this.table.id });
 
 		if (!record) throw new AppError(400, 'Item was not created');
 

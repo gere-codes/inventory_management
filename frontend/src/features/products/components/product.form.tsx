@@ -3,14 +3,14 @@ import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { closeModal, EModalMode } from '@common';
 import { Button, InputField, TextareaField } from '@ui';
-import { productSchema, type TProduct } from '../product.schema';
+import { productFormSchema, type TProductFormValues } from '../product.schema';
 import { useAppDispatch, useAppSelector } from '@hooks';
 import { categoryThunk, selectCategories } from '@categories';
 import { productThunk } from '../product.thunk';
 
 interface Props {
 	mode: EModalMode;
-	productData?: Partial<TProduct> | null;
+	productData: TProductFormValues;
 }
 
 export const ProductForm = ({ mode, productData }: Props) => {
@@ -23,21 +23,37 @@ export const ProductForm = ({ mode, productData }: Props) => {
 		handleSubmit,
 		watch,
 		formState: { errors },
-	} = useForm<TProduct>({
-		resolver: zodResolver(productSchema),
-		mode: 'all',
-		defaultValues: productData || {},
+	} = useForm<TProductFormValues>({
+		resolver: zodResolver(productFormSchema),
+		mode: 'onBlur',
+		values: {
+			mode: mode,
+			id: productData?.id ?? '',
+			name: productData?.name ?? '',
+			categoryId: productData?.categoryId ?? '',
+			price: productData?.price ?? 0,
+			sku: productData?.sku ?? '',
+			quantity: productData?.quantity ?? 1,
+		} as TProductFormValues,
 	});
 
 	useEffect(() => {
 		dispatch(categoryThunk.getAll());
 	}, [dispatch]);
 
-	const onSubmit = (data: TProduct) => {
-		if (data.id) {
-			dispatch(productThunk.update({ id: data.id, body: data }));
+	const onSubmit = async (data: TProductFormValues) => {
+		const body = {
+			name: data.name,
+			categoryId: data.categoryId,
+			quantity: data.quantity,
+			price: data.price,
+			sku: data.sku,
+			description: data.description,
+		};
+		if (data.mode === EModalMode.EDIT) {
+			dispatch(productThunk.update({ id: data.id, body }));
 		} else {
-			dispatch(productThunk.create(data));
+			dispatch(productThunk.create(body));
 		}
 		dispatch(closeModal());
 	};
@@ -115,7 +131,7 @@ export const ProductForm = ({ mode, productData }: Props) => {
 						Category*
 					</label>
 					<select
-						{...register('categoryId')} // Directly register the ID
+						{...register('categoryId')}
 						id="categoryId"
 						required
 						className="w-full px-3 py-2 border border-gray-300 rounded-md h-[42px]"
@@ -123,9 +139,7 @@ export const ProductForm = ({ mode, productData }: Props) => {
 						<option value="">Select a category</option>
 						{categories?.map((cat) => (
 							<option key={cat.id} value={cat.id}>
-								{' '}
-								{/* Value is the UUID */}
-								{cat.name} {/* Label is the Name */}
+								{cat.name}
 							</option>
 						))}
 					</select>

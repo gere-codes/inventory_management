@@ -12,6 +12,7 @@ import {
 import { Button } from '@ui';
 import { debounce } from '@utils';
 import { setCurrentPage } from '@products';
+
 export const ProductsPage = () => {
 	const FIRST_PAGE = 1;
 
@@ -76,6 +77,9 @@ export const ProductsPage = () => {
 					style={{
 						width: 138,
 						height: 40,
+					}}
+					onClick={() => {
+						dispatch(openModal({ data: null, mode: EModalMode.CREATE, type: EModalType.PRODUCT }));
 					}}
 				>
 					+ Add Product

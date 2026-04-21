@@ -7,3 +7,4 @@ export { EModalMode, EModalType } from './modal/modal.enum';
 export { modalSlice, closeModal, openModal } from './modal/modal.slice';
 export * from './modal/moda.selector';
 export { ModalContainer } from './modal/modal-container.common';
+export { Confirmation } from './modal/modal.conformation';

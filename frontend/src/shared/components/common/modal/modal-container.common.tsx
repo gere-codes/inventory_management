@@ -3,7 +3,7 @@ import { EModalType } from './modal.enum';
 import { selectModal } from './moda.selector';
 import { Modal } from './modal.common';
 import { closeModal } from './modal.slice';
-import { ProductForm } from '@products';
+import { ProductForm, ProductModalManager } from '@products';
 
 export const ModalContainer = () => {
 	const { type, mode, data } = useAppSelector(selectModal);
@@ -14,7 +14,7 @@ export const ModalContainer = () => {
 	const renderModal = (type: EModalType) => {
 		switch (type) {
 			case EModalType.PRODUCT:
-				return <ProductForm mode={mode} productData={data} />;
+				return <ProductModalManager mode={mode} productData={data} />;
 
 			default:
 				return null;

@@ -41,11 +41,7 @@ export const ProductsPage = () => {
 	}, [debouncedSearch]);
 
 	const handleDelete = async (product: TProduct) => {
-		await dispatch(productThunk.delete(product.id));
-
-		const nextPage = currentPage !== FIRST_PAGE && products.length === 1 ? currentPage - 1 : currentPage;
-
-		await dispatch(productThunk.paginate({ page: nextPage, limit: itemsPerPage }));
+		dispatch(openModal({ data: product, type: EModalType.PRODUCT, mode: EModalMode.DELETE }));
 	};
 	const handleOrder = async (product: TProduct) => {};
 

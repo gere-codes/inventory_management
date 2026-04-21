@@ -5,7 +5,7 @@ import { closeModal, EModalMode } from '@common';
 import { Button, InputField, TextareaField } from '@ui';
 import { productFormSchema, type TProductFormValues } from '../product.schema';
 import { useAppDispatch, useAppSelector } from '@hooks';
-import { categoryThunk, selectCategories } from '@categories';
+import { CategorySelect, categoryThunk, selectCategories, useCategories } from '@categories';
 import { productThunk } from '../product.thunk';
 import { selectProductsPagination } from '../product.selectors';
 
@@ -15,7 +15,8 @@ interface Props {
 }
 
 export const ProductForm = ({ mode, productData }: Props) => {
-	const categories = useAppSelector(selectCategories);
+	const { categories, isLoading } = useCategories();
+
 	const { currentPage, itemsPerPage, totalItems, totalPages } = useAppSelector(selectProductsPagination);
 
 	const dispatch = useAppDispatch();
@@ -38,10 +39,6 @@ export const ProductForm = ({ mode, productData }: Props) => {
 			quantity: productData?.quantity ?? 1,
 		} as TProductFormValues,
 	});
-
-	useEffect(() => {
-		dispatch(categoryThunk.getAll());
-	}, [dispatch]);
 
 	const onSubmit = async (data: TProductFormValues) => {
 		const body = {
@@ -130,22 +127,7 @@ export const ProductForm = ({ mode, productData }: Props) => {
 
 				{/* Category */}
 				<div>
-					<label htmlFor="category" className="block text-sm font-bold text-gray-700 mb-2 ">
-						Category*
-					</label>
-					<select
-						{...register('categoryId')}
-						id="categoryId"
-						required
-						className="w-full px-3 py-2 border border-gray-300 rounded-md h-[42px]"
-					>
-						<option value="">Select a category</option>
-						{categories?.map((cat) => (
-							<option key={cat.id} value={cat.id}>
-								{cat.name}
-							</option>
-						))}
-					</select>
+					<CategorySelect categories={categories} isLoading={isLoading} register={register} />
 				</div>
 
 				{/* Description */}

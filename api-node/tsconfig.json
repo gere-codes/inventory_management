@@ -43,18 +43,19 @@
 		"skipLibCheck": true,
 
 		// Paths
-		"baseUrl": ".",
+		"baseUrl": "./src",
 		"paths": {
-			"@src/*": ["src/*"],
+			"@src/*": ["./*"],
 
-			"@config/*": ["src/config/*"],
-			"@core/*": ["src/core/*"],
-			"@db/*": ["src/db/*"],
-			"@modules/*": ["src/modules/*"],
-			"@routes/*": ["src/routes/*"],
+			"@config/*": ["config/*"],
+			"@core/*": ["core/*"],
+			"@db/*": ["db/*"],
+			"@modules/*": ["modules/*"],
+			"@routes/*": ["routes/*"],
 
-			"@utils/*": ["src/core/utils/*"],
-			"@middlewares/*": ["src/core/middlewares/*"]
+			"@utils": ["core/utils/index.js"],
+			"@utils/*": ["core/utils/*"],
+			"@middlewares/*": ["core/middlewares/*"]
 		}
 	},
 	"include": ["src/**/*"]

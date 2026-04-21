@@ -1,7 +1,7 @@
 import { and, desc, eq, ilike, SQL, sql, type AnyTable, type ColumnBaseConfig } from 'drizzle-orm';
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import type { AnyPgTable, PgColumn, PgTable } from 'drizzle-orm/pg-core';
-import { AppError } from '@utils/index.js';
+import { AppError } from '@utils';
 import type { PaginatedResult } from '../types/general.js';
 
 export interface IBaseRepository<T, TCreate, TUpdate> {

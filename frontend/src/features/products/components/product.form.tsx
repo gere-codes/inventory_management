@@ -37,6 +37,7 @@ export const ProductForm = ({ mode, productData }: Props) => {
 			price: productData?.price ?? 0,
 			sku: productData?.sku ?? '',
 			quantity: productData?.quantity ?? 1,
+			description: productData?.description ?? '',
 		} as TProductFormValues,
 	});
 

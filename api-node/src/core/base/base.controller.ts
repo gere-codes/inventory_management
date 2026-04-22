@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import type { BaseService, IBaseService } from './base.service.js';
 import { catchAsync } from '@utils/index.js';
+import type { IFileService } from '@services';
 
 export interface IBaseController<T, TCreate, TUpdate> {
 	getAll(req: Request, res: Response, next: NextFunction): void;
@@ -13,7 +14,10 @@ export interface IBaseController<T, TCreate, TUpdate> {
 }
 
 export abstract class BaseController<T, TCreate, TUpdate> implements IBaseController<T, TCreate, TUpdate> {
-	constructor(protected service: BaseService<T, TCreate, TUpdate>) {}
+	constructor(
+		protected service: BaseService<T, TCreate, TUpdate>,
+		protected fileService?: IFileService,
+	) {}
 
 	getAll = catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 		const userId = req.user.id;
@@ -39,8 +43,15 @@ export abstract class BaseController<T, TCreate, TUpdate> implements IBaseContro
 	create = catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 		const userId = req.user.id;
 		const { body } = req;
+		let imageUrl: string | undefined;
 
-		const result = await this.service.create(userId, body);
+		if (req.file && this.fileService) {
+			imageUrl = await this.fileService.upload(req.file);
+		}
+
+		const payload = { ...body, imageUrl };
+
+		const result = await this.service.create(userId, payload);
 
 		res.status(201).json({
 			success: true,

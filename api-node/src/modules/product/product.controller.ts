@@ -4,12 +4,15 @@ import { ProductService } from './product.service.js';
 import type { TProduct, TProductCreate, TProductUpdate } from './product.shema.js';
 import { ProductRepository } from './product.repository.js';
 import { db } from '@src/db/index.js';
+import { LocalFileService } from '@services';
 
 class ProductController extends BaseController<TProduct, TProductCreate, TProductUpdate> {
 	constructor() {
 		const productRepository = new ProductRepository(db);
 		const productService = new ProductService(productRepository);
-		super(productService);
+
+		const fileService = new LocalFileService();
+		super(productService, fileService);
 	}
 }
 

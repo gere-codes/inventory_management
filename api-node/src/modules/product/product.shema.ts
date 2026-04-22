@@ -6,9 +6,10 @@ export const productCreateSchema = z.object({
 	name: sanitized(z.string().min(2).max(100)),
 	price: z.coerce.number().positive(),
 	description: sanitized(z.string().max(1000)).nullable().optional(),
-	quantity: z.number().int().nonnegative(),
+	quantity: z.coerce.number().int().nonnegative().min(1),
 	categoryId: z.uuid(),
 	sku: sanitized(z.string().min(3).max(36)),
+	imageUrl: z.string().optional().nullable(),
 });
 
 export const productSchema = productCreateSchema.extend({

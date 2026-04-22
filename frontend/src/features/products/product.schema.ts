@@ -8,6 +8,7 @@ export const productCreateSchema = z.object({
 	quantity: z.number().int().nonnegative(),
 	categoryId: z.uuid(),
 	sku: z.string().min(3).max(36),
+	imageUrl: z.string().optional().nullable(),
 });
 
 export const productSchema = productCreateSchema.extend({
@@ -19,16 +20,24 @@ export const productSchema = productCreateSchema.extend({
 });
 export const productUpdateSchema = productCreateSchema.partial();
 
+const imageSchema = z.union([
+	z.instanceof(File).refine((f) => f.size <= 5 * 1024 * 1024, 'Max 5MB'),
+	z.url('Must be a valid URL'),
+	z.null(),
+	z.undefined(),
+]);
+
 export const productFormSchema = z.discriminatedUnion('mode', [
 	// CREATE
 	z.object({
 		mode: z.literal('CREATE'),
 		name: z.string().min(2),
+		image: imageSchema.optional(),
 		price: z.number().min(0.01),
 		categoryId: z.uuid(),
 		id: z.string().optional(),
-		sku: z.string().min(3, 'Minimum 3 charatesr are required'),
-		quantity: z.number().min(0, 'Quantity'),
+		sku: z.string().min(3, { message: 'Minimum 3 characters are required' }),
+		quantity: z.number().min(0, { message: 'Quantity must be ≥ 0' }),
 		description: z.string().optional().nullable(),
 	}),
 
@@ -36,6 +45,7 @@ export const productFormSchema = z.discriminatedUnion('mode', [
 	z.object({
 		mode: z.literal('EDIT'),
 		name: z.string().min(2),
+		image: imageSchema.optional(),
 		price: z.number().min(0.01),
 		categoryId: z.uuid(),
 		id: z.uuid(),

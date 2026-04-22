@@ -24,6 +24,7 @@ app.use(
 	helmet({
 		xPoweredBy: false,
 		frameguard: { action: 'deny' },
+		crossOriginResourcePolicy: { policy: 'cross-origin' },
 	}),
 );
 app.use(cookieParser());
@@ -31,6 +32,14 @@ app.use(cookieParser());
 app.use(apiLimiter);
 
 app.get('/health', (req, res) => res.send('OK'));
+
+app.use(
+	'/uploads',
+	express.static('uploads', {
+		index: false,
+		fallthrough: true,
+	}),
+);
 
 app.use('/api', apiRoutes);
 

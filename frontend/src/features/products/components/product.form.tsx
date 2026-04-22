@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useForm, useWatch } from 'react-hook-form';
+import { useForm, useWatch, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { closeModal, EModalMode } from '@common';
 import { Button, InputField, TextareaField } from '@ui';
@@ -16,6 +16,7 @@ interface Props {
 
 export const ProductForm = ({ mode, productData }: Props) => {
 	const { categories, isLoading } = useCategories();
+	const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
 	const { currentPage, itemsPerPage, totalItems, totalPages } = useAppSelector(selectProductsPagination);
 
@@ -26,6 +27,8 @@ export const ProductForm = ({ mode, productData }: Props) => {
 		handleSubmit,
 		watch,
 		formState: { errors },
+		setValue,
+		control,
 	} = useForm<TProductFormValues>({
 		resolver: zodResolver(productFormSchema),
 		mode: 'onBlur',
@@ -38,33 +41,99 @@ export const ProductForm = ({ mode, productData }: Props) => {
 			sku: productData?.sku ?? '',
 			quantity: productData?.quantity ?? 1,
 			description: productData?.description ?? '',
+			image: productData?.image ?? '',
 		} as TProductFormValues,
 	});
 
 	const onSubmit = async (data: TProductFormValues) => {
-		const body = {
-			name: data.name,
-			categoryId: data.categoryId,
-			quantity: data.quantity,
-			price: data.price,
-			sku: data.sku,
-			description: data.description,
-		};
+		const formData = new FormData();
+
+		Object.entries(data).forEach(([key, value]) => {
+			if (value === null || value === undefined) return;
+
+			if (value instanceof File) {
+				formData.append(key, value);
+			} else {
+				formData.append(key, value.toString());
+			}
+		});
 		if (data.mode === EModalMode.EDIT) {
-			await dispatch(productThunk.update({ id: data.id, body }));
+			await dispatch(productThunk.update({ id: data.id, body: formData }));
 		} else {
-			await dispatch(productThunk.create(body));
+			await dispatch(productThunk.create(formData));
 			await dispatch(productThunk.paginate({ page: currentPage, limit: itemsPerPage }));
 		}
 		dispatch(closeModal());
 	};
+
+	const imageFile = watch('image');
+
+	// revoke url when component unmounts
+	useEffect(() => {
+		if (!(imageFile instanceof File)) {
+			setPreviewUrl(null);
+			return;
+		}
+
+		const objectUrl = URL.createObjectURL(imageFile);
+		setPreviewUrl(objectUrl);
+
+		return () => {
+			if (imageFile && imageFile instanceof File) {
+				URL.revokeObjectURL(objectUrl);
+			}
+		};
+	}, [imageFile]);
 
 	return (
 		<form onSubmit={handleSubmit(onSubmit)} className="bg-white p-6" data-testid="product-form">
 			<h2 className="capitalize font-bold text-xl text-center mb-1">
 				{mode === EModalMode.EDIT ? 'update product' : 'add product'}
 			</h2>
-			<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+			<div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
+				{/* image */}
+				<Controller
+					name="image"
+					control={control}
+					render={({ field: { onChange, value, ...field } }) => {
+						return (
+							<div className="border border-gray-200 rounded h-24 w-24 relative">
+								{imageFile ? (
+									<img
+										src={imageFile instanceof File ? URL.createObjectURL(imageFile) : imageFile}
+										alt="Preview"
+										className="object-center aspect-square h-full w-full"
+									/>
+								) : (
+									<>
+										<input
+											{...field}
+											type="file"
+											id="image"
+											name="image"
+											className="h-full w-full opacity-0 absolute"
+											accept="image/jpeg, image/png"
+											multiple={false}
+											onChange={(e) => {
+												const file = e.target.files && e.target.files[0];
+
+												if (file) {
+													setValue('image', file);
+												}
+											}}
+										/>
+										<label
+											htmlFor="image"
+											className="h-full w-full flex items-center justify-center cursor-pointer"
+										>
+											<span className="text-gray-500 text-xs">Upload Image</span>
+										</label>
+									</>
+								)}
+							</div>
+						);
+					}}
+				/>
 				{/* Product Name */}
 				<div className="md:col-span-2">
 					<InputField

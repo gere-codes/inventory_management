@@ -1,4 +1,5 @@
 import { memo, type FC } from 'react';
+import { BASE_URL } from '@api';
 import { AiFillEdit } from 'react-icons/ai';
 import { MdDelete } from 'react-icons/md';
 import { IoBagHandleSharp } from 'react-icons/io5';
@@ -22,7 +23,7 @@ export const ProductItem = memo(({ product, onEdit, onDelete, onOrder }: Props) 
 	return (
 		<tr key={product.id} className="hover:bg-gray-50  border-b border-gray-200">
 			<TableItemData item={product.sku} />
-			<TableItemData item={product.name} />
+			<TableItemData item={product.name} imageUrl={product?.imageUrl ?? ''} />
 			<TableItemData item={'$' + Number(product.price).toFixed(2)} />
 			<TableItemData item={product.category} />
 			<TableItemData item={`${product.quantity} pcs`} />
@@ -42,10 +43,19 @@ export const ProductItem = memo(({ product, onEdit, onDelete, onOrder }: Props) 
 	);
 });
 
-const TableItemData = ({ item }: { item: string | number }) => {
+const TableItemData = ({ item, imageUrl }: { item: string | number; imageUrl?: string }) => {
 	return (
 		<td className="px-4 py-4  w-1/7 text-ellipsis  overflow-hidden">
-			<p className="text-sm font-medium text-gray-900 truncate">{item}</p>
+			<div className="flex gap-1 items-center">
+				{imageUrl && (
+					<img
+						src={`${BASE_URL}${imageUrl}`}
+						alt={item.toString().substring(0, 1)}
+						className="w-10 h-10 border border-gray-100 rounded"
+					/>
+				)}
+				<p className="text-sm font-medium text-gray-900 truncate">{item}</p>
+			</div>
 		</td>
 	);
 };

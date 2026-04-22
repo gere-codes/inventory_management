@@ -55,7 +55,12 @@
 
 			"@utils": ["core/utils/index.js"],
 			"@utils/*": ["core/utils/*"],
-			"@middlewares/*": ["core/middlewares/*"]
+
+			"@middlewares": ["core/middlewares/index.js"],
+			"@middlewares/*": ["core/middlewares/*"],
+
+			"@services": ["services/index.js"],
+			"@services/*": ["services/utils/*"]
 		}
 	},
 	"include": ["src/**/*"]

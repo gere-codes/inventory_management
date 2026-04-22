@@ -1,11 +1,12 @@
 import { Router } from 'express';
 import { productController } from './product.controller.js';
+import { upload } from '@middlewares';
 
 const productRoutes = Router();
 
 productRoutes.get('/', productController.getAll);
 productRoutes.get('/paginate', productController.paginate);
-productRoutes.post('/', productController.create);
+productRoutes.post('/', upload.single('image'), productController.create);
 productRoutes.put('/:id', productController.update);
 productRoutes.delete('/:id', productController.delete);
 

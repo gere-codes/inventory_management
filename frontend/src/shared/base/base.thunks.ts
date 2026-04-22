@@ -3,18 +3,18 @@ import type { IBaseService } from './base.service';
 import { isAxiosError } from 'axios';
 import type { PaginatedResult } from '../types';
 
-export abstract class BaseThunks<T, TCreate, TUpdate> {
-	protected service: IBaseService<T, TCreate, TUpdate>;
+export abstract class BaseThunks<T, TCreate, TUpdate, TCreateBody = TCreate, TUpdateBody = TUpdate> {
+	protected service: IBaseService<T, TCreate, TUpdate, TCreateBody, TUpdateBody>;
 	readonly resource: string;
 	public getAll: AsyncThunk<T[], void, {}>;
 	public getById: AsyncThunk<T, string, {}>;
-	public create: AsyncThunk<T, TCreate, {}>;
-	public update: AsyncThunk<T, { id: string; body: TUpdate }, {}>;
+	public create: AsyncThunk<T, TCreateBody, {}>;
+	public update: AsyncThunk<T, { id: string; body: TUpdateBody }, {}>;
 	public delete: AsyncThunk<T, string, {}>;
 	public paginate: AsyncThunk<PaginatedResult<T>, { page: number; limit: number }, {}>;
 	public search: AsyncThunk<PaginatedResult<T>, { term: string; page: number; limit: number }, {}>;
 
-	constructor(resource: string, service: IBaseService<T, TCreate, TUpdate>) {
+	constructor(resource: string, service: IBaseService<T, TCreate, TUpdate, TCreateBody, TUpdateBody>) {
 		this.resource = resource;
 		this.service = service;
 
@@ -36,14 +36,14 @@ export abstract class BaseThunks<T, TCreate, TUpdate> {
 			}
 		});
 
-		this.create = createAsyncThunk<T, TCreate>(`${resource}/create`, async (body, { rejectWithValue }) => {
+		this.create = createAsyncThunk<T, TCreateBody>(`${resource}/create`, async (body, { rejectWithValue }) => {
 			try {
 				return await service.create(body);
 			} catch (error) {
 				return rejectWithValue(this.handleError(error, `Error occurred while adding an item to ${resource}`));
 			}
 		});
-		this.update = createAsyncThunk<T, { id: string; body: TUpdate }>(
+		this.update = createAsyncThunk<T, { id: string; body: TUpdateBody }>(
 			`${resource}/update`,
 			async ({ id, body }, { rejectWithValue }) => {
 				try {

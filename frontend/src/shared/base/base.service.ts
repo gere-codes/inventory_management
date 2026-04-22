@@ -2,16 +2,22 @@ import { privateInstance } from '../api/instance.api';
 import type { PaginatedResult } from '../types';
 import z from 'zod';
 
-export interface IBaseService<T, TCreate, TUpdate> {
+export interface IBaseService<T, TCreate, TUpdate, TCreateBody = TCreate, TUpdateBody = TUpdate> {
 	getAll(): Promise<T[]>;
 	getById(id: string): Promise<T>;
-	create(data: TCreate): Promise<T>;
-	update(id: string, data: TUpdate): Promise<T>;
+	create(data: TCreateBody): Promise<T>;
+	update(id: string, data: TUpdateBody): Promise<T>;
 	delete(id: string): Promise<T>;
 	paginate(page: number, limit: number): Promise<PaginatedResult<T>>;
 	search(term: string, page: number, limit: number): Promise<PaginatedResult<T>>;
 }
-export abstract class BaseService<T, TCreate, TUpdate> implements IBaseService<T, TCreate, TUpdate> {
+export abstract class BaseService<
+	T,
+	TCreate,
+	TUpdate,
+	TCreateBody = TCreate,
+	TUpdateBody = TUpdate,
+> implements IBaseService<T, TCreate, TUpdate, TCreateBody, TUpdateBody> {
 	protected readonly resource: string;
 	protected schema: z.ZodSchema<T>;
 	protected createSchema: z.ZodSchema<TCreate>;
@@ -38,12 +44,12 @@ export abstract class BaseService<T, TCreate, TUpdate> implements IBaseService<T
 		return this.schema.parse(result.data.data);
 	}
 
-	async create(body: TCreate): Promise<T> {
+	async create(body: TCreateBody): Promise<T> {
 		const result = await privateInstance.post<{ success: boolean; data: T }>(`/${this.resource}`, body);
 		return this.schema.parse(result.data.data);
 	}
 
-	async update(id: string, body: TUpdate): Promise<T> {
+	async update(id: string, body: TUpdateBody): Promise<T> {
 		const result = await privateInstance.put<{ success: boolean; data: T }>(`/${this.resource}/${id}`, body);
 		return this.schema.parse(result.data.data);
 	}

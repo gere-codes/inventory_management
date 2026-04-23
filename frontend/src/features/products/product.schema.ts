@@ -22,7 +22,7 @@ export const productUpdateSchema = productCreateSchema.partial();
 
 const imageSchema = z.union([
 	z.instanceof(File).refine((f) => f.size <= 5 * 1024 * 1024, 'Max 5MB'),
-	z.url('Must be a valid URL'),
+	z.string(),
 	z.null(),
 	z.undefined(),
 ]);

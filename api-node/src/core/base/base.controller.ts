@@ -64,7 +64,15 @@ export abstract class BaseController<T, TCreate, TUpdate> implements IBaseContro
 		const id = req.params?.id as string;
 		const { body } = req;
 
-		const result = await this.service.update(userId, id, body);
+		let imageUrl: string | undefined = req.body?.image;
+
+		if (req.file && this.fileService) {
+			imageUrl = await this.fileService.upload(req.file);
+		}
+
+		const payload = { ...body, imageUrl };
+
+		const result = await this.service.update(userId, id, payload);
 
 		res.status(201).json({
 			success: true,

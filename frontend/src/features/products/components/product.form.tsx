@@ -103,7 +103,7 @@ export const ProductForm = ({ mode, productData }: Props) => {
 								{imageFile ? (
 									<div className="relative">
 										<button
-											onClick={() => setValue('image', null)}
+											onClick={() => setValue('image', '')}
 											className="absolute -top-2 -right-2 text-gray-600 hover:text-gray-800"
 										>
 											<TiDelete size={25} />

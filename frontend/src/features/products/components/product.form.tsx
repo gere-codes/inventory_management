@@ -3,15 +3,17 @@ import { useForm, useWatch, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { closeModal, EModalMode } from '@common';
 import { Button, InputField, TextareaField } from '@ui';
-import { productFormSchema, type TProductFormValues } from '../product.schema';
+import { productFormSchema, type TProduct, type TProductCreate, type TProductFormValues } from '../product.schema';
 import { useAppDispatch, useAppSelector } from '@hooks';
 import { CategorySelect, categoryThunk, selectCategories, useCategories } from '@categories';
 import { productThunk } from '../product.thunk';
 import { selectProductsPagination } from '../product.selectors';
+import { BASE_URL } from '@api';
+import { TiDelete } from 'react-icons/ti';
 
 interface Props {
 	mode: EModalMode;
-	productData: TProductFormValues;
+	productData: TProduct;
 }
 
 export const ProductForm = ({ mode, productData }: Props) => {
@@ -41,7 +43,7 @@ export const ProductForm = ({ mode, productData }: Props) => {
 			sku: productData?.sku ?? '',
 			quantity: productData?.quantity ?? 1,
 			description: productData?.description ?? '',
-			image: productData?.image ?? '',
+			image: productData?.imageUrl ?? null,
 		} as TProductFormValues,
 	});
 
@@ -99,11 +101,23 @@ export const ProductForm = ({ mode, productData }: Props) => {
 						return (
 							<div className="border border-gray-200 rounded h-24 w-24 relative">
 								{imageFile ? (
-									<img
-										src={imageFile instanceof File ? URL.createObjectURL(imageFile) : imageFile}
-										alt="Preview"
-										className="object-center aspect-square h-full w-full"
-									/>
+									<div className="relative">
+										<button
+											onClick={() => setValue('image', null)}
+											className="absolute -top-2 -right-2 text-gray-600 hover:text-gray-800"
+										>
+											<TiDelete size={25} />
+										</button>
+										<img
+											src={
+												imageFile instanceof File
+													? URL.createObjectURL(imageFile)
+													: `${BASE_URL}${imageFile}`
+											}
+											alt="Preview"
+											className="object-center aspect-square h-full w-full"
+										/>
+									</div>
 								) : (
 									<>
 										<input

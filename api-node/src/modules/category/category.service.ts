@@ -8,14 +8,15 @@ import {
 	type TCategoryCreate,
 	type TCategoryUpdate,
 } from './category.schema.js';
+import type { ICategoryRepository } from './category.repository.js';
 
-interface ICategoryService extends IBaseService<TCategory, TCategoryCreate, TCategoryUpdate> {}
+export interface ICategoryService extends IBaseService<TCategory, TCategoryCreate, TCategoryUpdate> {}
 
 export class CategoryService
-	extends BaseService<TCategory, TCategoryCreate, TCategoryUpdate>
+	extends BaseService<TCategory, TCategoryCreate, TCategoryUpdate, ICategoryRepository>
 	implements ICategoryService
 {
-	constructor(repository: IBaseRepository<TCategory, TCategoryCreate, TCategoryUpdate>) {
+	constructor(repository: ICategoryRepository) {
 		super(repository, categorySchema, categoryCreateSchema, categoryUpdateSchema);
 	}
 }

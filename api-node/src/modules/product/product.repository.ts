@@ -1,11 +1,18 @@
-import { BaseRepository } from '@src/core/base/base.repository.js';
+import { BaseRepository, type IBaseRepository } from '@src/core/base/base.repository.js';
 import type { TProduct, TProductCreate, TProductUpdate } from './product.shema.js';
 import { categories, products } from '@src/db/index.js';
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { and, desc, eq, ilike, or, SQL, sql } from 'drizzle-orm';
 import { EProductStatus } from './product.enum.js';
+import type { AnyPgTable } from 'drizzle-orm/pg-core';
 
-export class ProductRepository extends BaseRepository<TProduct, TProductCreate, TProductUpdate, typeof products> {
+export interface IProductRepository extends IBaseRepository<TProduct, TProductCreate, TProductUpdate> {
+	getStats(userId: string): any;
+}
+export class ProductRepository
+	extends BaseRepository<TProduct, TProductCreate, TProductUpdate, typeof products>
+	implements IProductRepository
+{
 	constructor(db: NodePgDatabase<any>) {
 		super(products, db);
 	}
@@ -99,5 +106,33 @@ export class ProductRepository extends BaseRepository<TProduct, TProductCreate, 
 
 	protected override getBaseQuery() {
 		return this.db.select().from(this.table).leftJoin(categories, eq(this.table.categoryId, categories.id));
+	}
+
+	public async getStats(userId: string) {
+		const result = await this.db
+			.select({
+				outOfStock: sql<number>`count(case when ${this.table.quantity} <= 0 then 1 end)`,
+				lowStock: sql<number>`count(case when ${this.table.quantity} > 0 and ${this.table.quantity} <= 5 then 1 end)`,
+				totalProducts: sql<number>`count(*)`,
+			})
+			.from(this.table as AnyPgTable)
+			.where(eq(this.table.userId, userId));
+
+		const categoriesResult = await this.db
+			.select({
+				name: categories.name,
+				count: sql<number>`count(${this.table.id})`,
+			})
+			.from(this.table as AnyPgTable)
+			.leftJoin(categories, eq(this.table.categoryId, categories.id))
+			.where(eq(this.table.userId, userId))
+			.groupBy(categories.name);
+
+		return {
+			outOfStock: result[0]?.outOfStock ?? 0,
+			lowStock: result[0]?.lowStock ?? 0,
+			totalProducts: result[0]?.totalProducts ?? 0,
+			categories: categoriesResult,
+		};
 	}
 }

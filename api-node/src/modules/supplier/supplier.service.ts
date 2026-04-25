@@ -8,14 +8,15 @@ import {
 	type TSupplierUpdate,
 } from './supplier.schema.js';
 import type { IBaseRepository } from '@src/core/base/base.repository.js';
+import type { ISupplierRepository } from './supplier.repository.js';
 
-interface ISupplierService extends IBaseService<TSupplier, TSupplierCreate, TSupplierUpdate> {}
+export interface ISupplierService extends IBaseService<TSupplier, TSupplierCreate, TSupplierUpdate> {}
 
 export class SupplierService
-	extends BaseService<TSupplier, TSupplierCreate, TSupplierUpdate>
+	extends BaseService<TSupplier, TSupplierCreate, TSupplierUpdate, ISupplierRepository>
 	implements ISupplierService
 {
-	constructor(repository: IBaseRepository<TSupplier, TSupplierCreate, TSupplierUpdate>) {
+	constructor(repository: ISupplierRepository) {
 		super(repository, supplierSchema, supplierCreateSchema, supplierUpdateSchema);
 	}
 }

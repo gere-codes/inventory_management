@@ -8,10 +8,20 @@ import {
 	type TProductCreate,
 	type TProductUpdate,
 } from './product.shema.js';
+import type { IProductRepository } from './product.repository.js';
 
-interface IProductService extends IBaseService<TProduct, TProductCreate, TProductUpdate> {}
-export class ProductService extends BaseService<TProduct, TProductCreate, TProductUpdate> implements IProductService {
-	constructor(repository: IBaseRepository<TProduct, TProductCreate, TProductUpdate>) {
+export interface IProductService extends IBaseService<TProduct, TProductCreate, TProductUpdate> {
+	getStats(userId: string): any;
+}
+export class ProductService
+	extends BaseService<TProduct, TProductCreate, TProductUpdate, IProductRepository>
+	implements IProductService
+{
+	constructor(repository: IProductRepository) {
 		super(repository, productSchema, productCreateSchema, productUpdateSchema);
+	}
+
+	async getStats(userId: string) {
+		return await this.repository.getStats(userId);
 	}
 }

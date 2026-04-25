@@ -9,15 +9,21 @@ export interface IBaseService<T, TCreate, TUpdate> {
 	update(userId: string, id: string, data: TUpdate): Promise<T>;
 	delete(userId: string, id: string): Promise<T>;
 	paginate(userId: string, page: number, limit: number): Promise<PaginatedResult<T>>;
+	search(userId: string, term: string, page: number, limit: number): Promise<PaginatedResult<T>>;
 }
-export abstract class BaseService<T, TCreate, TUpdate> implements IBaseService<T, TCreate, TUpdate> {
-	protected repository: IBaseRepository<T, TCreate, TUpdate>;
+export abstract class BaseService<
+	T,
+	TCreate,
+	TUpdate,
+	TRepository extends IBaseRepository<T, TCreate, TUpdate>,
+> implements IBaseService<T, TCreate, TUpdate> {
+	protected repository: TRepository;
 	protected schema: z.ZodSchema<T>;
 	protected createSchema: z.ZodSchema<TCreate>;
 	protected updateSchema: z.ZodSchema<TUpdate>;
 
 	constructor(
-		repository: IBaseRepository<T, TCreate, TUpdate>,
+		repository: TRepository,
 		schema: z.ZodSchema<T>,
 		createSchema: z.ZodSchema<TCreate>,
 		updateSchema: z.ZodSchema<TUpdate>,

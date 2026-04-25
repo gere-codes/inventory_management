@@ -13,9 +13,14 @@ export interface IBaseController<T, TCreate, TUpdate> {
 	search(req: Request, res: Response, next: NextFunction): void;
 }
 
-export abstract class BaseController<T, TCreate, TUpdate> implements IBaseController<T, TCreate, TUpdate> {
+export abstract class BaseController<
+	T,
+	TCreate,
+	TUpdate,
+	TService extends IBaseService<T, TCreate, TUpdate>,
+> implements IBaseController<T, TCreate, TUpdate> {
 	constructor(
-		protected service: BaseService<T, TCreate, TUpdate>,
+		protected service: TService,
 		protected fileService?: IFileService,
 	) {}
 

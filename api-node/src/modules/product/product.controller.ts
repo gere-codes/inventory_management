@@ -1,12 +1,15 @@
 import type { Request, Response, NextFunction } from 'express';
-import { BaseController } from '@core/base/base.controller.js';
-import { ProductService } from './product.service.js';
+import { BaseController, type IBaseController } from '@core/base/base.controller.js';
+import { ProductService, type IProductService } from './product.service.js';
 import type { TProduct, TProductCreate, TProductUpdate } from './product.shema.js';
 import { ProductRepository } from './product.repository.js';
 import { db } from '@src/db/index.js';
 import { LocalFileService } from '@services';
-
-class ProductController extends BaseController<TProduct, TProductCreate, TProductUpdate> {
+import { catchAsync } from '@src/core/utils/catch-async.util.js';
+export interface IProductController extends IBaseController<TProduct, TProductCreate, TProductUpdate> {
+	getStats(req: Request, res: Response, next: NextFunction): void;
+}
+class ProductController extends BaseController<TProduct, TProductCreate, TProductUpdate, IProductService> {
 	constructor() {
 		const productRepository = new ProductRepository(db);
 		const productService = new ProductService(productRepository);
@@ -14,6 +17,15 @@ class ProductController extends BaseController<TProduct, TProductCreate, TProduc
 		const fileService = new LocalFileService();
 		super(productService, fileService);
 	}
+
+	getStats = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+		const userId = req.user.id;
+		const result = await this.service.getStats(userId);
+		res.status(200).json({
+			success: true,
+			data: result,
+		});
+	});
 }
 
 export const productController = new ProductController();

@@ -53,6 +53,9 @@
 			"@utils": ["shared/utils/index"],
 			"@utils/*": ["shared/utils/*"],
 
+			"@constants": ["shared/constants/index"],
+			"@constants/*": ["shared/constants/*"],
+
 			"@routes": ["shared/routes/index"],
 			"@routes/*": ["shared/routes/*"],
 

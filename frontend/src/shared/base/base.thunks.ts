@@ -3,9 +3,20 @@ import type { IBaseService } from './base.service';
 import { isAxiosError } from 'axios';
 import type { PaginatedResult } from '../types';
 
-export abstract class BaseThunks<T, TCreate, TUpdate, TCreateBody = TCreate, TUpdateBody = TUpdate> {
-	protected service: IBaseService<T, TCreate, TUpdate, TCreateBody, TUpdateBody>;
-	readonly resource: string;
+export abstract class BaseThunks<
+	T,
+	TCreate,
+	TUpdate,
+	TCreateBody = TCreate,
+	TUpdateBody = TUpdate,
+	TService extends IBaseService<T, TCreate, TUpdate, TCreateBody, TUpdateBody> = IBaseService<
+		T,
+		TCreate,
+		TUpdate,
+		TCreateBody,
+		TUpdateBody
+	>,
+> {
 	public getAll: AsyncThunk<T[], void, {}>;
 	public getById: AsyncThunk<T, string, {}>;
 	public create: AsyncThunk<T, TCreateBody, {}>;
@@ -14,7 +25,10 @@ export abstract class BaseThunks<T, TCreate, TUpdate, TCreateBody = TCreate, TUp
 	public paginate: AsyncThunk<PaginatedResult<T>, { page: number; limit: number }, {}>;
 	public search: AsyncThunk<PaginatedResult<T>, { term: string; page: number; limit: number }, {}>;
 
-	constructor(resource: string, service: IBaseService<T, TCreate, TUpdate, TCreateBody, TUpdateBody>) {
+	constructor(
+		protected resource: string,
+		protected service: TService,
+	) {
 		this.resource = resource;
 		this.service = service;
 

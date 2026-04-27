@@ -17,38 +17,27 @@ interface Pagination {
 	totalPages: number;
 	totalItems: number;
 }
-export interface BaseState<T> {
+export type BaseState<T, TExtra = {}> = {
 	items: T[];
 	item: T | null;
 	status: 'idle' | 'loading' | 'succeeded' | 'failed';
 	error: string | null;
 	pagination: Pagination;
-}
+} & TExtra;
 
 export const baseSlice = <
 	T extends { id: string },
+	TState extends BaseState<T>,
 	TCreate extends object,
 	TUpdate extends object,
 	CustomeReducers extends SliceCaseReducers<BaseState<T>>,
 >(
 	name: string,
-	thunks: BaseThunks<T, TCreate, TUpdate>,
+	thunks: BaseThunks<T, TCreate, TUpdate, any, any, any>,
+	initialState: TState,
 	customerReducers?: CustomeReducers,
-	customExtraReducers?: (builder: ActionReducerMapBuilder<BaseState<T>>) => void,
+	customExtraReducers?: (builder: ActionReducerMapBuilder<TState>) => void,
 ) => {
-	const initialState: BaseState<T> = {
-		items: [],
-		item: null,
-		status: 'idle',
-		error: null,
-		pagination: {
-			currentPage: 1,
-			itemsPerPage: 10,
-			totalItems: 0,
-			totalPages: 1,
-		},
-	};
-
 	return createSlice({
 		name,
 		initialState,

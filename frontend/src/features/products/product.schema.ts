@@ -60,3 +60,17 @@ export type TProductCreate = z.infer<typeof productCreateSchema>;
 export type TProductUpdate = z.infer<typeof productUpdateSchema>;
 
 export type TProductFormValues = z.infer<typeof productFormSchema>;
+
+export const productStatsSchema = z.object({
+	categories: z.array(
+		z.object({
+			name: z.string(),
+			count: z.number(),
+		}),
+	),
+	lowStock: z.string().optional().nullable(),
+	outOfStock: z.string().optional().nullable(),
+	totalProducts: z.string().optional().nullable(),
+});
+
+export type TProductStats = z.infer<typeof productStatsSchema>;

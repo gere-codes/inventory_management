@@ -3,3 +3,7 @@ export enum EProductStatus {
 	LOW_STOCK = 'Low Stock',
 	IN_STOCK = 'In Stock',
 }
+
+export enum EProduct {
+	RESOURCE = 'product',
+}

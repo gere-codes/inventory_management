@@ -1,4 +1,6 @@
 import { baseSlice } from '@base';
 import { categoryThunk } from './category.thunk';
+import { createIinitialBaseState } from '@constants';
+import type { TCategory } from './category.schema';
 
-export const categorySlice = baseSlice('category', categoryThunk, {});
+export const categorySlice = baseSlice('category', categoryThunk, { ...createIinitialBaseState<TCategory>() });

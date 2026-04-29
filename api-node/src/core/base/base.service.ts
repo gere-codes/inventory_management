@@ -15,7 +15,7 @@ export abstract class BaseService<
 	T,
 	TCreate,
 	TUpdate,
-	TRepository extends IBaseRepository<T, TCreate, TUpdate>,
+	TRepository extends IBaseRepository<T, TCreate, TUpdate> = IBaseRepository<T, TCreate, TUpdate>,
 > implements IBaseService<T, TCreate, TUpdate> {
 	protected repository: TRepository;
 	protected schema: z.ZodSchema<T>;

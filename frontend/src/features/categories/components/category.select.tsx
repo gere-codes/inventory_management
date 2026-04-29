@@ -22,7 +22,7 @@ export const CategorySelect = ({ categories, isLoading, register }: Props) => {
 				className="w-full px-3 py-2 border border-gray-300 rounded-md h-[42px]"
 			>
 				<option value="">Select a category</option>
-				{categories.map((cat) => (
+				{categories?.map((cat) => (
 					<option key={cat.id} value={cat.id}>
 						{cat.name}
 					</option>

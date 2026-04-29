@@ -14,6 +14,9 @@ import { Button } from '@ui';
 import { debounce } from '@utils';
 import { setCurrentPage } from '@products';
 import { IoTrendingDownOutline } from 'react-icons/io5';
+import { LuPackageMinus, LuPackageOpen } from 'react-icons/lu';
+import { TbPackages } from 'react-icons/tb';
+import type { IconType } from 'react-icons';
 
 export const ProductsPage = () => {
 	const FIRST_PAGE = 1;
@@ -67,59 +70,48 @@ export const ProductsPage = () => {
 	};
 
 	return (
-		<section className="py-2">
-			<section className="my-2 flex gap-6">
-				<section className=" bg-green-50 h-[145px] w-[350px] text-left text-green-900 p-2 rounded-lg shadow-sm flex gap-2 items-center">
-					<span className="p-2 bg-green-200 rounded">
-						<IoTrendingDownOutline size={30} />
-					</span>
-
-					<div>
-						<span>{productStats?.lowStock}</span>
-						<h2 className="text-sm ">Low in Stock</h2>
-					</div>
-				</section>
-				<section className=" bg-red-50 h-[145px] w-[350px]  text-left text-red-600 p-2 rounded-lg shadow-sm flex gap-2 items-center">
-					<span className="p-2 bg-red-200 rounded">
-						<IoTrendingDownOutline size={30} />
-					</span>
-
-					<div>
-						<span>{productStats?.outOfStock}</span>
-						<h2 className="text-sm ">Out of Stock</h2>
-					</div>
-				</section>
-				<DynamicPieChart data={productStats?.categories} />
+		<section className="py-4 space-y-6">
+			{/* Stats */}
+			<section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+				<ProductLevel
+					Icon={TbPackages}
+					color="blue"
+					count={productStats?.totalProducts}
+					name="Total Products"
+				/>
+				<ProductLevel Icon={LuPackageMinus} color="yellow" count={productStats?.lowStock} name="Low in Stock" />
+				<ProductLevel Icon={LuPackageOpen} color="red" count={productStats?.outOfStock} name="Out of Stock" />
 			</section>
-			<section className="flex justify-between items-end">
-				<section className="flex flex-col gap-4 flex-1">
+
+			{/* Search + Add */}
+			<section className="flex justify-between items-center flex-wrap gap-4">
+				<div className="flex flex-col gap-2 flex-1">
 					<h2 className="text-xl font-bold">Products List</h2>
-					<section>
-						<SearchBar
-							value={term}
-							onSearch={(newValue) => {
-								setTerm(newValue);
-								debouncedSearch(newValue);
-							}}
-							placeholder="Search..."
-						/>
-					</section>
-				</section>
+					<SearchBar
+						value={term}
+						onSearch={(newValue) => {
+							setTerm(newValue);
+							debouncedSearch(newValue);
+						}}
+						placeholder="Search..."
+					/>
+				</div>
+
 				<Button
-					className="w-fit flex justify-center items-center gap-1 text-white"
-					style={{
-						width: 138,
-						height: 40,
-					}}
-					onClick={() => {
-						dispatch(openModal({ data: null, mode: EModalMode.CREATE, type: EModalType.PRODUCT }));
-					}}
+					className="w-fit flex items-center gap-1 text-white"
+					style={{ width: 138, height: 40 }}
+					onClick={() =>
+						dispatch(openModal({ data: null, mode: EModalMode.CREATE, type: EModalType.PRODUCT }))
+					}
 				>
 					+ Add Product
 				</Button>
 			</section>
 
+			{/* Table */}
 			<ProductTable products={products} onDelete={handleDelete} onEdit={handleEdit} onOrder={handleOrder} />
+
+			{/* Pagination */}
 			<Pagination
 				currentPage={currentPage}
 				totalPages={totalPages}
@@ -127,6 +119,46 @@ export const ProductsPage = () => {
 				onPageChange={handlePageChange}
 				onPerPageChange={handlePerPageChange}
 			/>
+		</section>
+	);
+};
+type TColor = 'yellow' | 'red' | 'blue';
+const colorMap: Record<TColor, Record<'bg' | 'text' | 'iconBg', string>> = {
+	yellow: {
+		bg: 'bg-yellow-50',
+		text: 'text-yellow-600',
+		iconBg: 'bg-yellow-200',
+	},
+	red: {
+		bg: 'bg-red-50',
+		text: 'text-red-600',
+		iconBg: 'bg-red-200',
+	},
+	blue: {
+		bg: 'bg-blue-50',
+		text: 'text-blue-600',
+		iconBg: 'bg-blue-200',
+	},
+};
+
+interface IProductLevel {
+	name: string;
+	count?: number;
+	Icon: IconType;
+	color: TColor;
+}
+
+const ProductLevel = ({ color, count, name, Icon }: IProductLevel) => {
+	const styles = colorMap[color];
+	return (
+		<section className={`${styles.bg} ${styles.text} h-[160px] p-4 rounded-lg shadow-xs flex items-center gap-4`}>
+			<span className={`p-3 ${styles.iconBg} rounded-lg`}>
+				<Icon size={28} />
+			</span>
+			<div>
+				<span className="text-3xl font-semibold">{count}</span>
+				<h2 className="text-sm ">{name}</h2>
+			</div>
 		</section>
 	);
 };

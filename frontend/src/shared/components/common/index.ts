@@ -2,6 +2,7 @@ export * from './layout.common';
 export * from './sidebar.common';
 export * from './pagination.common';
 export * from './search-bar.common';
+export * from './charts/pie.chart';
 
 export { EModalMode, EModalType } from './modal/modal.enum';
 export { modalSlice, closeModal, openModal } from './modal/modal.slice';

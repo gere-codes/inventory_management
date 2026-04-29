@@ -1,26 +1,41 @@
 import { baseSlice } from '@base';
 import { productThunk } from './product.thunk';
-import type { TProduct } from './product.schema';
+import type { TProduct, TProductStats } from './product.schema';
 import { createIinitialBaseState } from '@constants';
 
+interface StatsState {
+	data: TProductStats;
+	status: 'idle' | 'loading' | 'succeeded' | 'failed';
+	error: any;
+}
+const initialStatsState: StatsState = {
+	data: {
+		categories: [],
+		lowStock: '',
+		outOfStock: '',
+		totalProducts: '',
+	},
+	status: 'idle',
+	error: null,
+};
 export const productSlice = baseSlice(
 	'product',
 	productThunk,
-	{ ...createIinitialBaseState<TProduct>(), stats: null },
+	{ ...createIinitialBaseState<TProduct>(), stats: initialStatsState },
 	{},
 
 	(builder) => {
 		builder
 			.addCase(productThunk.getStats.pending, (state) => {
-				state.status = 'loading';
+				state.stats.status = 'loading';
 			})
 			.addCase(productThunk.getStats.fulfilled, (state, action) => {
-				state.status = 'succeeded';
-				state.stats = action.payload;
+				state.stats.status = 'succeeded';
+				state.stats.data = action.payload;
 			})
 			.addCase(productThunk.getStats.rejected, (state, action) => {
-				state.status = 'failed';
-				state.error = (action.payload as string) || 'An error occurred';
+				state.stats.status = 'failed';
+				state.stats.error = (action.payload as string) || 'An error occurred';
 			});
 	},
 );

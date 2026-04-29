@@ -11,6 +11,7 @@ productRoutes.put('/:id', upload.single('image'), productController.update);
 productRoutes.delete('/:id', productController.delete);
 
 productRoutes.get('/search', productController.search);
+productRoutes.get('/stats', productController.getStats);
 productRoutes.get('/:id', productController.getById);
 
 export default productRoutes;

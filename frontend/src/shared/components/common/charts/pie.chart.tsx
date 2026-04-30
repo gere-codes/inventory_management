@@ -38,7 +38,7 @@ export function DynamicPieChart({ data }: Props) {
 	};
 
 	return (
-		<section className="h-[145px] w-[350px] border border-gray-100 rounded-md bg-gray-50">
+		<section className="h-[350px] w-[450px] border border-gray-100 rounded-md bg-gray-50">
 			<ResponsiveContainer width={'100%'} height={'100%'}>
 				<PieChart width={'100%'} height={'100%'}>
 					<Pie
@@ -48,7 +48,7 @@ export function DynamicPieChart({ data }: Props) {
 						cx="50%"
 						cy="50%"
 						innerRadius={0}
-						outerRadius={40}
+						outerRadius={80}
 						paddingAngle={0}
 						cornerRadius={0}
 						label={renderLabel}

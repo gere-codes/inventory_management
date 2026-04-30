@@ -13,7 +13,7 @@ export const ProductTable = memo(({ products, onDelete, onEdit, onOrder }: Props
 
 	return (
 		<section className="bg-white rounded-lg border border-gray-200 overflow-hidden relative mt-4">
-			<section className="overflow-y-auto h-[calc(100vh-12.5rem)] relative">
+			<section className="overflow-y-auto h-[calc(100vh-24.5rem)] relative">
 				<table className="w-full table-fixed divide-y divide-gray-200">
 					<TableHeaders headers={tableHeaders} />
 

@@ -18,7 +18,7 @@ export const Pagination: React.FC<Props> = ({
 	const safeTotalPages = totalPages < 1 ? 1 : totalPages;
 
 	return (
-		<div className="flex justify-end items-center gap-6 mt-4 pt-4 ">
+		<div className="flex justify-end items-center gap-6  ">
 			<div className="flex items-center gap-2">
 				<span className="text-sm font-medium text-gray-700">Rows per page:</span>
 				<select

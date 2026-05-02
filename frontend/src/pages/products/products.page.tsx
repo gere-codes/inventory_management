@@ -13,7 +13,6 @@ import {
 import { Button } from '@ui';
 import { debounce } from '@utils';
 import { setCurrentPage } from '@products';
-import { IoTrendingDownOutline } from 'react-icons/io5';
 import { LuPackageMinus, LuPackageOpen } from 'react-icons/lu';
 import { TbPackages } from 'react-icons/tb';
 import type { IconType } from 'react-icons';
@@ -76,7 +75,7 @@ export const ProductsPage = () => {
 				<ProductLevel
 					Icon={TbPackages}
 					color="blue"
-					count={productStats?.totalProducts}
+					count={productStats?.totalProducts ?? 0}
 					name="Total Products"
 				/>
 				<ProductLevel Icon={LuPackageMinus} color="yellow" count={productStats?.lowStock} name="Low in Stock" />
@@ -84,7 +83,7 @@ export const ProductsPage = () => {
 			</section>
 
 			{/* Search + Add */}
-			<section className="flex justify-between items-center flex-wrap gap-4">
+			<section className="flex justify-between items-end">
 				<div className="flex flex-col gap-2 flex-1">
 					<h2 className="text-xl font-bold">Products List</h2>
 					<SearchBar
@@ -143,7 +142,7 @@ const colorMap: Record<TColor, Record<'bg' | 'text' | 'iconBg', string>> = {
 
 interface IProductLevel {
 	name: string;
-	count?: number;
+	count: number;
 	Icon: IconType;
 	color: TColor;
 }

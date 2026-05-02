@@ -11,9 +11,9 @@ interface StatsState {
 const initialStatsState: StatsState = {
 	data: {
 		categories: [],
-		lowStock: '',
-		outOfStock: '',
-		totalProducts: '',
+		lowStock: 0,
+		outOfStock: 0,
+		totalProducts: 0,
 	},
 	status: 'idle',
 	error: null,

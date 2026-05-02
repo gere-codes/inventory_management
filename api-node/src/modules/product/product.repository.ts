@@ -111,9 +111,12 @@ export class ProductRepository
 	public async getStats(userId: string) {
 		const result = await this.db
 			.select({
-				outOfStock: sql<number>`count(case when ${this.table.quantity} <= 0 then 1 end)`,
-				lowStock: sql<number>`count(case when ${this.table.quantity} > 0 and ${this.table.quantity} <= 5 then 1 end)`,
-				totalProducts: sql<number>`count(*)`,
+				outOfStock: sql<number>`count(case when ${this.table.quantity} <= 0 then 1 end)`.mapWith(Number),
+				lowStock:
+					sql<number>`count(case when ${this.table.quantity} > 0 and ${this.table.quantity} <= 5 then 1 end)`.mapWith(
+						Number,
+					),
+				totalProducts: sql<number>`count(*)`.mapWith(Number),
 			})
 			.from(this.table as AnyPgTable)
 			.where(eq(this.table.userId, userId));
@@ -121,7 +124,7 @@ export class ProductRepository
 		const categoriesResult = await this.db
 			.select({
 				name: categories.name,
-				count: sql<number>`count(${this.table.id})`,
+				count: sql<number>`count(${this.table.id})`.mapWith(Number),
 			})
 			.from(this.table as AnyPgTable)
 			.leftJoin(categories, eq(this.table.categoryId, categories.id))

@@ -68,9 +68,9 @@ export const productStatsSchema = z.object({
 			count: z.number(),
 		}),
 	),
-	lowStock: z.string().optional().nullable(),
-	outOfStock: z.string().optional().nullable(),
-	totalProducts: z.string().optional().nullable(),
+	lowStock: z.number(),
+	outOfStock: z.number(),
+	totalProducts: z.number(),
 });
 
 export type TProductStats = z.infer<typeof productStatsSchema>;

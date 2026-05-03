@@ -1,5 +1,12 @@
 import { useEffect, useState } from 'react';
-import { selectCategories, selectCategoryPagination, categoryThunk, CategoryTable } from '@categories';
+import {
+	selectCategories,
+	selectCategoryPagination,
+	categoryThunk,
+	CategoryTable,
+	setCategoriesPerPage,
+	setCurrentCategoryPage,
+} from '@categories';
 import { useAppDispatch, useAppSelector } from '@hooks';
 import { DynamicPieChart, Pagination, SearchBar } from '@common';
 import { productThunk, selectProductStats } from '@products';
@@ -24,6 +31,11 @@ export const CategoriesPage = () => {
 
 	const noop = () => {};
 
+	const handlePerPageChange = (perPage: number) => {
+		dispatch(setCurrentCategoryPage(perPage));
+		dispatch(setCategoriesPerPage(perPage));
+	};
+
 	return (
 		<section className="flex flex-col lg:flex-row">
 			<section className=" w-full lg:max-w-2/3">
@@ -34,7 +46,7 @@ export const CategoriesPage = () => {
 					totalPages={totalPages}
 					itemsPerPage={itemsPerPage}
 					onPageChange={noop}
-					onPerPageChange={noop}
+					onPerPageChange={handlePerPageChange}
 				/>
 			</section>
 

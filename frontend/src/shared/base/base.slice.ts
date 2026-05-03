@@ -35,7 +35,7 @@ export const baseSlice = <
 	name: string,
 	thunks: BaseThunks<T, TCreate, TUpdate, any, any, any>,
 	initialState: TState,
-	customerReducers?: CustomeReducers,
+	customeReducers?: CustomeReducers,
 	customExtraReducers?: (builder: ActionReducerMapBuilder<TState>) => void,
 ) => {
 	return createSlice({
@@ -51,7 +51,7 @@ export const baseSlice = <
 			setItemsPerPage: (state, action) => {
 				state.pagination.itemsPerPage = action.payload;
 			},
-			...customerReducers,
+			...customeReducers,
 		},
 		extraReducers: (builder) => {
 			builder

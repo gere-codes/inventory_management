@@ -18,10 +18,17 @@ interface Pagination {
 	totalItems: number;
 }
 export type BaseState<T, TExtra = {}> = {
-	items: T[];
-	item: T | null;
-	status: 'idle' | 'loading' | 'succeeded' | 'failed';
-	error: string | null;
+	list: {
+		data: T[];
+		status: 'idle' | 'loading' | 'succeeded' | 'failed';
+		error: string | null;
+	};
+	item: {
+		data: T;
+		status: 'idle' | 'loading' | 'succeeded' | 'failed';
+		error: string | null;
+	};
+
 	pagination: Pagination;
 } & TExtra;
 
@@ -42,8 +49,8 @@ export const baseSlice = <
 		name,
 		initialState,
 		reducers: {
-			resetError: (state) => {
-				state.error = null;
+			resetListError: (state) => {
+				state.list.error = null;
 			},
 			setCurrentPage: (state, action) => {
 				state.pagination.currentPage = action.payload;
@@ -58,115 +65,115 @@ export const baseSlice = <
 
 				// Get all
 				.addCase(thunks.getAll.pending, (state) => {
-					state.status = 'loading';
-					state.error = null;
+					state.list.status = 'loading';
+					state.list.error = null;
 				})
 				.addCase(thunks.getAll.fulfilled, (state, action: PayloadAction<T[]>) => {
-					state.status = 'succeeded';
-					state.error = null;
-					state.items = castDraft(action.payload);
+					state.list.status = 'succeeded';
+					state.list.error = null;
+					state.list.data = castDraft(action.payload);
 				})
 				.addCase(thunks.getAll.rejected, (state, action) => {
-					state.status = 'failed';
-					state.error = (action.payload as string) || 'An error occurred';
+					state.list.status = 'failed';
+					state.list.error = (action.payload as string) || 'An error occurred';
 				})
 
 				// Get by Id
 				.addCase(thunks.getById.pending, (state) => {
-					state.status = 'loading';
-					state.error = null;
+					state.item.status = 'loading';
+					state.item.error = null;
 				})
 				.addCase(thunks.getById.fulfilled, (state, action: PayloadAction<T>) => {
-					state.status = 'succeeded';
-					state.error = null;
-					state.item = action.payload as typeof state.item;
+					state.item.status = 'succeeded';
+					state.item.error = null;
+					state.item.data = action.payload as typeof state.item.data;
 				})
 				.addCase(thunks.getById.rejected, (state, action) => {
-					state.status = 'failed';
-					state.error = (action.payload as string) || 'An error occurred';
+					state.item.status = 'failed';
+					state.item.error = (action.payload as string) || 'An error occurred';
 				})
 
 				// create
 				.addCase(thunks.create.pending, (state) => {
-					state.status = 'loading';
-					state.error = null;
+					state.list.status = 'loading';
+					state.list.error = null;
 				})
 				.addCase(thunks.create.fulfilled, (state, action: PayloadAction<T>) => {
-					state.status = 'succeeded';
-					state.error = null;
+					state.list.status = 'succeeded';
+					state.list.error = null;
 					const item = castDraft(action.payload);
-					// state.items.unshift(item);
+					// state.list.data.unshift(item);
 					// state.pagination.totalItems += 1;
 				})
 				.addCase(thunks.create.rejected, (state, action) => {
-					state.status = 'failed';
-					state.error = (action.payload as string) || 'An error occurred';
+					state.list.status = 'failed';
+					state.list.error = (action.payload as string) || 'An error occurred';
 				})
 				// update
 				.addCase(thunks.update.pending, (state) => {
-					state.status = 'loading';
-					state.error = null;
+					state.list.status = 'loading';
+					state.list.error = null;
 				})
 				.addCase(thunks.update.fulfilled, (state, action: PayloadAction<T>) => {
-					state.status = 'succeeded';
-					state.error = null;
+					state.list.status = 'succeeded';
+					state.list.error = null;
 					const item = castDraft(action.payload);
-					const itemIndex = state.items.findIndex((i) => i.id === item.id);
+					const itemIndex = state.list.data.findIndex((i) => i.id === item.id);
 
 					if (itemIndex !== -1) {
-						state.items[itemIndex] = item;
+						state.list.data[itemIndex] = item;
 					}
 				})
 				.addCase(thunks.update.rejected, (state, action) => {
-					state.status = 'failed';
-					state.error = (action.payload as string) || 'An error occurred';
+					state.list.status = 'failed';
+					state.list.error = (action.payload as string) || 'An error occurred';
 				})
 
 				// delete
 				.addCase(thunks.delete.pending, (state) => {
-					state.status = 'loading';
+					state.list.status = 'loading';
 				})
 				.addCase(thunks.delete.fulfilled, (state, action: PayloadAction<T>) => {
-					state.status = 'succeeded';
-					const itemIndex = state.items.findIndex((i) => i.id === action.payload.id);
+					state.list.status = 'succeeded';
+					const itemIndex = state.list.data.findIndex((i) => i.id === action.payload.id);
 					if (itemIndex !== -1) {
-						state.items.splice(itemIndex, 1);
+						state.list.data.splice(itemIndex, 1);
 						state.pagination.totalItems -= 1;
 					}
 				})
 				.addCase(thunks.delete.rejected, (state, action) => {
-					state.status = 'failed';
-					state.error = (action.payload as string) || 'An error occurred';
+					state.list.status = 'failed';
+					state.list.error = (action.payload as string) || 'An error occurred';
 				})
 
 				// search
 				.addCase(thunks.search.pending, (state) => {
-					state.status = 'loading';
+					state.list.status = 'loading';
 				})
 				.addCase(thunks.search.fulfilled, (state, action: PayloadAction<PaginatedResult<T>>) => {
-					state.status = 'succeeded';
-					state.error = null;
-					state.items = castDraft(action.payload.data);
+					state.list.status = 'succeeded';
+					state.list.error = null;
+					state.list.data = castDraft(action.payload.data);
 				})
 				.addCase(thunks.search.rejected, (state, action) => {
-					state.status = 'failed';
-					state.error = (action.payload as string) || 'An error occurred';
+					state.list.status = 'failed';
+					state.list.error = (action.payload as string) || 'An error occurred';
 				})
 
 				// Get paginated
 				.addCase(thunks.paginate.pending, (state) => {
-					state.status = 'loading';
-					state.error = null;
+					state.list.status = 'loading';
+					state.list.error = null;
 				})
 				.addCase(thunks.paginate.fulfilled, (state, action: PayloadAction<PaginatedResult<T>>) => {
-					state.status = 'succeeded';
-					state.error = null;
-					state.items = action.payload.data as typeof state.items;
+					state.list.status = 'succeeded';
+					state.list.error = null;
+					state.list.data = castDraft(action.payload.data);
 					state.pagination = action.payload.pagination as typeof state.pagination;
 				})
 				.addCase(thunks.paginate.rejected, (state, action) => {
-					state.status = 'failed';
-					state.error = (action.payload as string) || 'An error occurred';
+					state.list.status = 'failed';
+					state.list.error = (action.payload as string) || 'An error occurred';
 				});
 
 			if (customExtraReducers) {

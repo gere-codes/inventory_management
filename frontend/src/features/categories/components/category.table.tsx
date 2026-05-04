@@ -8,7 +8,7 @@ interface Props {
 	onEdit: (category: TCategory) => void;
 }
 export const CategoryTable = memo(({ categories, onDelete, onEdit }: Props) => {
-	const tableHeaders = ['name', 'description', 'crated at', 'updated at', 'actions'];
+	const tableHeaders = ['name', 'description', 'actions'];
 
 	return (
 		<section className="bg-white rounded-lg border border-gray-200 overflow-hidden relative mt-4">

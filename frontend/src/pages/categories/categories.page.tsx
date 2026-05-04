@@ -6,9 +6,10 @@ import {
 	CategoryTable,
 	setCategoriesPerPage,
 	setCurrentCategoryPage,
+	type TCategory,
 } from '@categories';
 import { useAppDispatch, useAppSelector } from '@hooks';
-import { DynamicPieChart, Pagination, SearchBar } from '@common';
+import { DynamicPieChart, EModalMode, EModalType, openModal, Pagination, SearchBar } from '@common';
 import { productThunk, selectProductStats } from '@products';
 
 export const CategoriesPage = () => {
@@ -39,11 +40,15 @@ export const CategoriesPage = () => {
 		dispatch(setCategoriesPerPage(perPage));
 	};
 
+	const handleEdit = (category: TCategory) => {
+		dispatch(openModal({ data: category, type: EModalType.CATEGORY, mode: EModalMode.EDIT }));
+	};
+
 	return (
 		<section className="flex flex-col lg:flex-row">
 			<section className=" w-full lg:max-w-2/3">
 				<SearchBar value={term} onSearch={(newValue) => setTerm(newValue)} placeholder="Search Product..." />
-				<CategoryTable categories={categories} onDelete={noop} onEdit={noop} />
+				<CategoryTable categories={categories} onDelete={noop} onEdit={handleEdit} />
 				<Pagination
 					currentPage={currentPage}
 					totalPages={totalPages}

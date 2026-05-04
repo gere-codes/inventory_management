@@ -14,8 +14,6 @@ export const CategoryItem = memo(({ category, onEdit, onDelete }: Props) => {
 		<tr key={category.id} className="hover:bg-gray-50  border-b border-gray-200">
 			<TableItemData item={category.name} />
 			<TableItemData item={category.description || ''} />
-			<TableItemData item={new Date(category.updatedAt).toLocaleDateString()} />
-			<TableItemData item={new Date(category.createdAt).toLocaleDateString()} />
 
 			<td className="px-4 py-4  w-1/4 text-ellipsis overflow-hidden">
 				<span className="flex gap-3 truncate ">

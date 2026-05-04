@@ -31,8 +31,11 @@ export const CategoriesPage = () => {
 
 	const noop = () => {};
 
+	const handlePageChange = (pageNum: number) => {
+		dispatch(setCurrentCategoryPage(pageNum));
+	};
+
 	const handlePerPageChange = (perPage: number) => {
-		dispatch(setCurrentCategoryPage(perPage));
 		dispatch(setCategoriesPerPage(perPage));
 	};
 
@@ -45,7 +48,7 @@ export const CategoriesPage = () => {
 					currentPage={currentPage}
 					totalPages={totalPages}
 					itemsPerPage={itemsPerPage}
-					onPageChange={noop}
+					onPageChange={handlePageChange}
 					onPerPageChange={handlePerPageChange}
 				/>
 			</section>

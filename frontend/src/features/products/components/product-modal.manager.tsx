@@ -7,7 +7,7 @@ import { ProductForm } from './product.form';
 
 interface Props {
 	mode: EModalMode;
-	productData: TProductFormValues;
+	productData: TProduct;
 }
 
 export const ProductModalManager = ({ productData, mode }: Props) => {
@@ -33,17 +33,18 @@ export const ProductModalManager = ({ productData, mode }: Props) => {
 		close();
 	};
 
-	if (mode === EModalMode.DELETE) {
-		return (
-			<Confirmation
-				title="Delete Product?"
-				// message={`Are you sure you want to delete ${productData.name}?`}
-				name={productData.name}
-				onCancel={close}
-				onConfirm={handleDelete}
-			/>
-		);
+	switch (mode) {
+		case EModalMode.DELETE:
+			return (
+				<Confirmation
+					title="Delete Product?"
+					name={productData.name}
+					onCancel={close}
+					onConfirm={handleDelete}
+				/>
+			);
+		case EModalMode.CREATE:
+		case EModalMode.EDIT:
+			return <ProductForm productData={productData} mode={mode} />;
 	}
-
-	return <ProductForm productData={productData} mode={mode} />;
 };

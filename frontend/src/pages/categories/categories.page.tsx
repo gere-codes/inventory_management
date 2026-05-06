@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
 	selectCategories,
 	selectCategoryPagination,
@@ -11,9 +11,11 @@ import {
 import { useAppDispatch, useAppSelector } from '@hooks';
 import { DynamicPieChart, EModalMode, EModalType, openModal, Pagination, SearchBar } from '@common';
 import { productThunk, selectProductStats } from '@products';
+import { debounce } from '@/shared/utils';
 
 export const CategoriesPage = () => {
 	const [term, setTerm] = useState<string>('');
+	const FIRST_PAGE = 1;
 
 	const dispatch = useAppDispatch();
 	const categories = useAppSelector(selectCategories);
@@ -40,14 +42,41 @@ export const CategoriesPage = () => {
 		dispatch(setCategoriesPerPage(perPage));
 	};
 
+	//debounce
+	const debouncedSearch = useMemo(
+		() =>
+			debounce((term) => {
+				dispatch(categoryThunk.search({ term, page: FIRST_PAGE, limit: itemsPerPage }));
+			}, 500),
+		[dispatch, itemsPerPage],
+	);
+	useEffect(() => {
+		return () => {
+			debouncedSearch.cancel();
+		};
+	}, [debouncedSearch]);
+
 	const handleEdit = (category: TCategory) => {
-		dispatch(openModal({ data: category, type: EModalType.CATEGORY, mode: EModalMode.EDIT }));
+		dispatch(
+			openModal({
+				data: category,
+				type: EModalType.CATEGORY,
+				mode: EModalMode.EDIT,
+			}),
+		);
 	};
 
 	return (
 		<section className="flex flex-col lg:flex-row">
 			<section className=" w-full lg:max-w-2/3">
-				<SearchBar value={term} onSearch={(newValue) => setTerm(newValue)} placeholder="Search Product..." />
+				<SearchBar
+					value={term}
+					onSearch={(newValue) => {
+						setTerm(newValue);
+						debouncedSearch(newValue);
+					}}
+					placeholder="Search Product..."
+				/>
 				<CategoryTable categories={categories} onDelete={noop} onEdit={handleEdit} />
 				<Pagination
 					currentPage={currentPage}

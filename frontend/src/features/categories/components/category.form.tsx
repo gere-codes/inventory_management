@@ -4,6 +4,7 @@ import { Button, InputField, TextareaField } from '@ui';
 import { categorySchema, type TCategory } from '../category.schema';
 import { closeModal, EModalMode } from '@common';
 import { useAppDispatch } from '@hooks';
+import { categoryThunk } from '../category.thunk';
 
 interface Props {
 	mode: EModalMode;
@@ -30,8 +31,21 @@ export const CategoryForm = ({ mode, categoryData }: Props) => {
 
 	const dispatch = useAppDispatch();
 
+	const onSubmit = async (data: TCategory) => {
+		const body = {
+			name: data.name,
+			description: data.description,
+		};
+
+		if (mode === EModalMode.CREATE) {
+			dispatch(categoryThunk.create(body));
+		} else {
+			dispatch(categoryThunk.update({ body, id: data.id }));
+		}
+		dispatch(closeModal());
+	};
 	return (
-		<form className="p-2 w-78">
+		<form onSubmit={handleSubmit(onSubmit)} className="p-2 w-78">
 			<h2 className="capitalize font-bold text-xl text-center mb-1">
 				{mode === EModalMode.EDIT ? 'update product' : 'add product'}
 			</h2>

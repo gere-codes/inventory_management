@@ -1,9 +1,9 @@
-import { closeModal, EModalMode } from '@common';
-import { categorySchema, type TCategory } from '../category.schema';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, InputField, TextareaField } from '@/shared/components/ui';
-import { useAppDispatch } from '@/shared/hooks';
+import { Button, InputField, TextareaField } from '@ui';
+import { categorySchema, type TCategory } from '../category.schema';
+import { closeModal, EModalMode } from '@common';
+import { useAppDispatch } from '@hooks';
 
 interface Props {
 	mode: EModalMode;
@@ -16,9 +16,16 @@ export const CategoryForm = ({ mode, categoryData }: Props) => {
 		handleSubmit,
 		formState: { errors },
 		setValue,
-	} = useForm({
+	} = useForm<TCategory>({
 		resolver: zodResolver(categorySchema),
-		defaultValues: categoryData,
+		mode: 'onBlur',
+		values: {
+			id: categoryData.id ?? '',
+			name: categoryData.name ?? '',
+			description: categoryData.description ?? '',
+			createdAt: categoryData.createdAt ?? '',
+			updatedAt: categoryData.updatedAt ?? '',
+		},
 	});
 
 	const dispatch = useAppDispatch();
@@ -28,10 +35,17 @@ export const CategoryForm = ({ mode, categoryData }: Props) => {
 			<h2 className="capitalize font-bold text-xl text-center mb-1">
 				{mode === EModalMode.EDIT ? 'update product' : 'add product'}
 			</h2>
-			<div>
-				<InputField {...register('name')} label="Name" id="name" />
-				<TextareaField {...register('description')} label="Description" id="description" />
-				<div className="mt-6 flex justify-end space-x-3">
+			<section>
+				<section className="flex gap-4 flex-col">
+					<InputField {...register('name')} label="Name" id="name" error={errors.name?.message} />
+					<TextareaField
+						{...register('description')}
+						label="Description"
+						id="description"
+						error={errors.description?.message}
+					/>
+				</section>
+				<section className="mt-6 flex justify-end space-x-3">
 					<Button
 						variant="secondary"
 						type="button"
@@ -43,8 +57,8 @@ export const CategoryForm = ({ mode, categoryData }: Props) => {
 						Cancel
 					</Button>
 					<Button type="submit">{mode === EModalMode.EDIT ? 'Update ' : 'Save '}</Button>
-				</div>
-			</div>
+				</section>
+			</section>
 		</form>
 	);
 };

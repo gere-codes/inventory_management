@@ -11,7 +11,8 @@ import {
 import { useAppDispatch, useAppSelector } from '@hooks';
 import { DynamicPieChart, EModalMode, EModalType, openModal, Pagination, SearchBar } from '@common';
 import { productThunk, selectProductStats } from '@products';
-import { debounce } from '@/shared/utils';
+import { debounce } from '@utils';
+import { Button } from '@ui';
 
 export const CategoriesPage = () => {
 	const [term, setTerm] = useState<string>('');
@@ -69,14 +70,21 @@ export const CategoriesPage = () => {
 	return (
 		<section className="flex flex-col lg:flex-row">
 			<section className=" w-full lg:max-w-2/3">
-				<SearchBar
-					value={term}
-					onSearch={(newValue) => {
-						setTerm(newValue);
-						debouncedSearch(newValue);
-					}}
-					placeholder="Search Product..."
-				/>
+				<section className=" flex flex-col gap-2 mt-2">
+					<h2 className="font-bold text-xl">Categories List</h2>
+					<section className="flex justify-between">
+						<SearchBar
+							value={term}
+							onSearch={(newValue) => {
+								setTerm(newValue);
+								debouncedSearch(newValue);
+							}}
+							placeholder="Search..."
+						/>
+
+						<Button style={{ width: 138, height: 40 }}>Add Category</Button>
+					</section>
+				</section>
 				<CategoryTable categories={categories} onDelete={noop} onEdit={handleEdit} />
 				<Pagination
 					currentPage={currentPage}

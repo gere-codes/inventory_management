@@ -1,10 +1,10 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, InputField, TextareaField } from '@ui';
 import { categorySchema, type TCategory } from '../category.schema';
+import { categoryThunk } from '../category.thunk';
+import { Button, InputField, TextareaField } from '@ui';
 import { closeModal, EModalMode } from '@common';
 import { useAppDispatch } from '@hooks';
-import { categoryThunk } from '../category.thunk';
 
 interface Props {
 	mode: EModalMode;

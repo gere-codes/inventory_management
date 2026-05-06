@@ -21,11 +21,11 @@ export const CategoryForm = ({ mode, categoryData }: Props) => {
 		resolver: zodResolver(categorySchema),
 		mode: 'onBlur',
 		values: {
-			id: categoryData.id ?? '',
-			name: categoryData.name ?? '',
-			description: categoryData.description ?? '',
-			createdAt: categoryData.createdAt ?? '',
-			updatedAt: categoryData.updatedAt ?? '',
+			id: categoryData?.id ?? '',
+			name: categoryData?.name ?? '',
+			description: categoryData?.description ?? '',
+			createdAt: categoryData?.createdAt ?? '',
+			updatedAt: categoryData?.updatedAt ?? '',
 		},
 	});
 

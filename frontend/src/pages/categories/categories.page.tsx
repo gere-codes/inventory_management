@@ -82,7 +82,14 @@ export const CategoriesPage = () => {
 							placeholder="Search..."
 						/>
 
-						<Button style={{ width: 138, height: 40 }}>Add Category</Button>
+						<Button
+							onClick={() =>
+								dispatch(openModal({ data: null, mode: EModalMode.CREATE, type: EModalType.CATEGORY }))
+							}
+							style={{ width: 138, height: 40 }}
+						>
+							Add Category
+						</Button>
 					</section>
 				</section>
 				<CategoryTable categories={categories} onDelete={noop} onEdit={handleEdit} />

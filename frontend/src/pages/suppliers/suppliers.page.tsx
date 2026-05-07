@@ -4,12 +4,13 @@ import { useAppDispatch, useAppSelector } from '@hooks';
 
 export const SuppliersPage = () => {
 	const suppliers = useAppSelector(selectSuppliers);
-	const { currentPage, itemsPerPage, totalItems, totalPages } = useAppSelector(selectSuppliersPagination);
+
+	const pagiination = useAppSelector(selectSuppliersPagination);
 	const dispatch = useAppDispatch();
 
 	useEffect(() => {
-		dispatch(supplierThunk.paginate({ page: currentPage, limit: itemsPerPage }));
-	}, [currentPage, itemsPerPage, dispatch]);
+		dispatch(supplierThunk.paginate({ page: pagiination.currentPage, limit: pagiination.itemsPerPage }));
+	}, [pagiination?.currentPage, pagiination?.itemsPerPage, dispatch]);
 	return (
 		<section>
 			<h2>section page</h2>

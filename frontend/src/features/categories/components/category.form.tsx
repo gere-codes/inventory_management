@@ -1,10 +1,10 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { categorySchema, type TCategory } from '../category.schema';
-import { categoryThunk } from '../category.thunk';
+import { categoryFormSchema, categorySchema, type TCategory, type TCategoryForm } from '../category.schema';
 import { Button, InputField, TextareaField } from '@ui';
 import { closeModal, EModalMode } from '@common';
 import { useAppDispatch } from '@hooks';
+import { categoryThunk } from '../category.thunk';
 
 interface Props {
 	mode: EModalMode;
@@ -17,30 +17,33 @@ export const CategoryForm = ({ mode, categoryData }: Props) => {
 		handleSubmit,
 		formState: { errors },
 		setValue,
-	} = useForm<TCategory>({
-		resolver: zodResolver(categorySchema),
+	} = useForm<TCategoryForm>({
+		resolver: zodResolver(categoryFormSchema),
 		mode: 'onBlur',
 		values: {
-			id: categoryData?.id ?? '',
+			mode: mode,
+			id: categoryData?.id,
 			name: categoryData?.name ?? '',
 			description: categoryData?.description ?? '',
 			createdAt: categoryData?.createdAt ?? '',
 			updatedAt: categoryData?.updatedAt ?? '',
-		},
+		} as TCategoryForm,
 	});
 
 	const dispatch = useAppDispatch();
+	console.log(errors);
 
-	const onSubmit = async (data: TCategory) => {
+	const onSubmit = async (data: TCategoryForm) => {
+		console.log('on submit');
 		const body = {
-			name: data.name,
-			description: data.description,
+			name: data?.name,
+			description: data?.description,
 		};
 
-		if (mode === EModalMode.CREATE) {
-			dispatch(categoryThunk.create(body));
+		if (data.mode === EModalMode.EDIT) {
+			dispatch(categoryThunk.update({ id: data.id, body: body }));
 		} else {
-			dispatch(categoryThunk.update({ body, id: data.id }));
+			dispatch(categoryThunk.create(body));
 		}
 		dispatch(closeModal());
 	};

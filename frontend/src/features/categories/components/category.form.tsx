@@ -34,7 +34,6 @@ export const CategoryForm = ({ mode, categoryData }: Props) => {
 	const { currentPage, itemsPerPage, totalItems, totalPages } = useAppSelector(selectCategoryPagination);
 
 	const dispatch = useAppDispatch();
-	console.log(errors);
 
 	const onSubmit = async (data: TCategoryForm) => {
 		console.log('on submit');

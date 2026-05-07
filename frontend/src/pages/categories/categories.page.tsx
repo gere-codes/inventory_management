@@ -33,7 +33,9 @@ export const CategoriesPage = () => {
 		dispatch(categoryThunk.paginate({ page: currentPage, limit: itemsPerPage }));
 	}, [dispatch, currentPage, itemsPerPage]);
 
-	const noop = () => {};
+	const handleDelete = (category: TCategory) => {
+		dispatch(openModal({ data: category, mode: EModalMode.DELETE, type: EModalType.CATEGORY }));
+	};
 
 	const handlePageChange = (pageNum: number) => {
 		dispatch(setCurrentCategoryPage(pageNum));
@@ -92,7 +94,7 @@ export const CategoriesPage = () => {
 						</Button>
 					</section>
 				</section>
-				<CategoryTable categories={categories} onDelete={noop} onEdit={handleEdit} />
+				<CategoryTable categories={categories} onDelete={handleDelete} onEdit={handleEdit} />
 				<Pagination
 					currentPage={currentPage}
 					totalPages={totalPages}

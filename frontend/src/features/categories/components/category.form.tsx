@@ -3,8 +3,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { categoryFormSchema, categorySchema, type TCategory, type TCategoryForm } from '../category.schema';
 import { Button, InputField, TextareaField } from '@ui';
 import { closeModal, EModalMode } from '@common';
-import { useAppDispatch } from '@hooks';
+import { useAppDispatch, useAppSelector } from '@hooks';
 import { categoryThunk } from '../category.thunk';
+import { selectCategoryPagination } from '../category.selectors';
 
 interface Props {
 	mode: EModalMode;
@@ -30,6 +31,8 @@ export const CategoryForm = ({ mode, categoryData }: Props) => {
 		} as TCategoryForm,
 	});
 
+	const { currentPage, itemsPerPage, totalItems, totalPages } = useAppSelector(selectCategoryPagination);
+
 	const dispatch = useAppDispatch();
 	console.log(errors);
 
@@ -43,7 +46,8 @@ export const CategoryForm = ({ mode, categoryData }: Props) => {
 		if (data.mode === EModalMode.EDIT) {
 			dispatch(categoryThunk.update({ id: data.id, body: body }));
 		} else {
-			dispatch(categoryThunk.create(body));
+			await dispatch(categoryThunk.create(body));
+			await dispatch(categoryThunk.paginate({ page: currentPage, limit: itemsPerPage }));
 		}
 		dispatch(closeModal());
 	};

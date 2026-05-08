@@ -9,7 +9,7 @@ supplierRoutes.post('/', supplierController.create);
 supplierRoutes.put('/:id', supplierController.update);
 supplierRoutes.delete('/:id', supplierController.delete);
 
-supplierRoutes.get('/:id', supplierController.getById);
 supplierRoutes.get('/search', supplierController.search);
+supplierRoutes.get('/:id', supplierController.getById);
 
 export default supplierRoutes;

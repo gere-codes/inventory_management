@@ -112,8 +112,8 @@ export abstract class BaseController<
 	search = catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 		const userId = req.user?.id;
 		const page = Number(req.query.currentPage) || 1;
-		const limit = Number(req.query.itemsPerPage) || 10;
-		const term = (req.query.term as string) || '';
+		const limit = Number(req.query?.itemsPerPage) || 10;
+		const term = (req.query?.term as string) || '';
 
 		const result = await this.service.search(userId, term, page, limit);
 

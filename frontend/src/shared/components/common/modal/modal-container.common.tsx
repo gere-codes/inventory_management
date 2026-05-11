@@ -3,8 +3,9 @@ import { EModalType } from './modal.enum';
 import { selectModal } from './moda.selector';
 import { Modal } from './modal.common';
 import { closeModal } from './modal.slice';
-import { ProductForm, ProductModalManager } from '@products';
+import { ProductModalManager } from '@products';
 import { CategoryModalManager } from '@/features/categories/components/category-modal.manager';
+import { SupplierModalManager } from '@suppliers';
 
 export const ModalContainer = () => {
 	const { type, mode, data } = useAppSelector(selectModal);
@@ -18,6 +19,8 @@ export const ModalContainer = () => {
 				return <ProductModalManager mode={mode} productData={data} />;
 			case EModalType.CATEGORY:
 				return <CategoryModalManager mode={mode} categoryData={data} />;
+			case EModalType.SUPPLIER:
+				return <SupplierModalManager mode={mode} supplierData={data} />;
 
 			default:
 				return null;

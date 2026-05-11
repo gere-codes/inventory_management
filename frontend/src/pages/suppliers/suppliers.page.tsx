@@ -5,6 +5,7 @@ import { SupplierTable } from '@suppliers';
 import { EModalMode, EModalType, openModal, SearchBar } from '@common';
 import { debounce } from '@utils';
 import { Button } from '@/shared/components/ui';
+import type { TSupplier } from '@/features/suppliers/supplier.schema';
 
 export const SuppliersPage = () => {
 	const FIRST_PAGE = 1;
@@ -20,7 +21,12 @@ export const SuppliersPage = () => {
 		dispatch(supplierThunk.paginate({ page: pagiination.currentPage, limit: pagiination.itemsPerPage }));
 	}, [pagiination?.currentPage, pagiination?.itemsPerPage, dispatch]);
 
-	const noop = () => {};
+	const handleDelete = async (supplier: TSupplier) => {
+		dispatch(openModal({ data: supplier, type: EModalType.SUPPLIER, mode: EModalMode.DELETE }));
+	};
+	const handleEnd = async (supplier: TSupplier) => {
+		dispatch(openModal({ data: supplier, type: EModalType.SUPPLIER, mode: EModalMode.EDIT }));
+	};
 
 	const debouncedSearch = useMemo(
 		() =>
@@ -63,7 +69,7 @@ export const SuppliersPage = () => {
 			</section>
 
 			{/* Table */}
-			<SupplierTable suppliers={suppliers} onDelete={noop} onEdit={noop} />
+			<SupplierTable suppliers={suppliers} onDelete={handleDelete} onEdit={handleEnd} />
 		</section>
 	);
 };

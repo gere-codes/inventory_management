@@ -20,20 +20,24 @@ export const SupplierForm = ({ mode, supplierData }: Props) => {
 		mode: 'onBlur',
 		values: {
 			mode: mode,
-			id: supplierData?.id,
-			name: supplierData?.name,
-			phone: supplierData?.phone,
-			addres: supplierData?.address,
-			description: supplierData?.description,
-			createdAt: supplierData?.createdAt,
-			updateAt: supplierData?.updatedAt,
+			id: supplierData?.id ?? '',
+			name: supplierData?.name ?? '',
+			phone: supplierData?.phone ?? '',
+			addres: supplierData?.address ?? '',
+			description: supplierData?.description ?? '',
+			createdAt: supplierData?.createdAt ?? '',
+			updateAt: supplierData?.updatedAt ?? '',
 		} as TSupplierForm,
 	});
 
 	const dispatch = useAppDispatch();
 
+	const onSubmit = async (data: TSupplierForm) => {
+		console.log(data);
+	};
+
 	return (
-		<form>
+		<form onScroll={handleSubmit(onSubmit)}>
 			<h2 className="capitalize font-bold text-xl text-center mb-1">
 				{mode === EModalMode.EDIT ? 'update product' : 'add product'}
 			</h2>
@@ -41,8 +45,8 @@ export const SupplierForm = ({ mode, supplierData }: Props) => {
 			<section>
 				<section className="flex gap-4 flex-col">
 					<InputField {...register('name')} label="Name" id="name" error={errors.name?.message} />
-					<InputField {...register('phone')} label="Name" id="name" error={errors.phone?.message} />
-					<InputField {...register('address')} label="Name" id="name" error={errors.address?.message} />
+					<InputField {...register('phone')} label="Phone" id="phone" error={errors.phone?.message} />
+					<InputField {...register('address')} label="Address" id="address" error={errors.address?.message} />
 					<TextareaField
 						{...register('description')}
 						label="Description"

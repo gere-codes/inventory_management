@@ -3,6 +3,7 @@ import { users } from './user.js';
 import { products } from './product.js';
 import { categories } from './category.js';
 import { suppliers } from './supplier.js';
+import { orders } from './orders.js';
 
 export const userRelations = relations(users, ({ many }) => ({
 	products: many(products),
@@ -21,6 +22,17 @@ export const productRelations = relations(products, ({ one, many }) => ({
 	}),
 }));
 
+export const orderRelations = relations(orders, ({ one }) => ({
+	user: one(users, {
+		fields: [orders.userId],
+		references: [users.id],
+	}),
+	product: one(products, {
+		fields: [orders.productId],
+		references: [products.id],
+	}),
+}));
+
 export const categoryRelations = relations(categories, ({ one, many }) => ({
 	user: one(users, {
 		fields: [categories.userId],
@@ -36,5 +48,5 @@ export const supplierRelations = relations(suppliers, ({ one, many }) => ({
 	}),
 }));
 
-const relationships = { userRelations, productRelations, supplierRelations, categoryRelations };
+const relationships = { userRelations, productRelations, supplierRelations, categoryRelations, orderRelations };
 export default relationships;

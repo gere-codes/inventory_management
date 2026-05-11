@@ -29,6 +29,13 @@
       "when": 1776796447776,
       "tag": "0003_majestic_ego",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1778529969399,
+      "tag": "0004_fair_silver_surfer",
+      "breakpoints": true
     }
   ]
 }

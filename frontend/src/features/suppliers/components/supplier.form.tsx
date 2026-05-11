@@ -1,11 +1,10 @@
 import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useAppDispatch, useAppSelector } from '@hooks';
 import { closeModal, EModalMode } from '@common';
 import { supplierFormSchema, type TSupplier, type TSupplierForm } from '../supplier.schema';
 import { Button, InputField, TextareaField } from '@ui';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { supplierThunk } from '../supplier.thunk';
-import { categoryThunk } from '@/features/categories';
 import { selectSuppliersPagination } from '../supplier.selectors';
 
 interface Props {
@@ -23,13 +22,13 @@ export const SupplierForm = ({ mode, supplierData }: Props) => {
 		mode: 'onBlur',
 		values: {
 			mode: mode,
-			id: supplierData?.id ?? '',
+			id: supplierData?.id,
 			name: supplierData?.name ?? '',
 			phone: supplierData?.phone ?? '',
-			addres: supplierData?.address ?? '',
+			address: supplierData?.address ?? '',
 			description: supplierData?.description ?? '',
 			createdAt: supplierData?.createdAt ?? '',
-			updateAt: supplierData?.updatedAt ?? '',
+			updatedAt: supplierData?.updatedAt ?? '',
 		} as TSupplierForm,
 	});
 
@@ -37,6 +36,7 @@ export const SupplierForm = ({ mode, supplierData }: Props) => {
 
 	const dispatch = useAppDispatch();
 
+	console.log(errors);
 	const onSubmit = async (data: TSupplierForm) => {
 		const body = {
 			name: data?.name,
@@ -51,13 +51,13 @@ export const SupplierForm = ({ mode, supplierData }: Props) => {
 			await dispatch(supplierThunk.update({ id: data.id, body }));
 		} else {
 			await dispatch(supplierThunk.create(body));
-			await dispatch(categoryThunk.paginate({ page: currentPage, limit: itemsPerPage }));
+			await dispatch(supplierThunk.paginate({ page: currentPage, limit: itemsPerPage }));
 		}
 		dispatch(closeModal());
 	};
 
 	return (
-		<form onSubmit={handleSubmit(onSubmit)}>
+		<form onSubmit={handleSubmit(onSubmit)} className="w-96 p-2">
 			<h2 className="capitalize font-bold text-xl text-center mb-1">
 				{mode === EModalMode.EDIT ? 'update product' : 'add product'}
 			</h2>

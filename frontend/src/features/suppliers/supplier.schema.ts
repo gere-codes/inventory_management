@@ -29,7 +29,7 @@ export const supplierFormSchema = z.discriminatedUnion('mode', [
 		address: z.string().optional().nullable(),
 		description: z.string().optional().nullable(),
 		createdAt: z.string().optional(),
-		updateAt: z.string().optional(),
+		updatedAt: z.string().optional(),
 	}),
 	z.object({
 		mode: z.literal(EModalMode.EDIT),
@@ -39,7 +39,7 @@ export const supplierFormSchema = z.discriminatedUnion('mode', [
 		address: z.string().optional().nullable(),
 		description: z.string().optional().nullable(),
 		createdAt: z.string().optional(),
-		updateAt: z.string().optional(),
+		updatedAt: z.string().optional(),
 	}),
 ]);
 

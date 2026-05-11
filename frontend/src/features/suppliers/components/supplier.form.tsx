@@ -1,9 +1,12 @@
 import { useForm } from 'react-hook-form';
-import { useAppDispatch } from '@hooks';
+import { useAppDispatch, useAppSelector } from '@hooks';
 import { closeModal, EModalMode } from '@common';
 import { supplierFormSchema, type TSupplier, type TSupplierForm } from '../supplier.schema';
 import { Button, InputField, TextareaField } from '@ui';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { supplierThunk } from '../supplier.thunk';
+import { categoryThunk } from '@/features/categories';
+import { selectSuppliersPagination } from '../supplier.selectors';
 
 interface Props {
 	mode: EModalMode;
@@ -30,14 +33,31 @@ export const SupplierForm = ({ mode, supplierData }: Props) => {
 		} as TSupplierForm,
 	});
 
+	const { currentPage, itemsPerPage, totalItems, totalPages } = useAppSelector(selectSuppliersPagination);
+
 	const dispatch = useAppDispatch();
 
 	const onSubmit = async (data: TSupplierForm) => {
-		console.log(data);
+		const body = {
+			name: data?.name,
+			phone: data?.phone,
+			address: data?.address,
+			description: data?.description,
+			createdAt: data?.createdAt,
+			updatedAt: data?.updatedAt,
+		};
+
+		if (data.mode === EModalMode.EDIT) {
+			await dispatch(supplierThunk.update({ id: data.id, body }));
+		} else {
+			await dispatch(supplierThunk.create(body));
+			await dispatch(categoryThunk.paginate({ page: currentPage, limit: itemsPerPage }));
+		}
+		dispatch(closeModal());
 	};
 
 	return (
-		<form onScroll={handleSubmit(onSubmit)}>
+		<form onSubmit={handleSubmit(onSubmit)}>
 			<h2 className="capitalize font-bold text-xl text-center mb-1">
 				{mode === EModalMode.EDIT ? 'update product' : 'add product'}
 			</h2>

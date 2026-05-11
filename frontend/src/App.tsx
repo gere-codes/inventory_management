@@ -1,5 +1,5 @@
 import { Route, Routes } from 'react-router';
-import { ProductsPage, LoginPage, RegisterPage, SuppliersPage, CategoriesPage } from '@pages';
+import { ProductsPage, LoginPage, RegisterPage, SuppliersPage, CategoriesPage, OrdersPage } from '@pages';
 import { ProtectedRoute, PublicRoute } from '@routes';
 import { ModalContainer } from '@common';
 
@@ -18,6 +18,7 @@ function App() {
 					<Route path="/" element={<ProductsPage />} />
 					<Route path="/suppliers" element={<SuppliersPage />} />
 					<Route path="/categories" element={<CategoriesPage />} />
+					<Route path="/orders" element={<OrdersPage />} />
 				</Route>
 			</Routes>
 

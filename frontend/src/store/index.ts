@@ -6,6 +6,7 @@ import { productSlice } from '@products';
 import { categorySlice } from '@categories';
 import { supplierSlice } from '@suppliers';
 import { modalSlice } from '@common';
+import { orderSlice } from '@/features/orders/order.slice';
 
 const persistConfig = {
 	key: 'root',
@@ -18,6 +19,7 @@ const rootReducer = combineReducers({
 	product: productSlice.reducer,
 	category: categorySlice.reducer,
 	supplier: supplierSlice.reducer,
+	order: orderSlice.reducer,
 	modal: modalSlice.reducer,
 });
 

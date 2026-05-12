@@ -17,7 +17,7 @@ export abstract class BaseController<
 	T,
 	TCreate,
 	TUpdate,
-	TService extends IBaseService<T, TCreate, TUpdate>,
+	TService extends IBaseService<T, TCreate, TUpdate> = IBaseService<T, TCreate, TUpdate>,
 > implements IBaseController<T, TCreate, TUpdate> {
 	constructor(
 		protected service: TService,

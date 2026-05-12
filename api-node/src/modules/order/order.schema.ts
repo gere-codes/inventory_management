@@ -2,7 +2,7 @@ import { sanitized } from '@src/core/validation/sanitized.js';
 import z, { uuid } from 'zod';
 
 export const orderSchema = z.object({
-	productdtId: z.uuid(),
+	productId: z.uuid(),
 	name: z.string().min(1),
 	price: z.coerce.number().positive(),
 	description: sanitized(z.string().max(1000)).nullable().optional(),
@@ -22,3 +22,7 @@ export const responseOrderSchema = orderSchema.extend({
 	createdAt: z.coerce.date().transform((v) => v.toISOString()),
 	updatedAt: z.coerce.date().transform((v) => v.toISOString()),
 });
+
+export type TCreateOrder = z.infer<typeof createOrderSchema>;
+export type TUpdateOrder = z.infer<typeof updateOrderSchema>;
+export type TOrder = z.infer<typeof responseOrderSchema>;

@@ -1,5 +1,5 @@
 import { sanitized } from '@src/core/validation/sanitized.js';
-import z, { uuid } from 'zod';
+import z from 'zod';
 
 export const orderSchema = z.object({
 	productId: z.uuid(),

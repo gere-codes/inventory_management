@@ -13,7 +13,7 @@ interface Props {
 	onDelete: (order: TOrder) => void;
 	onOrder: (order: TOrder) => void;
 }
-export const orderItem = memo(({ order, onEdit, onDelete, onOrder }: Props) => {
+export const OrderItem = memo(({ order, onEdit, onDelete, onOrder }: Props) => {
 	const statusStyles = {
 		[EOrderStatus.RECEIVED]: 'bg-green-100 text-green-800',
 		[EOrderStatus.PENDING]: 'bg-yellow-100 text-yellow-800',

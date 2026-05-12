@@ -8,6 +8,7 @@ export const orderSchema = z.object({
 	quantity: z.coerce.number().int().nonnegative(),
 	description: z.string().max(1000).nullable().optional(),
 	categoryId: z.uuid(),
+	category: z.string(),
 	sku: z.string().min(3).max(36),
 	imageUrl: z.string().optional().nullable(),
 	status: z.enum(['pending', 'cancelled', 'received']),
@@ -19,6 +20,7 @@ export const orderSchema = z.object({
 export const createOrderSchema = orderSchema.omit({
 	id: true,
 	userId: true,
+	category: true,
 	createdAt: true,
 	updatedAt: true,
 });

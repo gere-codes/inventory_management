@@ -11,3 +11,5 @@ class OrderController extends BaseController<TOrder, TCreateOrder, TUpdateOrder>
 		super(service);
 	}
 }
+
+export const orderController = new OrderController();

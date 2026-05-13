@@ -75,6 +75,9 @@
 			"@suppliers": ["features/suppliers/index"],
 			"@suppliers/*": ["features/suppliers/*"],
 
+			"@orders": ["features/orders/index"],
+			"@orders/*": ["features/orders/*"],
+
 			// Store
 			"@store": ["store/index"],
 			"@store/*": ["store/*"]

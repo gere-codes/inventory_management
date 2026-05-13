@@ -91,7 +91,7 @@ export const CategoriesPage = () => {
 							}
 							style={{ width: 138, height: 40 }}
 						>
-							Add Category
+							+ Add Category
 						</Button>
 					</section>
 				</section>

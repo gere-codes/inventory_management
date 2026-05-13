@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@hooks';
 import { debounce } from '@utils';
 import { Button } from '@ui';
-import { EModalMode, EModalType, openModal, SearchBar } from '@common';
+import { EModalMode, EModalType, openModal, Pagination, SearchBar } from '@common';
 import { OrderTable, orderThunk, selectOrderList, selectOrderPagination } from '@orders';
 
 export const OrdersPage = () => {
@@ -30,7 +30,7 @@ export const OrdersPage = () => {
 	}, [debouncedSearch]);
 
 	return (
-		<section>
+		<section className="py-4 space-y-6">
 			{/* Search + Add */}
 			<section className="flex justify-between items-end">
 				<div className="flex flex-col gap-2 flex-1">
@@ -54,6 +54,15 @@ export const OrdersPage = () => {
 				</Button>
 			</section>
 			<OrderTable orders={orders} onDelete={noop} onEdit={noop} onOrder={noop} />
+
+			{/* Pagination */}
+			<Pagination
+				currentPage={currentPage}
+				totalPages={totalPages}
+				itemsPerPage={itemsPerPage}
+				onPageChange={noop}
+				onPerPageChange={noop}
+			/>
 		</section>
 	);
 };

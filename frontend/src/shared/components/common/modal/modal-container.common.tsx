@@ -6,6 +6,7 @@ import { closeModal } from './modal.slice';
 import { ProductModalManager } from '@products';
 import { CategoryModalManager } from '@/features/categories/components/category-modal.manager';
 import { SupplierModalManager } from '@suppliers';
+import { OrderMOdalManager } from '@orders';
 
 export const ModalContainer = () => {
 	const { type, mode, data } = useAppSelector(selectModal);
@@ -21,6 +22,8 @@ export const ModalContainer = () => {
 				return <CategoryModalManager mode={mode} categoryData={data} />;
 			case EModalType.SUPPLIER:
 				return <SupplierModalManager mode={mode} supplierData={data} />;
+			case EModalType.ORDER:
+				return <OrderMOdalManager mode={mode} orderData={data} />;
 
 			default:
 				return null;

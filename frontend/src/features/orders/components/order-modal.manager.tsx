@@ -8,7 +8,7 @@ interface Props {
 	orderData: TOrder;
 }
 
-export const OrderMOdalManager = ({ mode, orderData }: Props) => {
+export const OrderModalManager = ({ mode, orderData }: Props) => {
 	switch (mode) {
 		case EModalMode.CREATE:
 		case EModalMode.EDIT:

@@ -7,7 +7,7 @@ export const createIinitialBaseState = <T>(): BaseState<T> => ({
 		error: null,
 	},
 	item: {
-		data: {} as any,
+		data: null,
 		status: 'idle',
 		error: null,
 	},

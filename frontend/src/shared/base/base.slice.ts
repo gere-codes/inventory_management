@@ -24,7 +24,7 @@ export type BaseState<T, TExtra = {}> = {
 		error: string | null;
 	};
 	item: {
-		data: T;
+		data: T | null;
 		status: 'idle' | 'loading' | 'succeeded' | 'failed';
 		error: string | null;
 	};

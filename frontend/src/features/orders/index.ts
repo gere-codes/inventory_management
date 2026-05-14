@@ -6,3 +6,4 @@ export { orderThunk } from './order.thunk';
 
 export { OrderItem } from './components/order.row';
 export { OrderTable } from './components/order.table';
+export { OrderMOdalManager } from './components/order-modal.manager';

@@ -149,7 +149,6 @@ export const OrderForm = ({ mode, orderData }: Props) => {
 						placeholder="Enter order name"
 					/>
 				</div>
-
 				{/* Price */}
 				<div>
 					<InputField
@@ -165,7 +164,6 @@ export const OrderForm = ({ mode, orderData }: Props) => {
 						placeholder="0.00"
 					/>
 				</div>
-
 				{/* SKU */}
 				<div>
 					<InputField
@@ -180,7 +178,6 @@ export const OrderForm = ({ mode, orderData }: Props) => {
 						disabled={mode === EModalMode.EDIT}
 					/>
 				</div>
-
 				{/* Quantity */}
 				<div>
 					<InputField
@@ -196,12 +193,46 @@ export const OrderForm = ({ mode, orderData }: Props) => {
 						step={1}
 					/>
 				</div>
-
 				{/* Category */}
 				<div>
 					<CategorySelect categories={categories} isLoading={isLoading} register={register} />
 				</div>
 
+				{/* Status */}
+				<div>
+					<label htmlFor="category" className="block text-sm font-bold text-gray-700 mb-2 ">
+						Status*
+					</label>
+					<select
+						{...register('status')}
+						className="w-full px-3 py-2 border border-gray-300 rounded-md h-[42px]"
+					>
+						{orderStatus?.map((status) => (
+							<option className="capitalize" value={status}>
+								{status}
+							</option>
+						))}
+					</select>
+				</div>
+
+				{/* Type */}
+				<div>
+					<label htmlFor="category" className="block text-sm font-bold text-gray-700 mb-2 ">
+						Type*
+					</label>
+					<select
+						required
+						{...register('type')}
+						className="w-full px-3 py-2 border border-gray-300 rounded-md h-[42px]"
+					>
+						<option className="capitalize" value={'new'}>
+							New
+						</option>
+						<option className="capitalize" value={'reorder'}>
+							Reorder
+						</option>
+					</select>
+				</div>
 				{/* Description */}
 				<div className="md:col-span-2">
 					<TextareaField
@@ -232,3 +263,5 @@ export const OrderForm = ({ mode, orderData }: Props) => {
 		</form>
 	);
 };
+
+const orderStatus = ['pending', 'cancelled', 'received'];

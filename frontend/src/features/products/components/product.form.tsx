@@ -12,7 +12,7 @@ import { BASE_URL } from '@api';
 import { TiDelete } from 'react-icons/ti';
 
 interface Props {
-	mode: EModalMode;
+	mode: EModalMode.CREATE | EModalMode.EDIT;
 	productData: TProduct;
 }
 
@@ -34,17 +34,10 @@ export const ProductForm = ({ mode, productData }: Props) => {
 	} = useForm<TProductFormValues>({
 		resolver: zodResolver(productFormSchema),
 		mode: 'onBlur',
-		values: {
-			mode: mode,
-			id: productData?.id ?? '',
-			name: productData?.name ?? '',
-			categoryId: productData?.categoryId ?? '',
-			price: productData?.price ?? 0,
-			sku: productData?.sku ?? '',
-			quantity: productData?.quantity ?? 1,
-			description: productData?.description ?? '',
-			image: productData?.imageUrl ?? null,
-		} as TProductFormValues,
+		defaultValues: {
+			mode,
+			...productData,
+		},
 	});
 
 	const onSubmit = async (data: TProductFormValues) => {

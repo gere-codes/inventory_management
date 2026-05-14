@@ -41,11 +41,16 @@ export const OrderForm = ({ mode, orderData }: Props) => {
 	});
 
 	const onSubmit = async (data: TOrderForm) => {
-		const body = {};
+		const result = orderFormSchema.safeParse(data);
+
+		if (!result.success) return;
+
+		const { mode, ...payload } = result.data;
+
 		if (data.mode === EModalMode.EDIT) {
-			await dispatch(orderThunk.update({ id: data.id, body: data }));
+			await dispatch(orderThunk.update({ id: data.id, body: payload }));
 		} else {
-			await dispatch(orderThunk.create(data));
+			await dispatch(orderThunk.create({ ...payload }));
 			await dispatch(orderThunk.paginate({ page: currentPage, limit: itemsPerPage }));
 		}
 		dispatch(closeModal());

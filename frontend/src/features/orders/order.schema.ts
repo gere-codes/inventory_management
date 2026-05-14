@@ -48,5 +48,3 @@ export const orderFormSchema = z.discriminatedUnion('mode', [
 ]);
 
 export type TOrderForm = z.infer<typeof orderFormSchema>;
-
-export const TCreateUTUpdateOrder = z.union([createOrderSchema, updateOrderSchema]);

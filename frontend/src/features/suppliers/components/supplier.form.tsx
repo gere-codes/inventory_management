@@ -8,7 +8,7 @@ import { supplierThunk } from '../supplier.thunk';
 import { selectSuppliersPagination } from '../supplier.selectors';
 
 interface Props {
-	mode: EModalMode;
+	mode: EModalMode.CREATE | EModalMode.EDIT;
 	supplierData: TSupplier;
 }
 
@@ -20,16 +20,11 @@ export const SupplierForm = ({ mode, supplierData }: Props) => {
 	} = useForm<TSupplierForm>({
 		resolver: zodResolver(supplierFormSchema),
 		mode: 'onBlur',
-		values: {
+
+		defaultValues: {
 			mode: mode,
-			id: supplierData?.id,
-			name: supplierData?.name ?? '',
-			phone: supplierData?.phone ?? '',
-			address: supplierData?.address ?? '',
-			description: supplierData?.description ?? '',
-			createdAt: supplierData?.createdAt ?? '',
-			updatedAt: supplierData?.updatedAt ?? '',
-		} as TSupplierForm,
+			...supplierData,
+		},
 	});
 
 	const { currentPage, itemsPerPage, totalItems, totalPages } = useAppSelector(selectSuppliersPagination);

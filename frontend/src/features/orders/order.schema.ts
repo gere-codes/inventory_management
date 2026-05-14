@@ -1,32 +1,52 @@
 import z from 'zod';
+const imageSchema = z.union([
+	z.instanceof(File).refine((f) => f.size <= 5 * 1024 * 1024, 'Max 5MB'),
+	z.string(),
+	z.null(),
+	z.undefined(),
+]);
 export const orderSchema = z.object({
 	id: z.uuid(),
-	userId: z.uuid(),
 	productId: z.uuid(),
 	name: z.string().min(1),
-	price: z.coerce.number().nonnegative().multipleOf(0.01),
-	quantity: z.coerce.number().int().nonnegative(),
+	price: z.number().min(0.01),
+	quantity: z.number().min(0),
 	description: z.string().max(1000).nullable().optional(),
 	categoryId: z.uuid(),
 	category: z.string(),
 	sku: z.string().min(3).max(36),
-	imageUrl: z.string().optional().nullable(),
+	image: imageSchema.optional(),
 	status: z.enum(['pending', 'cancelled', 'received']),
 	type: z.enum(['new', 'reorder']),
 	createdAt: z.string(),
 	updatedAt: z.string(),
 });
 
-export const createOrderSchema = orderSchema.omit({
+const commonFields = orderSchema.omit({
 	id: true,
-	userId: true,
 	category: true,
 	createdAt: true,
 	updatedAt: true,
 });
+export const createOrderSchema = commonFields.extend({});
 
-export const updateOrderSchema = createOrderSchema.partial();
+export const updateOrderSchema = commonFields.partial();
 
 export type TOrder = z.infer<typeof orderSchema>;
 export type TCreateOrder = z.infer<typeof createOrderSchema>;
 export type TUpdateOrder = z.infer<typeof updateOrderSchema>;
+
+export const orderFormSchema = z.discriminatedUnion('mode', [
+	commonFields.extend({
+		mode: z.literal('CREATE'),
+	}),
+
+	commonFields.extend({
+		mode: z.literal('EDIT'),
+		id: z.uuid(),
+	}),
+]);
+
+export type TOrderForm = z.infer<typeof orderFormSchema>;
+
+export const TCreateUTUpdateOrder = z.union([createOrderSchema, updateOrderSchema]);

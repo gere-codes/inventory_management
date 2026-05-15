@@ -10,6 +10,7 @@ import { Button, InputField, TextareaField } from '@ui';
 import { CategorySelect, useCategories } from '@categories';
 import { closeModal, EModalMode } from '@common';
 import { orderFormSchema, type TOrder, type TOrderForm } from '../order.schema';
+import { EOrderStatus, EOrderType } from '../order.enums';
 
 interface Props {
 	mode: EModalMode.CREATE | EModalMode.EDIT;
@@ -19,6 +20,7 @@ interface Props {
 export const OrderForm = ({ mode, orderData }: Props) => {
 	const { categories, isLoading } = useCategories();
 	const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+	const isReadOnlyField = orderData?.type === EOrderType.REORDER;
 
 	const { currentPage, itemsPerPage, totalItems, totalPages } = useAppSelector(selectOrderPagination);
 
@@ -41,12 +43,18 @@ export const OrderForm = ({ mode, orderData }: Props) => {
 	});
 
 	const onSubmit = async (data: TOrderForm) => {
-		const result = orderFormSchema.safeParse(data);
+		if (orderData?.status === EOrderStatus.CANCELLED) {
+			dispatch(closeModal());
+			return;
+		}
 
-		if (!result.success) return;
+		const result = orderFormSchema.safeParse(data);
+		if (!result.success) {
+			console.error('Form validation errors:', result.error);
+			return;
+		}
 
 		const { mode, ...payload } = result.data;
-
 		const formData = new FormData();
 
 		Object.entries(payload).forEach(([key, value]) => {
@@ -58,13 +66,22 @@ export const OrderForm = ({ mode, orderData }: Props) => {
 			}
 		});
 
-		if (data.mode === EModalMode.EDIT) {
-			await dispatch(orderThunk.update({ id: data.id, body: formData }));
-		} else {
-			await dispatch(orderThunk.create(formData));
-			await dispatch(orderThunk.paginate({ page: currentPage, limit: itemsPerPage }));
+		try {
+			if (data.mode === EModalMode.EDIT) {
+				await dispatch(orderThunk.update({ id: data.id, body: formData }));
+			} else {
+				await dispatch(orderThunk.create(formData));
+				await dispatch(
+					orderThunk.paginate({
+						page: currentPage,
+						limit: itemsPerPage,
+					}),
+				);
+			}
+			dispatch(closeModal());
+		} catch (error) {
+			console.error('Submission error:', error);
 		}
-		dispatch(closeModal());
 	};
 
 	const imageFile = watch('image');
@@ -151,6 +168,7 @@ export const OrderForm = ({ mode, orderData }: Props) => {
 				<div className="md:col-span-2">
 					<InputField
 						{...register('name')}
+						disabled={isReadOnlyField}
 						error={errors?.name?.message}
 						label="order Name*"
 						type="text"
@@ -186,7 +204,7 @@ export const OrderForm = ({ mode, orderData }: Props) => {
 						required
 						className="w-full px-3 py-2 border border-gray-300 rounded-md "
 						placeholder="Enter SKU"
-						disabled={mode === EModalMode.EDIT}
+						disabled={isReadOnlyField}
 					/>
 				</div>
 				{/* Quantity */}

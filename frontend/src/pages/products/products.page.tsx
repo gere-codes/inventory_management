@@ -16,6 +16,7 @@ import { setCurrentPage } from '@products';
 import { LuPackageMinus, LuPackageOpen } from 'react-icons/lu';
 import { TbPackages } from 'react-icons/tb';
 import type { IconType } from 'react-icons';
+import { orderFormSchema, orderThunk, type TOrder, type TOrderForm } from '@/features/orders';
 
 export const ProductsPage = () => {
 	const FIRST_PAGE = 1;
@@ -53,7 +54,6 @@ export const ProductsPage = () => {
 	const handleDelete = async (product: TProduct) => {
 		dispatch(openModal({ data: product, type: EModalType.PRODUCT, mode: EModalMode.DELETE }));
 	};
-	const handleOrder = async (product: TProduct) => {};
 
 	const handleEdit = async (product: TProduct) => {
 		dispatch(openModal({ data: product, type: EModalType.PRODUCT, mode: EModalMode.EDIT }));
@@ -66,6 +66,17 @@ export const ProductsPage = () => {
 	const handlePerPageChange = (perPage: number) => {
 		dispatch(setItemsPerPage(perPage));
 		dispatch(setCurrentPage(currentPage));
+	};
+
+	const handleReorder = async (product: TProduct) => {
+		const data: TOrderForm = {
+			...product,
+			mode: 'CREATE',
+			status: 'pending',
+			type: 'reorder',
+		};
+
+		dispatch(openModal({ data, type: EModalType.ORDER, mode: EModalMode.CREATE }));
 	};
 
 	return (
@@ -108,7 +119,7 @@ export const ProductsPage = () => {
 			</section>
 
 			{/* Table */}
-			<ProductTable products={products} onDelete={handleDelete} onEdit={handleEdit} onOrder={handleOrder} />
+			<ProductTable products={products} onDelete={handleDelete} onEdit={handleEdit} onOrder={handleReorder} />
 
 			{/* Pagination */}
 			<Pagination

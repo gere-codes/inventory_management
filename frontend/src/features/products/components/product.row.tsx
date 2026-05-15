@@ -2,10 +2,10 @@ import { memo, type FC } from 'react';
 import { BASE_URL } from '@api';
 import { AiFillEdit } from 'react-icons/ai';
 import { MdDelete } from 'react-icons/md';
-import { IoBagHandleSharp } from 'react-icons/io5';
 import type { IconType } from 'react-icons/lib';
 import type { TProduct } from '../product.schema';
 import { EProductStatus } from '../product.enum';
+import { FiRefreshCcw } from 'react-icons/fi';
 
 interface Props {
 	product: TProduct;
@@ -36,7 +36,7 @@ export const ProductItem = memo(({ product, onEdit, onDelete, onOrder }: Props) 
 				<span className="flex gap-3 truncate ">
 					<TableActionButton handleClick={() => onEdit(product)} Icon={AiFillEdit} />
 					<TableActionButton handleClick={() => onDelete(product)} Icon={MdDelete} />
-					<TableActionButton handleClick={() => onOrder(product)} Icon={IoBagHandleSharp} />
+					<TableActionButton handleClick={() => onOrder(product)} Icon={FiRefreshCcw} />
 				</span>
 			</td>
 		</tr>

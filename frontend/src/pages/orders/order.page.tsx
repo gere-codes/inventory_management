@@ -4,6 +4,7 @@ import { debounce } from '@utils';
 import { Button } from '@ui';
 import { EModalMode, EModalType, openModal, Pagination, SearchBar } from '@common';
 import { OrderTable, orderThunk, selectOrderList, selectOrderPagination, type TOrder } from '@orders';
+import { setCurrentOrderPage, setOrdersPerPage } from '@/features/orders/order.slice';
 
 export const OrdersPage = () => {
 	const FIRST_PAGE = 1;
@@ -37,6 +38,14 @@ export const OrdersPage = () => {
 		dispatch(openModal({ data, type: EModalType.ORDER, mode: EModalMode.EDIT }));
 	};
 
+	const handlePageChange = async (perPage: number) => {
+		dispatch(setCurrentOrderPage(perPage));
+	};
+
+	const handlePerPageChange = async (perPage: number) => {
+		dispatch(setOrdersPerPage(perPage));
+	};
+
 	return (
 		<section className="py-4 space-y-6">
 			{/* Search + Add */}
@@ -68,8 +77,8 @@ export const OrdersPage = () => {
 				currentPage={currentPage}
 				totalPages={totalPages}
 				itemsPerPage={itemsPerPage}
-				onPageChange={noop}
-				onPerPageChange={noop}
+				onPageChange={handlePageChange}
+				onPerPageChange={handlePerPageChange}
 			/>
 		</section>
 	);

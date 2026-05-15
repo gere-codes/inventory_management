@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from '@hooks';
 import { debounce } from '@utils';
 import { Button } from '@ui';
 import { EModalMode, EModalType, openModal, Pagination, SearchBar } from '@common';
-import { OrderTable, orderThunk, selectOrderList, selectOrderPagination } from '@orders';
+import { OrderTable, orderThunk, selectOrderList, selectOrderPagination, type TOrder } from '@orders';
 
 export const OrdersPage = () => {
 	const FIRST_PAGE = 1;
@@ -33,6 +33,10 @@ export const OrdersPage = () => {
 		dispatch(orderThunk.paginate({ page: currentPage, limit: itemsPerPage }));
 	}, [dispatch, currentPage, itemsPerPage]);
 
+	const handleEdit = async (data: TOrder) => {
+		dispatch(openModal({ data, type: EModalType.ORDER, mode: EModalMode.EDIT }));
+	};
+
 	return (
 		<section className="py-4 space-y-6">
 			{/* Search + Add */}
@@ -57,7 +61,7 @@ export const OrdersPage = () => {
 					+ Add Order
 				</Button>
 			</section>
-			<OrderTable orders={orders} onDelete={noop} onEdit={noop} onOrder={noop} />
+			<OrderTable orders={orders} onDelete={noop} onEdit={handleEdit} onOrder={noop} />
 
 			{/* Pagination */}
 			<Pagination

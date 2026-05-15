@@ -15,7 +15,7 @@ export const orderSchema = z.object({
 	categoryId: z.uuid(),
 	category: z.string().optional().nullable(),
 	sku: z.string().min(3).max(36),
-	image: imageSchema.optional(),
+	image: imageSchema.optional().nullable(),
 	status: z.enum(['pending', 'cancelled', 'received']),
 	type: z.enum(['new', 'reorder']),
 	createdAt: z.string(),

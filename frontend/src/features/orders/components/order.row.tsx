@@ -23,7 +23,7 @@ export const OrderItem = memo(({ order, onEdit, onDelete, onOrder }: Props) => {
 	return (
 		<tr key={order.id} className="hover:bg-gray-50  border-b border-gray-200">
 			<TableItemData item={order?.sku} />
-			<TableItemData item={order?.name} image={order?.image ?? ''} />
+			<TableItemData item={order?.name} image={String(order?.image ?? '')} />
 			<TableItemData item={'$' + Number(order.price).toFixed(2)} />
 			<TableItemData item={order?.category ?? ''} />
 			<TableItemData item={`${order.quantity} pcs`} />

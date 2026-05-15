@@ -16,7 +16,8 @@ import { setCurrentPage } from '@products';
 import { LuPackageMinus, LuPackageOpen } from 'react-icons/lu';
 import { TbPackages } from 'react-icons/tb';
 import type { IconType } from 'react-icons';
-import { orderFormSchema, orderThunk, type TOrder, type TOrderForm } from '@/features/orders';
+import { EOrderStatus, EOrderType, type TOrderForm } from '@orders';
+import { ECRUDMode } from '@enums';
 
 export const ProductsPage = () => {
 	const FIRST_PAGE = 1;
@@ -71,9 +72,9 @@ export const ProductsPage = () => {
 	const handleReorder = async (product: TProduct) => {
 		const data: TOrderForm = {
 			...product,
-			mode: 'CREATE',
-			status: 'pending',
-			type: 'reorder',
+			mode: ECRUDMode.CREATE,
+			status: EOrderStatus.PENDING,
+			type: EOrderType.REORDER,
 		};
 
 		dispatch(openModal({ data, type: EModalType.ORDER, mode: EModalMode.CREATE }));

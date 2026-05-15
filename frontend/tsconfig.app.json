@@ -59,6 +59,9 @@
 			"@routes": ["shared/routes/index"],
 			"@routes/*": ["shared/routes/*"],
 
+			"@enums": ["shared/enums/index"],
+			"@enums/*": ["shared/enums/*"],
+
 			"@sharedTypes": ["shared/types/index"],
 			"@sharedTypes/*": ["shared/types/*"],
 

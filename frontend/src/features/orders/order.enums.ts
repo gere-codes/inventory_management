@@ -3,3 +3,8 @@ export enum EOrderStatus {
 	RECEIVED = 'received',
 	CANCELLED = 'cancelled',
 }
+
+export enum EOrderType {
+	NEW = 'new',
+	REORDER = 'reorder',
+}

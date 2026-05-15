@@ -22,10 +22,10 @@ export const OrderItem = memo(({ order, onEdit, onDelete, onOrder }: Props) => {
 
 	return (
 		<tr key={order.id} className="hover:bg-gray-50  border-b border-gray-200">
-			<TableItemData item={order.sku} />
-			<TableItemData item={order.name} imageUrl={order?.imageUrl ?? ''} />
+			<TableItemData item={order?.sku} />
+			<TableItemData item={order?.name} image={order?.image ?? ''} />
 			<TableItemData item={'$' + Number(order.price).toFixed(2)} />
-			<TableItemData item={order.category} />
+			<TableItemData item={order?.category ?? ''} />
 			<TableItemData item={`${order.quantity} pcs`} />
 			<td className="px-4 py-4  w-1/7 text-ellipsis overflow-hidden">
 				<span className={`px-3 py-1.5 text-xs truncate font-medium rounded ${statusStyles[order.status]}`}>
@@ -35,21 +35,19 @@ export const OrderItem = memo(({ order, onEdit, onDelete, onOrder }: Props) => {
 			<td className="px-4 py-4  w-1/7 text-ellipsis overflow-hidden">
 				<span className="flex gap-3 truncate ">
 					<TableActionButton handleClick={() => onEdit(order)} Icon={AiFillEdit} />
-					<TableActionButton handleClick={() => onDelete(order)} Icon={MdDelete} />
-					<TableActionButton handleClick={() => onOrder(order)} Icon={IoBagHandleSharp} />
 				</span>
 			</td>
 		</tr>
 	);
 });
 
-const TableItemData = ({ item, imageUrl }: { item: string | number; imageUrl?: string }) => {
+const TableItemData = ({ item, image }: { item: string | number; image?: string }) => {
 	return (
 		<td className="px-4 py-4  w-1/7 text-ellipsis  overflow-hidden">
 			<div className="flex gap-1 items-center">
-				{imageUrl && (
+				{image && (
 					<img
-						src={`${BASE_URL}${imageUrl}`}
+						src={`${BASE_URL}${image}`}
 						alt={item.toString().substring(0, 1)}
 						className="w-10 h-10 border border-gray-100 rounded"
 					/>

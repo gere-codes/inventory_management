@@ -23,7 +23,7 @@ export class OrderRespository
 			sku: record.sku,
 			status: record.status,
 			type: record.type,
-			imageUrl: record?.imageUrl,
+			image: record?.image,
 			createdAt: record?.createdAt,
 			updatedAt: record?.updatedAt,
 		};

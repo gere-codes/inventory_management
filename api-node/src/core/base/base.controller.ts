@@ -48,13 +48,13 @@ export abstract class BaseController<
 	create = catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 		const userId = req.user.id;
 		const { body } = req;
-		let imageUrl: string | undefined;
+		let image: string | undefined;
 
 		if (req.file && this.fileService) {
-			imageUrl = await this.fileService.upload(req.file);
+			image = await this.fileService.upload(req.file);
 		}
 
-		const payload = { ...body, imageUrl };
+		const payload = { ...body, image };
 
 		const result = await this.service.create(userId, payload);
 
@@ -69,13 +69,13 @@ export abstract class BaseController<
 		const id = req.params?.id as string;
 		const { body } = req;
 
-		let imageUrl: string | undefined = req.body?.image;
+		let image: string | undefined = req.body?.image;
 
 		if (req.file && this.fileService) {
-			imageUrl = await this.fileService.upload(req.file);
+			image = await this.fileService.upload(req.file);
 		}
 
-		const payload = { ...body, imageUrl };
+		const payload = { ...body, image };
 
 		const result = await this.service.update(userId, id, payload);
 

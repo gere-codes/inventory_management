@@ -9,7 +9,7 @@ export const productCreateSchema = z.object({
 	quantity: z.coerce.number().int().nonnegative(),
 	categoryId: z.uuid(),
 	sku: sanitized(z.string().min(3).max(36)),
-	imageUrl: z.string().optional().nullable(),
+	image: z.string().optional().nullable(),
 });
 
 export const productSchema = productCreateSchema.extend({

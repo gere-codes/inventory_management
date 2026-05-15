@@ -13,7 +13,7 @@ export const products = pgTable('products', {
 	categoryId: uuid('category_id')
 		.references(() => categories.id)
 		.notNull(),
-	imageUrl: varchar('image_url', { length: 500 }),
+	image: varchar('image', { length: 500 }),
 	createdAt: timestamp('created_at').defaultNow().notNull(),
 	updatedAt: timestamp('updated_at')
 		.defaultNow()

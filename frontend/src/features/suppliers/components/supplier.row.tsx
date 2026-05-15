@@ -26,13 +26,13 @@ export const SupplierItem = memo(({ supplier, onEdit, onDelete }: Props) => {
 	);
 });
 
-const TableItemData = ({ item, imageUrl }: { item: string | number; imageUrl?: string }) => {
+const TableItemData = ({ item, image }: { item: string | number; image?: string }) => {
 	return (
 		<td className="px-4 py-4  w-1/7 text-ellipsis  overflow-hidden">
 			<div className="flex gap-1 items-center">
-				{imageUrl && (
+				{image && (
 					<img
-						src={`${BASE_URL}${imageUrl}`}
+						src={`${BASE_URL}${image}`}
 						alt={item.toString().substring(0, 1)}
 						className="w-10 h-10 border border-gray-100 rounded"
 					/>

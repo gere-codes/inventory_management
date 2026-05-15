@@ -23,7 +23,7 @@ export const ProductItem = memo(({ product, onEdit, onDelete, onOrder }: Props) 
 	return (
 		<tr key={product.id} className="hover:bg-gray-50  border-b border-gray-200">
 			<TableItemData item={product.sku} />
-			<TableItemData item={product.name} imageUrl={product?.imageUrl ?? ''} />
+			<TableItemData item={product.name} image={product?.image ?? ''} />
 			<TableItemData item={'$' + Number(product.price).toFixed(2)} />
 			<TableItemData item={product.category} />
 			<TableItemData item={`${product.quantity} pcs`} />
@@ -43,13 +43,13 @@ export const ProductItem = memo(({ product, onEdit, onDelete, onOrder }: Props) 
 	);
 });
 
-const TableItemData = ({ item, imageUrl }: { item: string | number; imageUrl?: string }) => {
+const TableItemData = ({ item, image }: { item: string | number; image?: string }) => {
 	return (
 		<td className="px-4 py-4  w-1/7 text-ellipsis  overflow-hidden">
 			<div className="flex gap-1 items-center">
-				{imageUrl && (
+				{image && (
 					<img
-						src={`${BASE_URL}${imageUrl}`}
+						src={`${BASE_URL}${image}`}
 						alt={item.toString().substring(0, 1)}
 						className="w-10 h-10 border border-gray-100 rounded"
 					/>

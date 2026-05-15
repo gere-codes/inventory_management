@@ -16,7 +16,7 @@ export const orders = pgTable('orders', {
 	categoryId: uuid('category_id')
 		.references(() => categories.id)
 		.notNull(),
-	imageUrl: varchar('image_url', { length: 500 }),
+	image: varchar('image', { length: 500 }),
 	status: varchar('status', { length: 20 }).notNull().default('pending'),
 	type: varchar('type', { length: 20 }).notNull().default('new'),
 	createdAt: timestamp('created_at').defaultNow().notNull(),

@@ -1,4 +1,4 @@
-import z from 'zod';
+import z, { uuid } from 'zod';
 const imageSchema = z.union([
 	z.instanceof(File).refine((f) => f.size <= 5 * 1024 * 1024, 'Max 5MB'),
 	z.string(),
@@ -25,6 +25,7 @@ export const orderSchema = z.object({
 const commonFields = orderSchema.omit({
 	id: true,
 	category: true,
+	productId: true,
 	createdAt: true,
 	updatedAt: true,
 });
@@ -44,6 +45,7 @@ export const orderFormSchema = z.discriminatedUnion('mode', [
 	commonFields.extend({
 		mode: z.literal('EDIT'),
 		id: z.uuid(),
+		productId: uuid(),
 	}),
 ]);
 

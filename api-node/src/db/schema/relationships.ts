@@ -3,7 +3,7 @@ import { users } from './user.js';
 import { products } from './product.js';
 import { categories } from './category.js';
 import { suppliers } from './supplier.js';
-import { orders } from './orders.js';
+import { orders } from './order.js';
 
 export const userRelations = relations(users, ({ many }) => ({
 	products: many(products),

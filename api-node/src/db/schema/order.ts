@@ -3,16 +3,12 @@ import { users } from './user.js';
 import { categories } from './category.js';
 import { products } from './product.js';
 
-export const orderType = pgEnum('order_type', ['new', 'reorder']);
-export const orderStatus = pgEnum('order_status', ['pending', 'cancelled', 'received']);
-
 export const orders = pgTable('orders', {
 	id: uuid('id').primaryKey().defaultRandom(),
 	userId: uuid('user_id').references(() => users.id),
 	description: varchar('description', { length: 1000 }),
-	productId: uuid('product_id')
-		.references(() => products.id)
-		.notNull(),
+	productId: uuid('product_id').references(() => products.id),
+
 	name: varchar('name', { length: 100 }).notNull(),
 	sku: varchar('sku', { length: 36 }).unique().notNull(),
 	price: decimal('price').default('0.00').notNull(),
@@ -21,8 +17,8 @@ export const orders = pgTable('orders', {
 		.references(() => categories.id)
 		.notNull(),
 	imageUrl: varchar('image_url', { length: 500 }),
-	status: orderStatus('status').notNull().default('pending'),
-	type: orderType('type').notNull().default('new'),
+	status: varchar('status', { length: 20 }).notNull().default('pending'),
+	type: varchar('type', { length: 20 }).notNull().default('new'),
 	createdAt: timestamp('created_at').defaultNow().notNull(),
 	updatedAt: timestamp('updated_at')
 		.defaultNow()

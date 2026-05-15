@@ -43,7 +43,7 @@ export const OrderForm = ({ mode, orderData }: Props) => {
 	});
 
 	const onSubmit = async (data: TOrderForm) => {
-		if (orderData?.status === EOrderStatus.CANCELLED) {
+		if (orderData?.status === EOrderStatus.CANCELLED || orderData?.status === EOrderStatus.RECEIVED) {
 			dispatch(closeModal());
 			return;
 		}

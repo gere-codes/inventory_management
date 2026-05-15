@@ -47,10 +47,21 @@ export const OrderForm = ({ mode, orderData }: Props) => {
 
 		const { mode, ...payload } = result.data;
 
+		const formData = new FormData();
+
+		Object.entries(payload).forEach(([key, value]) => {
+			if (value === null || value === undefined) return;
+			if (value instanceof File) {
+				formData.append(key, value);
+			} else {
+				formData.append(key, value.toString());
+			}
+		});
+
 		if (data.mode === EModalMode.EDIT) {
-			await dispatch(orderThunk.update({ id: data.id, body: payload }));
+			await dispatch(orderThunk.update({ id: data.id, body: formData }));
 		} else {
-			await dispatch(orderThunk.create({ ...payload }));
+			await dispatch(orderThunk.create(formData));
 			await dispatch(orderThunk.paginate({ page: currentPage, limit: itemsPerPage }));
 		}
 		dispatch(closeModal());

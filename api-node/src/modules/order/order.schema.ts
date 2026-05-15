@@ -6,7 +6,7 @@ export const orderSchema = z.object({
 	productId: z.uuid().optional().nullable(),
 	name: sanitized(z.string().min(1)),
 	price: z.coerce.number().min(0.01),
-	quantity: z.number().min(0),
+	quantity: z.coerce.number().int().nonnegative(),
 	description: sanitized(z.string().max(1000)).nullable().optional(),
 	categoryId: z.uuid().optional(),
 	category: z.string().optional(),

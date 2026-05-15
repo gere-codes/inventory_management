@@ -8,7 +8,7 @@ import {
 	createOrderSchema,
 } from './order.schema';
 
-class OrderService extends BaseService<TOrder, TCreateOrder, TUpdateOrder> {
+class OrderService extends BaseService<TOrder, TCreateOrder, TUpdateOrder, FormData, FormData> {
 	constructor(resource: string) {
 		super(resource, orderSchema, createOrderSchema, updateOrderSchema);
 	}

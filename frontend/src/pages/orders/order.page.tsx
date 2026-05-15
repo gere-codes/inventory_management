@@ -29,6 +29,10 @@ export const OrdersPage = () => {
 		};
 	}, [debouncedSearch]);
 
+	useEffect(() => {
+		dispatch(orderThunk.paginate({ page: currentPage, limit: itemsPerPage }));
+	}, [dispatch, currentPage, itemsPerPage]);
+
 	return (
 		<section className="py-4 space-y-6">
 			{/* Search + Add */}

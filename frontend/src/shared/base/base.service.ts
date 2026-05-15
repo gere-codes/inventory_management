@@ -70,6 +70,10 @@ export abstract class BaseService<
 			},
 		);
 
+		const data = z.array(this.schema).safeParse(result.data.data.data);
+
+		console.log(data.error);
+
 		return {
 			data: z.array(this.schema).parse(result.data.data.data),
 			pagination: result.data.data.pagination,

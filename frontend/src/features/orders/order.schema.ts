@@ -7,13 +7,13 @@ const imageSchema = z.union([
 ]);
 export const orderSchema = z.object({
 	id: z.uuid(),
-	productId: z.uuid(),
+	productId: z.uuid().optional().nullable(),
 	name: z.string().min(1),
 	price: z.number().min(0.01),
 	quantity: z.number().min(0),
 	description: z.string().max(1000).nullable().optional(),
 	categoryId: z.uuid(),
-	category: z.string(),
+	category: z.string().optional().nullable(),
 	sku: z.string().min(3).max(36),
 	image: imageSchema.optional(),
 	status: z.enum(['pending', 'cancelled', 'received']),
@@ -25,7 +25,6 @@ export const orderSchema = z.object({
 const commonFields = orderSchema.omit({
 	id: true,
 	category: true,
-	productId: true,
 	createdAt: true,
 	updatedAt: true,
 });
@@ -45,7 +44,7 @@ export const orderFormSchema = z.discriminatedUnion('mode', [
 	commonFields.extend({
 		mode: z.literal('EDIT'),
 		id: z.uuid(),
-		productId: uuid(),
+		productId: uuid().optional().nullable(),
 	}),
 ]);
 

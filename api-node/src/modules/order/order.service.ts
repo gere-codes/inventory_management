@@ -1,7 +1,7 @@
 import { BaseService } from '@src/core/base/base.service.js';
 import {
 	createOrderSchema,
-	responseOrderSchema,
+	orderSchema,
 	updateOrderSchema,
 	type TCreateOrder,
 	type TOrder,
@@ -11,6 +11,6 @@ import type { IOrderRepository } from './order.repository.js';
 
 export class OrderService extends BaseService<TOrder, TCreateOrder, TUpdateOrder> {
 	constructor(repository: IOrderRepository) {
-		super(repository, responseOrderSchema, createOrderSchema, updateOrderSchema);
+		super(repository, orderSchema, createOrderSchema, updateOrderSchema);
 	}
 }

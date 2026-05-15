@@ -5,36 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1775278208963,
-      "tag": "0000_yellow_natasha_romanoff",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1775504380027,
-      "tag": "0001_cute_union_jack",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1775761850731,
-      "tag": "0002_certain_mesmero",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1776796447776,
-      "tag": "0003_majestic_ego",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1778529969399,
-      "tag": "0004_fair_silver_surfer",
+      "when": 1778795965384,
+      "tag": "0000_chilly_justice",
       "breakpoints": true
     }
   ]

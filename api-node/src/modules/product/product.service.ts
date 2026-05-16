@@ -12,6 +12,15 @@ import type { IProductRepository } from './product.repository.js';
 
 export interface IProductService extends IBaseService<TProduct, TProductCreate, TProductUpdate> {
 	getStats(userId: string): any;
+	updateQuantity({
+		userId,
+		productId,
+		quantity,
+	}: {
+		userId: string;
+		productId: string;
+		quantity: number;
+	}): Promise<TProduct>;
 }
 export class ProductService
 	extends BaseService<TProduct, TProductCreate, TProductUpdate, IProductRepository>
@@ -23,5 +32,19 @@ export class ProductService
 
 	async getStats(userId: string) {
 		return await this.repository.getStats(userId);
+	}
+
+	async updateQuantity({
+		userId,
+		productId,
+		quantity,
+	}: {
+		userId: string;
+		productId: string;
+		quantity: number;
+	}): Promise<TProduct> {
+		const response = await this.repository.updateQuantity({ userId, productId, quantity });
+
+		return this.schema.parse(response);
 	}
 }

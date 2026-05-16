@@ -11,6 +11,7 @@ import { privateInstance } from '@/shared/api';
 
 export interface IProductService extends IBaseService<TProduct, TProductCreate, TProductUpdate, FormData, FormData> {
 	getStats(): Promise<any>;
+	updateQuantity({ productId, quantity }: { productId: string; quantity: number }): Promise<TProduct>;
 }
 export class ProductService
 	extends BaseService<TProduct, TProductCreate, TProductUpdate, FormData, FormData>
@@ -21,6 +22,10 @@ export class ProductService
 	}
 	async getStats(): Promise<any> {
 		const response = await privateInstance.get('/product/stats');
+		return response.data.data;
+	}
+	async updateQuantity({ productId, quantity }: { productId: string; quantity: number }): Promise<TProduct> {
+		const response = await privateInstance.put(`/product/${productId}/quantity`, { quantity });
 		return response.data.data;
 	}
 }

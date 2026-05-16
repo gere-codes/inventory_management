@@ -5,9 +5,19 @@ import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { and, desc, eq, ilike, or, SQL, sql } from 'drizzle-orm';
 import { EProductStatus } from './product.enum.js';
 import type { AnyPgTable } from 'drizzle-orm/pg-core';
+import { AppError } from '@src/core/utils/app-error.util.js';
 
 export interface IProductRepository extends IBaseRepository<TProduct, TProductCreate, TProductUpdate> {
 	getStats(userId: string): any;
+	updateQuantity({
+		userId,
+		productId,
+		quantity,
+	}: {
+		userId: string;
+		productId: string;
+		quantity: number;
+	}): Promise<TProduct>;
 }
 export class ProductRepository
 	extends BaseRepository<TProduct, TProductCreate, TProductUpdate, typeof products>
@@ -137,5 +147,34 @@ export class ProductRepository
 			totalProducts: result[0]?.totalProducts ?? 0,
 			categories: categoriesResult,
 		};
+	}
+
+	public async updateQuantity({
+		userId,
+		productId,
+		quantity,
+	}: {
+		userId: string;
+		productId: string;
+		quantity: number;
+	}): Promise<TProduct> {
+		const [record] = await this.db
+			.update(this.table)
+			.set({
+				quantity: sql`GREATEST(${this.table.quantity} + ${quantity}, 0)`,
+			})
+			.where(and(eq(this.table.userId, userId), eq(this.table.id, productId)))
+			.returning({ id: this.table.id });
+
+		if (!record) throw new AppError(400, 'Item was not updated');
+
+		const [product] = await this.db
+			.select()
+			.from(this.table)
+			.where(and(eq(this.table.userId, userId), eq(this.table.id, productId)))
+			.leftJoin(categories, eq(this.table.categoryId, categories.id))
+			.limit(1);
+
+		return this.format(product);
 	}
 }

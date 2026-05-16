@@ -89,7 +89,7 @@ export const CategoriesPage = () => {
 							onClick={() =>
 								dispatch(openModal({ data: null, mode: EModalMode.CREATE, type: EModalType.CATEGORY }))
 							}
-							style={{ width: 138, height: 40 }}
+							style={{ width: 150, height: 40 }}
 						>
 							+ Add Category
 						</Button>

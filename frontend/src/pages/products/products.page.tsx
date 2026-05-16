@@ -73,6 +73,7 @@ export const ProductsPage = () => {
 		const data: TOrderForm = {
 			...product,
 			productId: product.id,
+			quantity: 1,
 			mode: ECRUDMode.CREATE,
 			status: EOrderStatus.PENDING,
 			type: EOrderType.REORDER,

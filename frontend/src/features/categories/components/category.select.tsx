@@ -6,9 +6,10 @@ interface Props {
 	categories: TCategory[];
 	isLoading: boolean;
 	register: UseFormRegister<TProductFormValues>;
+	disabled?: boolean;
 }
 
-export const CategorySelect = ({ categories, isLoading, register }: Props) => {
+export const CategorySelect = ({ categories, isLoading, register, disabled }: Props) => {
 	if (isLoading) return <div className="animate-pulse w-full h-[42px] bg-gray-200 rounded" />;
 
 	return (
@@ -20,6 +21,7 @@ export const CategorySelect = ({ categories, isLoading, register }: Props) => {
 				required
 				{...register('categoryId')}
 				className="w-full px-3 py-2 border border-gray-300 rounded-md h-[42px]"
+				disabled={disabled}
 			>
 				<option value="">Select a category</option>
 				{categories?.map((cat) => (

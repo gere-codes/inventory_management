@@ -237,7 +237,12 @@ export const OrderForm = ({ mode, orderData }: Props) => {
 				</div>
 				{/* Category */}
 				<div>
-					<CategorySelect categories={categories} isLoading={isLoading} register={register} />
+					<CategorySelect
+						categories={categories}
+						isLoading={isLoading}
+						register={register}
+						disabled={isReadOnlyField}
+					/>
 				</div>
 
 				{/* Status */}
@@ -266,6 +271,7 @@ export const OrderForm = ({ mode, orderData }: Props) => {
 						required
 						{...register('type')}
 						className="w-full px-3 py-2 border border-gray-300 rounded-md h-[42px]"
+						disabled={isReadOnlyField}
 					>
 						<option className="capitalize" value={'new'}>
 							New

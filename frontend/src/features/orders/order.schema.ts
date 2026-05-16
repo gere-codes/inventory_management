@@ -44,7 +44,6 @@ export const orderFormSchema = z.discriminatedUnion('mode', [
 	commonFields.extend({
 		mode: z.literal('EDIT'),
 		id: z.uuid(),
-		productId: uuid().optional().nullable(),
 	}),
 ]);
 

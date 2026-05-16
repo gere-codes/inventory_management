@@ -11,6 +11,7 @@ import { CategorySelect, useCategories } from '@categories';
 import { closeModal, EModalMode } from '@common';
 import { orderFormSchema, type TOrder, type TOrderForm } from '../order.schema';
 import { EOrderStatus, EOrderType } from '../order.enums';
+import { productThunk } from '@products';
 
 interface Props {
 	mode: EModalMode.CREATE | EModalMode.EDIT;
@@ -68,6 +69,18 @@ export const OrderForm = ({ mode, orderData }: Props) => {
 
 		try {
 			if (data.mode === EModalMode.EDIT) {
+				if (payload.status === EOrderStatus.RECEIVED) {
+					if (payload.type === EOrderType.NEW) {
+						await dispatch(productThunk.create(formData));
+					} else {
+						await dispatch(
+							productThunk.updateQuantity({
+								productId: payload.productId as string,
+								quantity: payload.quantity,
+							}),
+						);
+					}
+				}
 				await dispatch(orderThunk.update({ id: data.id, body: formData }));
 			} else {
 				await dispatch(orderThunk.create(formData));

@@ -72,6 +72,7 @@ export const ProductsPage = () => {
 	const handleReorder = async (product: TProduct) => {
 		const data: TOrderForm = {
 			...product,
+			productId: product.id,
 			mode: ECRUDMode.CREATE,
 			status: EOrderStatus.PENDING,
 			type: EOrderType.REORDER,

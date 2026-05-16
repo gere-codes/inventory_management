@@ -10,7 +10,7 @@ export const orders = pgTable('orders', {
 	productId: uuid('product_id').references(() => products.id),
 
 	name: varchar('name', { length: 100 }).notNull(),
-	sku: varchar('sku', { length: 36 }).unique().notNull(),
+	sku: varchar('sku', { length: 36 }).notNull(),
 	price: decimal('price').default('0.00').notNull(),
 	quantity: integer('quantity').default(1).notNull(),
 	categoryId: uuid('category_id')

@@ -2,10 +2,11 @@ import { useEffect, useMemo, useState } from 'react';
 import { selectSuppliersList, selectSuppliersPagination, supplierThunk } from '@suppliers';
 import { useAppDispatch, useAppSelector } from '@hooks';
 import { SupplierTable } from '@suppliers';
-import { EModalMode, EModalType, openModal, SearchBar } from '@common';
+import { EModalMode, EModalType, openModal, Pagination, SearchBar } from '@common';
 import { debounce } from '@utils';
-import { Button } from '@/shared/components/ui';
+import { Button } from '@ui';
 import type { TSupplier } from '@/features/suppliers/supplier.schema';
+import { setSupplierCurrentPage, setSuppliersPerPage } from '@/features/suppliers/supplier.slice';
 
 export const SuppliersPage = () => {
 	const FIRST_PAGE = 1;
@@ -41,8 +42,17 @@ export const SuppliersPage = () => {
 			debouncedSearch.cancel();
 		};
 	}, [debouncedSearch]);
+
+	const handlePageChange = (pageNum: number) => {
+		dispatch(setSupplierCurrentPage(pageNum));
+	};
+
+	const handlePerPageChange = (perPage: number) => {
+		dispatch(setSuppliersPerPage(perPage));
+	};
+
 	return (
-		<section>
+		<section className="space-y-6">
 			{/* Search + Add */}
 			<section className="flex justify-between items-end">
 				<div className="flex flex-col gap-2 flex-1">
@@ -70,6 +80,15 @@ export const SuppliersPage = () => {
 
 			{/* Table */}
 			<SupplierTable suppliers={suppliers} onDelete={handleDelete} onEdit={handleEnd} />
+
+			{/* Pagination */}
+			<Pagination
+				currentPage={currentPage}
+				totalPages={totalPages}
+				itemsPerPage={itemsPerPage}
+				onPageChange={handlePageChange}
+				onPerPageChange={handlePerPageChange}
+			/>
 		</section>
 	);
 };

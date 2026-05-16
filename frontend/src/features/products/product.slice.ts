@@ -2,11 +2,12 @@ import { baseSlice } from '@base';
 import { productThunk } from './product.thunk';
 import type { TProduct, TProductStats } from './product.schema';
 import { createIinitialBaseState } from '@constants';
+import { castDraft } from 'immer';
 
 interface StatsState {
 	data: TProductStats;
 	status: 'idle' | 'loading' | 'succeeded' | 'failed';
-	error: any;
+	error: string | null;
 }
 const initialStatsState: StatsState = {
 	data: {
@@ -25,6 +26,7 @@ export const productSlice = baseSlice(
 	{},
 
 	(builder) => {
+		// stats
 		builder
 			.addCase(productThunk.getStats.pending, (state) => {
 				state.stats.status = 'loading';
@@ -36,6 +38,26 @@ export const productSlice = baseSlice(
 			.addCase(productThunk.getStats.rejected, (state, action) => {
 				state.stats.status = 'failed';
 				state.stats.error = (action.payload as string) || 'An error occurred';
+			})
+
+			// update poduct quantity
+			.addCase(productThunk.updateQuantity.pending, (state) => {
+				state.list.status = 'loading';
+				state.list.error = null;
+			})
+			.addCase(productThunk.updateQuantity.fulfilled, (state, action) => {
+				state.list.status = 'succeeded';
+				state.list.error = null;
+				const item = castDraft(action.payload);
+				const itemIndex = state.list.data.findIndex((i) => i.id === item.id);
+
+				if (itemIndex !== -1) {
+					state.list.data[itemIndex] = item;
+				}
+			})
+			.addCase(productThunk.updateQuantity.rejected, (state, action) => {
+				state.list.status = 'failed';
+				state.list.error = (action.payload as string) || 'An error occurred';
 			});
 	},
 );

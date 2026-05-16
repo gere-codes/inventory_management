@@ -8,6 +8,7 @@ import { LocalFileService } from '@services';
 import { catchAsync } from '@src/core/utils/catch-async.util.js';
 export interface IProductController extends IBaseController<TProduct, TProductCreate, TProductUpdate> {
 	getStats(req: Request, res: Response, next: NextFunction): void;
+	updateQuantity(req: Request, res: Response, next: NextFunction): void;
 }
 class ProductController extends BaseController<TProduct, TProductCreate, TProductUpdate, IProductService> {
 	constructor() {
@@ -21,6 +22,19 @@ class ProductController extends BaseController<TProduct, TProductCreate, TProduc
 	getStats = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 		const userId = req.user.id;
 		const result = await this.service.getStats(userId);
+		res.status(200).json({
+			success: true,
+			data: result,
+		});
+	});
+
+	updateQuantity = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+		const userId = req.user.id;
+		const quantity = Number(req.body?.quantity);
+		const productId = req.params?.id as string;
+
+		const result = await this.service.updateQuantity({ userId, productId, quantity });
+
 		res.status(200).json({
 			success: true,
 			data: result,

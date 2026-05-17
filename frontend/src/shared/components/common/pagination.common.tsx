@@ -18,7 +18,7 @@ export const Pagination: React.FC<Props> = ({
 	const safeTotalPages = totalPages < 1 ? 1 : totalPages;
 
 	return (
-		<div className="flex justify-end items-center gap-6  ">
+		<div className="flex justify-end h-[60px] gap-2">
 			<div className="flex items-center gap-2">
 				<span className="text-sm font-medium text-gray-700">Rows per page:</span>
 				<select
@@ -35,10 +35,10 @@ export const Pagination: React.FC<Props> = ({
 			</div>
 
 			<div className="flex items-center gap-3">
-				<span className="text-sm font-medium text-gray-700">
+				<span className="text-sm font-medium text-gray-700  min-w-[78px]">
 					Page {currentPage} of {safeTotalPages}
 				</span>
-				<div className="flex gap-1">
+				<div className="flex gap-1  min-w-[70px]">
 					<button
 						onClick={() => onPageChange?.(currentPage - 1)}
 						disabled={currentPage === 1}

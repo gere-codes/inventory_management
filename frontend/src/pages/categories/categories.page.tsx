@@ -70,46 +70,56 @@ export const CategoriesPage = () => {
 	};
 
 	return (
-		<section className="flex flex-col lg:flex-row">
-			<section className=" w-full lg:max-w-2/3 space-y-6">
-				{/* Search */}
-				<section className="flex flex-col gap-2 mt-2">
-					<h2 className="font-bold text-xl">Categories List</h2>
-					<section className="flex justify-between">
-						<SearchBar
-							value={term}
-							onSearch={(newValue) => {
-								setTerm(newValue);
-								debouncedSearch(newValue);
-							}}
-							placeholder="Search..."
-						/>
+		<section className=" pt-4 h-full">
+			<section className="flex flex-col-reverse lg:flex-row lg:h-full">
+				<section className="flex flex-col justify-between">
+					<section className="">
+						{/* Search */}
+						<section className="flex flex-col gap-2 ">
+							<h2 className="font-bold text-xl">Categories List</h2>
+							<section className="flex justify-between">
+								<SearchBar
+									value={term}
+									onSearch={(newValue) => {
+										setTerm(newValue);
+										debouncedSearch(newValue);
+									}}
+									placeholder="Search..."
+								/>
 
-						<Button
-							onClick={() =>
-								dispatch(openModal({ data: null, mode: EModalMode.CREATE, type: EModalType.CATEGORY }))
-							}
-							style={{ width: 150, height: 40 }}
-						>
-							+ Add Category
-						</Button>
+								<Button
+									onClick={() =>
+										dispatch(
+											openModal({
+												data: null,
+												mode: EModalMode.CREATE,
+												type: EModalType.CATEGORY,
+											}),
+										)
+									}
+									style={{ width: 150, height: 40 }}
+								>
+									+ Add Category
+								</Button>
+							</section>
+						</section>
+						{/* Table */}
+						<CategoryTable categories={categories} onDelete={handleDelete} onEdit={handleEdit} />
 					</section>
+					{/* Pagination */}
+					<Pagination
+						currentPage={currentPage}
+						totalPages={totalPages}
+						itemsPerPage={itemsPerPage}
+						onPageChange={handlePageChange}
+						onPerPageChange={handlePerPageChange}
+					/>
 				</section>
 
-				{/* Table */}
-				<CategoryTable categories={categories} onDelete={handleDelete} onEdit={handleEdit} />
-				{/* Pagination */}
-				<Pagination
-					currentPage={currentPage}
-					totalPages={totalPages}
-					itemsPerPage={itemsPerPage}
-					onPageChange={handlePageChange}
-					onPerPageChange={handlePerPageChange}
-				/>
-			</section>
-			<section className="">
-				<DynamicPieChart data={productStats.categories} />
-				<h2 className="text-center font-bold">Products by Categories</h2>
+				<section className="">
+					<DynamicPieChart data={productStats.categories} />
+					<h2 className="text-center font-bold">Products by Categories</h2>
+				</section>
 			</section>
 		</section>
 	);

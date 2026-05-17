@@ -83,9 +83,9 @@ export const ProductsPage = () => {
 	};
 
 	return (
-		<section className="py-4 space-y-6">
+		<section className="pt-4 flex flex-col h-full">
 			{/* Stats */}
-			<section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+			<section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 flex-1">
 				<ProductLevel
 					Icon={TbPackages}
 					color="blue"
@@ -96,42 +96,50 @@ export const ProductsPage = () => {
 				<ProductLevel Icon={LuPackageOpen} color="red" count={productStats?.outOfStock} name="Out of Stock" />
 			</section>
 
-			{/* Search + Add */}
-			<section className="flex justify-between items-end">
-				<div className="flex flex-col gap-2 flex-1">
-					<h2 className="text-xl font-bold">Products List</h2>
-					<SearchBar
-						value={term}
-						onSearch={(newValue) => {
-							setTerm(newValue);
-							debouncedSearch(newValue);
-						}}
-						placeholder="Search..."
+			<section className="flex flex-col justify-between">
+				<section className="">
+					{/* Search + Add */}
+					<section className="flex justify-between items-end">
+						<div className="flex flex-col gap-2 flex-1">
+							<h2 className="text-xl font-bold">Products List</h2>
+							<SearchBar
+								value={term}
+								onSearch={(newValue) => {
+									setTerm(newValue);
+									debouncedSearch(newValue);
+								}}
+								placeholder="Search..."
+							/>
+						</div>
+
+						<Button
+							className="w-fit flex items-center gap-1 text-white"
+							style={{ width: 138, height: 40 }}
+							onClick={() =>
+								dispatch(openModal({ data: null, mode: EModalMode.CREATE, type: EModalType.PRODUCT }))
+							}
+						>
+							+ Add Product
+						</Button>
+					</section>
+
+					{/* Table */}
+					<ProductTable
+						products={products}
+						onDelete={handleDelete}
+						onEdit={handleEdit}
+						onOrder={handleReorder}
 					/>
-				</div>
-
-				<Button
-					className="w-fit flex items-center gap-1 text-white"
-					style={{ width: 138, height: 40 }}
-					onClick={() =>
-						dispatch(openModal({ data: null, mode: EModalMode.CREATE, type: EModalType.PRODUCT }))
-					}
-				>
-					+ Add Product
-				</Button>
+				</section>
+				{/* Pagination */}
+				<Pagination
+					currentPage={currentPage}
+					totalPages={totalPages}
+					itemsPerPage={itemsPerPage}
+					onPageChange={handlePageChange}
+					onPerPageChange={handlePerPageChange}
+				/>
 			</section>
-
-			{/* Table */}
-			<ProductTable products={products} onDelete={handleDelete} onEdit={handleEdit} onOrder={handleReorder} />
-
-			{/* Pagination */}
-			<Pagination
-				currentPage={currentPage}
-				totalPages={totalPages}
-				itemsPerPage={itemsPerPage}
-				onPageChange={handlePageChange}
-				onPerPageChange={handlePerPageChange}
-			/>
 		</section>
 	);
 };

@@ -47,30 +47,34 @@ export const OrdersPage = () => {
 	};
 
 	return (
-		<section className="py-4 space-y-6">
-			{/* Search + Add */}
-			<section className="flex justify-between items-end">
-				<div className="flex flex-col gap-2 flex-1">
-					<h2 className="text-xl font-bold">Orders List</h2>
-					<SearchBar
-						value={term}
-						onSearch={(newValue) => {
-							setTerm(newValue);
-							debouncedSearch(newValue);
-						}}
-						placeholder="Search..."
-					/>
-				</div>
+		<section className="pt-4 flex flex-col h-full  justify-between">
+			<section className="">
+				{/* Search + Add */}
+				<section className="flex justify-between items-end ">
+					<div className="flex flex-col gap-2 flex-1">
+						<h2 className="text-xl font-bold">Orders List</h2>
+						<SearchBar
+							value={term}
+							onSearch={(newValue) => {
+								setTerm(newValue);
+								debouncedSearch(newValue);
+							}}
+							placeholder="Search..."
+						/>
+					</div>
 
-				<Button
-					className="w-fit flex items-center gap-1 text-white"
-					style={{ width: 138, height: 40 }}
-					onClick={() => dispatch(openModal({ data: null, mode: EModalMode.CREATE, type: EModalType.ORDER }))}
-				>
-					+ Add Order
-				</Button>
+					<Button
+						className="w-fit flex items-center gap-1 text-white"
+						style={{ width: 138, height: 40 }}
+						onClick={() =>
+							dispatch(openModal({ data: null, mode: EModalMode.CREATE, type: EModalType.ORDER }))
+						}
+					>
+						+ Add Order
+					</Button>
+				</section>
+				<OrderTable orders={orders} onDelete={noop} onEdit={handleEdit} onOrder={noop} />
 			</section>
-			<OrderTable orders={orders} onDelete={noop} onEdit={handleEdit} onOrder={noop} />
 
 			{/* Pagination */}
 			<Pagination

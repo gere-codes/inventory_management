@@ -52,34 +52,36 @@ export const SuppliersPage = () => {
 	};
 
 	return (
-		<section className="space-y-6">
-			{/* Search + Add */}
-			<section className="flex justify-between items-end">
-				<div className="flex flex-col gap-2 flex-1">
-					<h2 className="text-xl font-bold">Suppliers List</h2>
-					<SearchBar
-						value={term}
-						onSearch={(newValue) => {
-							setTerm(newValue);
-							debouncedSearch(newValue);
-						}}
-						placeholder="Search..."
-					/>
-				</div>
+		<section className="pt-4 flex flex-col h-full  justify-between">
+			<section>
+				{/* Search + Add */}
+				<section className="flex justify-between items-end">
+					<div className="flex flex-col gap-2 flex-1">
+						<h2 className="text-xl font-bold">Suppliers List</h2>
+						<SearchBar
+							value={term}
+							onSearch={(newValue) => {
+								setTerm(newValue);
+								debouncedSearch(newValue);
+							}}
+							placeholder="Search..."
+						/>
+					</div>
 
-				<Button
-					className="w-fit flex items-center gap-1 text-white"
-					style={{ width: 140, height: 40 }}
-					onClick={() =>
-						dispatch(openModal({ data: null, mode: EModalMode.CREATE, type: EModalType.SUPPLIER }))
-					}
-				>
-					+ Add Supplier
-				</Button>
+					<Button
+						className="w-fit flex items-center gap-1 text-white"
+						style={{ width: 140, height: 40 }}
+						onClick={() =>
+							dispatch(openModal({ data: null, mode: EModalMode.CREATE, type: EModalType.SUPPLIER }))
+						}
+					>
+						+ Add Supplier
+					</Button>
+				</section>
+
+				{/* Table */}
+				<SupplierTable suppliers={suppliers} onDelete={handleDelete} onEdit={handleEnd} />
 			</section>
-
-			{/* Table */}
-			<SupplierTable suppliers={suppliers} onDelete={handleDelete} onEdit={handleEnd} />
 
 			{/* Pagination */}
 			<Pagination

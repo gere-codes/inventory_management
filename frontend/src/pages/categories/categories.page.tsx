@@ -116,9 +116,9 @@ export const CategoriesPage = () => {
 					/>
 				</section>
 
-				<section className="">
+				<section className="lg:mt-10">
+					<h2 className="text-center font-bold text-gray-600">Products by Categories</h2>
 					<DynamicPieChart data={productStats.categories} />
-					<h2 className="text-center font-bold">Products by Categories</h2>
 				</section>
 			</section>
 		</section>

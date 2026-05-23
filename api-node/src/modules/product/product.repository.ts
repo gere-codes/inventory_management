@@ -37,7 +37,7 @@ export class ProductRepository
 			description: record.products?.description,
 			categoryId: record.products.categoryId,
 			category: record.categories.name || '',
-			image: record.products.image,
+			images: record.products.images,
 			status: this.getStockStatus(record.products.quantity),
 			createdAt: record.products.createdAt,
 			updatedAt: record.products.updatedAt,

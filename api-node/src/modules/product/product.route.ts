@@ -6,8 +6,8 @@ const productRoutes = Router();
 
 productRoutes.get('/', productController.getAll);
 productRoutes.get('/paginate', productController.paginate);
-productRoutes.post('/', upload.single('image'), productController.create);
-productRoutes.put('/:id', upload.single('image'), productController.update);
+productRoutes.post('/', upload.array('images', 4), productController.create);
+productRoutes.put('/:id', upload.array('images', 4), productController.update);
 productRoutes.delete('/:id', productController.delete);
 
 productRoutes.get('/search', productController.search);

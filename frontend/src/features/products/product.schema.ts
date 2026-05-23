@@ -1,5 +1,13 @@
 import { z } from 'zod';
 import { EProductStatus } from './product.enum.js';
+const imageSchema = z.union([
+	z.instanceof(File).refine((f) => f.size <= 5 * 1024 * 1024, 'Max 5MB'),
+	z.string(),
+	z.null(),
+	z.undefined(),
+]);
+
+const imagesSchema = z.array(imageSchema).optional().nullable();
 
 export const productCreateSchema = z.object({
 	name: z.string().min(2).max(100),
@@ -8,7 +16,7 @@ export const productCreateSchema = z.object({
 	quantity: z.number().int().nonnegative(),
 	categoryId: z.uuid(),
 	sku: z.string().min(3).max(36),
-	image: z.string().optional().nullable(),
+	images: imagesSchema,
 });
 
 export const productSchema = productCreateSchema.extend({
@@ -20,19 +28,12 @@ export const productSchema = productCreateSchema.extend({
 });
 export const productUpdateSchema = productCreateSchema.partial();
 
-const imageSchema = z.union([
-	z.instanceof(File).refine((f) => f.size <= 5 * 1024 * 1024, 'Max 5MB'),
-	z.string(),
-	z.null(),
-	z.undefined(),
-]);
-
 export const productFormSchema = z.discriminatedUnion('mode', [
 	// CREATE
 	z.object({
 		mode: z.literal('CREATE'),
 		name: z.string().min(2),
-		image: imageSchema.optional(),
+		images: imagesSchema,
 		price: z.number().min(0.01),
 		categoryId: z.uuid(),
 		id: z.string().optional(),
@@ -45,7 +46,7 @@ export const productFormSchema = z.discriminatedUnion('mode', [
 	z.object({
 		mode: z.literal('EDIT'),
 		name: z.string().min(2),
-		image: imageSchema.optional(),
+		images: imagesSchema,
 		price: z.number().min(0.01),
 		categoryId: z.uuid(),
 		id: z.uuid(),

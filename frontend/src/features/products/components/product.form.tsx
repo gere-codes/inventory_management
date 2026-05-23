@@ -18,7 +18,7 @@ interface Props {
 
 export const ProductForm = ({ mode, productData }: Props) => {
 	const { categories, isLoading } = useCategories();
-	const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+	const [previewUrl, setPreviewUrl] = useState<string[] | null>(null);
 
 	const { currentPage, itemsPerPage, totalItems, totalPages } = useAppSelector(selectProductsPagination);
 
@@ -46,8 +46,14 @@ export const ProductForm = ({ mode, productData }: Props) => {
 		Object.entries(data).forEach(([key, value]) => {
 			if (value === null || value === undefined) return;
 
-			if (value instanceof File) {
-				formData.append(key, value);
+			if (Array.isArray(value)) {
+				value.forEach((item) => {
+					if (item instanceof File) {
+						formData.append(key, item);
+					} else if (typeof item === 'string') {
+						formData.append(key, item);
+					}
+				});
 			} else {
 				formData.append(key, value.toString());
 			}
@@ -61,22 +67,24 @@ export const ProductForm = ({ mode, productData }: Props) => {
 		dispatch(closeModal());
 	};
 
-	const imageFile = watch('image');
+	const imageFile = watch('images');
 
 	// revoke url when component unmounts
 	useEffect(() => {
-		if (!(imageFile instanceof File)) {
-			setPreviewUrl(null);
+		if (!imageFile || !Array.isArray(imageFile) || imageFile.length === 0) {
+			setPreviewUrl([]); // Clear previews if no files exist
 			return;
 		}
 
-		const objectUrl = URL.createObjectURL(imageFile);
-		setPreviewUrl(objectUrl);
+		const objectUrls = imageFile
+			.filter((image) => image instanceof File)
+			.map((image) => URL.createObjectURL(image));
+
+		setPreviewUrl(objectUrls);
 
 		return () => {
-			if (imageFile && imageFile instanceof File) {
-				URL.revokeObjectURL(objectUrl);
-			}
+			// revoke object urls when component unmounts
+			objectUrls.forEach((url) => URL.revokeObjectURL(url));
 		};
 	}, [imageFile]);
 
@@ -88,54 +96,70 @@ export const ProductForm = ({ mode, productData }: Props) => {
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
 				{/* image */}
 				<Controller
-					name="image"
+					name="images"
 					control={control}
 					render={({ field: { onChange, value, ...field } }) => {
 						return (
-							<div className="border border-gray-200 rounded h-24 w-24 relative">
-								{imageFile ? (
-									<div className="relative">
-										<button
-											onClick={() => setValue('image', '')}
-											className="absolute -top-2 -right-2 text-gray-600 hover:text-gray-800"
-										>
-											<TiDelete size={25} />
-										</button>
-										<img
-											src={
-												imageFile instanceof File
-													? URL.createObjectURL(imageFile)
-													: `${BASE_URL}${imageFile}`
-											}
-											alt="Preview"
-											className="object-center aspect-square h-full w-full"
-										/>
-									</div>
-								) : (
-									<>
+							<div className="flex flex-wrap gap-2">
+								{/* Render existing image previews */}
+								{imageFile &&
+									imageFile.map((image, index) => (
+										<div className="border border-gray-200 rounded h-24 w-24 relative" key={index}>
+											<button
+												type="button"
+												onClick={() => {
+													// Filter out the deleted image by its index
+													const updatedImages = imageFile.filter((_, i) => i !== index);
+													setValue('images', updatedImages);
+												}}
+												className="absolute -top-2 -right-2 text-gray-600 hover:text-gray-800 z-10 bg-white rounded-full"
+											>
+												<TiDelete size={25} />
+											</button>
+											<img
+												src={
+													image instanceof File
+														? URL.createObjectURL(image)
+														: `${BASE_URL}${image}`
+												}
+												alt={`Preview ${index + 1}`}
+												className="object-cover h-full w-full rounded"
+											/>
+										</div>
+									))}
+
+								{/* Render upload slot ONLY if total images are less than 4 */}
+								{(!imageFile || imageFile.length < 4) && (
+									<div className="border border-gray-200 border-dashed rounded h-24 w-24 relative flex items-center justify-center hover:bg-gray-50 transition-colors">
 										<input
 											{...field}
 											type="file"
 											id="image"
 											name="image"
-											className="h-full w-full opacity-0 absolute"
+											className="h-full w-full opacity-0 absolute cursor-pointer z-10"
 											accept="image/jpeg, image/png"
 											multiple={false}
 											onChange={(e) => {
 												const file = e.target.files && e.target.files[0];
-
 												if (file) {
-													setValue('image', file);
+													const currentImages = imageFile || [];
+													setValue('images', [...currentImages, file]);
 												}
 											}}
 										/>
 										<label
 											htmlFor="image"
-											className="h-full w-full flex items-center justify-center cursor-pointer"
+											className="h-full w-full flex flex-col items-center justify-center cursor-pointer text-center p-1"
 										>
-											<span className="text-gray-500 text-xs">Upload Image</span>
+											<span className="text-gray-400 text-lg font-light">+</span>
+											<span className="text-gray-500 text-[10px] leading-tight">
+												Upload Image
+											</span>
+											<span className="text-gray-400 text-[9px]">
+												({imageFile?.length || 0}/4)
+											</span>
 										</label>
-									</>
+									</div>
 								)}
 							</div>
 						);

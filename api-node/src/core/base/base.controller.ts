@@ -69,13 +69,26 @@ export abstract class BaseController<
 		const id = req.params?.id as string;
 		const { body } = req;
 
-		let image: string | undefined = req.body?.image;
+		let existingImages: string[] = [];
 
-		if (req.file && this.fileService) {
-			image = await this.fileService.upload(req.file);
+		// normalize existing images to array
+		if (body?.images) {
+			if (Array.isArray(body.images)) {
+				existingImages = body.images;
+			} else if (typeof body.images === 'string') {
+				existingImages = [body.images];
+			}
 		}
 
-		const payload = { ...body, image };
+		// handle new images upload if any
+		let newImages: string[] = [];
+		if (req.files && Array.isArray(req.files) && req.files.length > 0 && this.fileService) {
+			newImages = await Promise.all(req.files.map((file) => this.fileService!.upload(file)));
+		}
+
+		const finalImages = [...existingImages, ...newImages];
+
+		const payload = { ...body, images: finalImages };
 
 		const result = await this.service.update(userId, id, payload);
 

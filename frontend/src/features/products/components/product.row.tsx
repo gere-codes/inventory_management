@@ -46,13 +46,15 @@ export const ProductItem = memo(({ product, onEdit, onDelete, onOrder }: Props) 
 const TableItemData = ({ item, images }: { item: string | number; images?: (string | File | null | undefined)[] }) => {
 	return (
 		<td className="px-4 py-4  w-1/7 text-ellipsis  overflow-hidden">
-			<div className="flex gap-1 items-center">
-				{images && (
-					<img
-						src={`${BASE_URL}${images[0]}`}
-						alt={item.toString().substring(0, 1)}
-						className="w-10 h-10 border border-gray-100 rounded"
-					/>
+			<div className="flex gap-1 items-center ">
+				{images && images?.length > 0 && (
+					<span className="block h-10 w-10 border border-gray-100 rounded ">
+						<img
+							src={`${BASE_URL}${images[0]}`}
+							alt={item.toString().substring(0, 1)}
+							className="object-cover aspect-square"
+						/>
+					</span>
 				)}
 				<p className="text-sm font-medium text-gray-900 truncate">{item}</p>
 			</div>

@@ -1,6 +1,6 @@
 import type { IBaseRepository } from './base.repository.js';
 import z from 'zod';
-import type { PaginatedResult } from '../types/general.js';
+import type { PaginatedResult, QueryOptions } from '../types/general.js';
 
 export interface IBaseService<T, TCreate, TUpdate> {
 	getAll(userId: string): Promise<T[]>;
@@ -10,6 +10,7 @@ export interface IBaseService<T, TCreate, TUpdate> {
 	delete(userId: string, id: string): Promise<T>;
 	paginate(userId: string, page: number, limit: number): Promise<PaginatedResult<T>>;
 	search(userId: string, term: string, page: number, limit: number): Promise<PaginatedResult<T>>;
+	findMany(options: QueryOptions): Promise<PaginatedResult<T>>;
 }
 export abstract class BaseService<
 	T,
@@ -85,6 +86,15 @@ export abstract class BaseService<
 
 		return {
 			data: responseData,
+			pagination,
+		};
+	}
+
+	async findMany(options: QueryOptions): Promise<PaginatedResult<T>> {
+		const { data, pagination } = await this.repository.findMany(options);
+
+		return {
+			data,
 			pagination,
 		};
 	}

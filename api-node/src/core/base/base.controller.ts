@@ -11,6 +11,7 @@ export interface IBaseController<T, TCreate, TUpdate> {
 	delete(req: Request, res: Response, next: NextFunction): void;
 	paginate(req: Request, res: Response, next: NextFunction): void;
 	search(req: Request, res: Response, next: NextFunction): void;
+	findMany(req: Request, res: Response, next: NextFunction): void;
 }
 
 export abstract class BaseController<
@@ -133,6 +134,32 @@ export abstract class BaseController<
 		res.status(200).json({
 			success: true,
 			data: result,
+		});
+	});
+
+	findMany = catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+		console.log('find many has been called');
+		const userId = req.user?.id;
+		const page = Number(req.query.currentPage) || 1;
+		const limit = Number(req.query?.itemsPerPage) || 10;
+		const term = (req.query?.term as string) || '';
+		const categoryId = (req.query?.categoryId as string) || '';
+		const minPrice = Number(req.query?.minPrice);
+		const maxPrice = Number(req.query?.maxPrice);
+		const options = {
+			userId,
+			page,
+			limit,
+			term,
+			categoryId,
+			minPrice,
+			maxPrice,
+		};
+
+		const reponse = await this.service.findMany(options);
+		res.status(200).json({
+			success: true,
+			data: reponse,
 		});
 	});
 }

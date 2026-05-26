@@ -12,7 +12,7 @@ export interface QueryOptions {
 	page?: number;
 	limit?: number;
 	userId?: string;
-	search?: string;
+	term?: string;
 	categoryId?: string;
 	minPrice?: number;
 	maxPrice?: number;

@@ -172,7 +172,7 @@ export abstract class BaseRepository<
 	}
 
 	async findMany(options: QueryOptions = {}): Promise<PaginatedResult<T>> {
-		const { page = 1, limit = 10, search, categoryId, minPrice, maxPrice } = options;
+		const { page = 1, limit = 10, term, categoryId, minPrice, maxPrice } = options;
 
 		const offset = (page - 1) * limit;
 
@@ -181,8 +181,8 @@ export abstract class BaseRepository<
 		if (options?.userId) {
 			filters.push(eq(this.table.userId, options.userId));
 		}
-		if (options?.search) {
-			filters.push(ilike(this.table.name, `%${search}%`));
+		if (options?.term) {
+			filters.push(ilike(this.table.name, `%${term}%`));
 		}
 		if (options.categoryId && 'categoryId' in this.table) {
 			const categoryColumn = (this.table as any).categoryId;

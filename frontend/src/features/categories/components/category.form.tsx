@@ -8,7 +8,7 @@ import { categoryThunk } from '../category.thunk';
 import { selectCategoryPagination } from '../category.selectors';
 
 interface Props {
-	mode: EModalMode;
+	mode: EModalMode.CREATE | EModalMode.EDIT;
 	categoryData: TCategory;
 }
 
@@ -23,12 +23,8 @@ export const CategoryForm = ({ mode, categoryData }: Props) => {
 		mode: 'onBlur',
 		values: {
 			mode: mode,
-			id: categoryData?.id,
-			name: categoryData?.name ?? '',
-			description: categoryData?.description ?? '',
-			createdAt: categoryData?.createdAt ?? '',
-			updatedAt: categoryData?.updatedAt ?? '',
-		} as TCategoryForm,
+			...categoryData,
+		},
 	});
 
 	const { currentPage, itemsPerPage, totalItems, totalPages } = useAppSelector(selectCategoryPagination);

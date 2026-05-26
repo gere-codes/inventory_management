@@ -7,3 +7,13 @@ export interface PaginatedResult<T> {
 		itemsPerPage: number;
 	};
 }
+
+export interface QueryOptions {
+	page?: number;
+	limit?: number;
+	userId?: string;
+	search?: string;
+	categoryId?: string;
+	minPrice?: number;
+	maxPrice?: number;
+}

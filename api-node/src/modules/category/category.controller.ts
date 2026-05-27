@@ -3,12 +3,15 @@ import type { TCategory, TCategoryCreate, TCategoryUpdate } from './category.sch
 import { CategoryRepository } from './category.repository.js';
 import { db } from '@src/db/index.js';
 import { CategoryService, type ICategoryService } from './category.service.js';
+import { LocalFileService } from '@src/services/storage.service.js';
 
 class CategoryController extends BaseController<TCategory, TCategoryCreate, TCategoryUpdate, ICategoryService> {
 	constructor() {
 		const repo = new CategoryRepository(db);
 		const service = new CategoryService(repo);
-		super(service);
+
+		const fileService = new LocalFileService();
+		super(service, fileService);
 	}
 }
 

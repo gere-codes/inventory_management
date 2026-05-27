@@ -52,15 +52,15 @@ export abstract class BaseController<
 		let payload = { ...body };
 
 		// Handling a single image
-		let image: string = '';
 		if (req.file && this.fileService) {
+			let image: string = '';
 			image = await this.fileService.upload(req.file);
 			payload.image = image;
 		}
 
 		// Handling an array of images
-		let images: string[] = [];
 		if (req.files && Array.isArray(req.files) && req.files.length > 0 && this.fileService) {
+			let images: string[] = [];
 			images = await Promise.all(req.files.map((file) => this.fileService!.upload(file)));
 			payload.images = images;
 		}
@@ -146,7 +146,6 @@ export abstract class BaseController<
 	});
 
 	findMany = catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-		console.log('find many has been called');
 		const userId = req.user?.id;
 		const page = Number(req.query.currentPage) || 1;
 		const limit = Number(req.query?.itemsPerPage) || 10;

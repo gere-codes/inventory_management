@@ -24,8 +24,8 @@ export const LoginPage = () => {
 
 	const { error: serverError, status } = useAppSelector(selectAuth);
 
-	const onSubmit = (data: TLoginFormData) => {
-		dispatch(authThunk.login(data));
+	const onSubmit = async (data: TLoginFormData) => {
+		await dispatch(authThunk.login(data));
 	};
 
 	const values = watch();

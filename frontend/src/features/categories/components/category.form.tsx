@@ -50,7 +50,12 @@ export const CategoryForm = ({ mode, categoryData }: Props) => {
 
 		Object.entries(payload).forEach(([key, value]) => {
 			if (value === null || value === undefined) return;
-			formData.append(key, value.toString());
+
+			if (value instanceof File) {
+				formData.append(key, value, value.name);
+			} else {
+				formData.append(key, value.toString());
+			}
 		});
 
 		if (data.mode === EModalMode.EDIT) {

@@ -3,6 +3,7 @@ import z from 'zod';
 
 export const categoryCreateSchema = z.object({
 	name: sanitized(z.string().min(2)),
+	image: z.string(),
 	description: sanitized(z.string()).nullable().optional(),
 });
 

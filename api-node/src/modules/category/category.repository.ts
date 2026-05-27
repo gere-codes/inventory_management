@@ -17,6 +17,7 @@ export class CategoryRepository
 		return {
 			id: record.id,
 			name: record.name,
+			image: record.image,
 			description: record.description,
 			createdAt: record.createdAt,
 			updatedAt: record.updatedAt,

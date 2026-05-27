@@ -14,7 +14,6 @@ export const products = pgTable('products', {
 	categoryId: uuid('category_id')
 		.references(() => categories.id)
 		.notNull(),
-	// image: varchar('image', { length: 500 }),
 	images: text('images')
 		.array()
 		.notNull()

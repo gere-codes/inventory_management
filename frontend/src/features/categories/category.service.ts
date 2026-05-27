@@ -8,7 +8,7 @@ import {
 	type TCategoryUpdate,
 } from './category.schema';
 
-export class CategoryService extends BaseService<TCategory, TCategoryCreate, TCategoryUpdate> {
+export class CategoryService extends BaseService<TCategory, TCategoryCreate, TCategoryUpdate, FormData, FormData> {
 	constructor(resource: string) {
 		super(resource, categorySchema, categoryCreateSchema, categoryUpdateSchema);
 	}

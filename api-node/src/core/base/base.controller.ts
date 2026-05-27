@@ -49,13 +49,21 @@ export abstract class BaseController<
 	create = catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 		const userId = req.user.id;
 		const { body } = req;
-		let images: string[] = [];
+		let payload = { ...body };
 
-		if (req.files && Array.isArray(req.files) && req.files.length > 0 && this.fileService) {
-			images = await Promise.all(req.files.map((file) => this.fileService!.upload(file)));
+		// Handling a single image
+		let image: string = '';
+		if (req.file && this.fileService) {
+			image = await this.fileService.upload(req.file);
+			payload.image = image;
 		}
 
-		const payload = { ...body, images };
+		// Handling an array of images
+		let images: string[] = [];
+		if (req.files && Array.isArray(req.files) && req.files.length > 0 && this.fileService) {
+			images = await Promise.all(req.files.map((file) => this.fileService!.upload(file)));
+			payload.images = images;
+		}
 
 		const result = await this.service.create(userId, payload);
 

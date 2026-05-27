@@ -1,8 +1,15 @@
 import z, { nullable } from 'zod';
+const imageSchema = z.union([
+	z.instanceof(File).refine((f) => f.size <= 5 * 1024 * 1024, 'Max 5MB'),
+	z.string(),
+	z.null(),
+	z.undefined(),
+]);
 
 export const categorySchema = z.object({
 	id: z.uuid(),
 	name: z.string().min(2),
+	image: imageSchema,
 	description: z.string().nullable().optional(),
 	createdAt: z.string().optional(),
 	updatedAt: z.string().optional(),

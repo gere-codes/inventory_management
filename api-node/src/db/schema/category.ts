@@ -1,5 +1,6 @@
 import { pgTable, uuid, varchar, timestamp } from 'drizzle-orm/pg-core';
 import { users } from './user.js';
+import { text } from 'drizzle-orm/gel-core';
 
 export const categories = pgTable('categories', {
 	id: uuid('id').primaryKey().defaultRandom(),
@@ -7,6 +8,7 @@ export const categories = pgTable('categories', {
 		.references(() => users.id)
 		.notNull(),
 	name: varchar('name', { length: 100 }).notNull(),
+	image: varchar('image', { length: 500 }).notNull(),
 	description: varchar('description', { length: 225 }),
 	createdAt: timestamp('created_at').defaultNow().notNull(),
 	updatedAt: timestamp('updated_at')

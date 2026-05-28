@@ -21,4 +21,4 @@ export default productRoutes;
 
 export const publicProductRoutes = Router();
 
-publicProductRoutes.get('/', productController.findMany);
+publicProductRoutes.get('/', productController.getCollection);

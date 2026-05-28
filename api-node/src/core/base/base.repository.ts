@@ -12,9 +12,8 @@ export interface IBaseRepository<T, TCreate, TUpdate> {
 	delete(userId: string, id: string): Promise<T>;
 	search(userId: string, term: string, page: number, limit: number): Promise<PaginatedResult<T>>;
 	paginate(userId: string, page?: number, limit?: number): Promise<PaginatedResult<T>>;
-	findMany(options: QueryOptions): Promise<PaginatedResult<T>>;
 	findAll(options: IQueryOptions): Promise<T[]>;
-	findAllAndCount(optoins: IQueryOptions): Promise<PaginatedResult<T>>;
+	findManyAndCount(optoins: IQueryOptions): Promise<PaginatedResult<T>>;
 }
 
 type AnyUserIdColumn = PgColumn<ColumnBaseConfig<'string', string>>;
@@ -173,60 +172,6 @@ export abstract class BaseRepository<
 		};
 	}
 
-	async findMany(options: QueryOptions = {}): Promise<PaginatedResult<T>> {
-		const { page = 1, limit = 10, term, categoryId, minPrice, maxPrice } = options;
-
-		const offset = (page - 1) * limit;
-
-		const filters: SQL[] = [];
-
-		if (options?.userId) {
-			filters.push(eq(this.table.userId, options.userId));
-		}
-		if (options?.term) {
-			filters.push(ilike(this.table.name, `%${term}%`));
-		}
-		if (options.categoryId && 'categoryId' in this.table) {
-			const categoryColumn = (this.table as any).categoryId;
-			filters.push(eq(categoryColumn, categoryId));
-		}
-		if (options?.minPrice && 'price' in this.table) {
-			const priceColumn = (this.table as any).price;
-			filters.push(gte(priceColumn, minPrice));
-		}
-		if (options?.maxPrice && 'price' in this.table) {
-			const priceColumn = (this.table as any).price;
-			filters.push(lte(priceColumn, maxPrice));
-		}
-
-		const whereClause = filters.length > 0 ? and(...filters) : undefined;
-
-		const query = this.getBaseQuery();
-		const results = (await query
-			.where(whereClause)
-			.orderBy(desc(this.table.createdAt))
-			.limit(limit)
-			.offset(offset)) as T[];
-
-		const countResult = await this.db
-
-			.select({ count: sql<number>`count(*)` })
-			.from(this.table as AnyPgTable)
-			.where(whereClause);
-
-		const total = countResult[0]?.count ?? 0;
-
-		return {
-			data: results.map((result) => this.format(result)),
-			pagination: {
-				totalItems: Number(total),
-				currentPage: page,
-				totalPages: Math.ceil(total / limit),
-				itemsPerPage: limit,
-			},
-		};
-	}
-
 	protected buildAdditionalFilters(filter: any): SQL[] {
 		return [];
 	}
@@ -263,7 +208,7 @@ export abstract class BaseRepository<
 		return results.map((result) => this.format(result));
 	}
 
-	async findAllAndCount(options: IQueryOptions): Promise<PaginatedResult<T>> {
+	async findManyAndCount(options: IQueryOptions): Promise<PaginatedResult<T>> {
 		const { pagination } = options;
 
 		const { page = 1, limit = 10 } = pagination || { page: 1, limit: 10 };

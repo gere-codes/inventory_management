@@ -2,6 +2,7 @@ import type { Request, Response, NextFunction } from 'express';
 import type { BaseService, IBaseService } from './base.service.js';
 import { catchAsync } from '@utils/index.js';
 import type { IFileService } from '@services';
+import type { IQueryOptions } from '../types/general.js';
 
 export interface IBaseController<T, TCreate, TUpdate> {
 	getAll(req: Request, res: Response, next: NextFunction): void;
@@ -11,7 +12,7 @@ export interface IBaseController<T, TCreate, TUpdate> {
 	delete(req: Request, res: Response, next: NextFunction): void;
 	paginate(req: Request, res: Response, next: NextFunction): void;
 	search(req: Request, res: Response, next: NextFunction): void;
-	findMany(req: Request, res: Response, next: NextFunction): void;
+	getCollection(req: Request, res: Response, next: NextFunction): void;
 }
 
 export abstract class BaseController<
@@ -145,28 +146,27 @@ export abstract class BaseController<
 		});
 	});
 
-	findMany = catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+	getCollection = catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 		const userId = req.user?.id;
-		const page = Number(req.query.currentPage) || 1;
-		const limit = Number(req.query?.itemsPerPage) || 10;
-		const term = (req.query?.term as string) || '';
-		const categoryId = (req.query?.categoryId as string) || '';
-		const minPrice = Number(req.query?.minPrice);
-		const maxPrice = Number(req.query?.maxPrice);
-		const options = {
-			userId,
-			page,
-			limit,
-			term,
-			categoryId,
-			minPrice,
-			maxPrice,
-		};
+		const { page, limit, search, paginate, ...rawFilters } = req.query;
 
-		const reponse = await this.service.findMany(options);
+		const options: IQueryOptions = {
+			pagination: {
+				page: Number(page) || 1,
+				limit: Number(limit) || 10,
+				disabled: paginate === 'false',
+			},
+			search: (search as string) || '',
+			filter: rawFilters as any,
+			context: {
+				userId,
+			},
+		};
+		const response = await this.service.getCollection(options);
+
 		res.status(200).json({
 			success: true,
-			data: reponse,
+			data: response,
 		});
 	});
 }

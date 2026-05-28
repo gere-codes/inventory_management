@@ -24,11 +24,7 @@ export interface IQueryOptions {
 		disabled?: boolean;
 	};
 
-	filter?: {
-		minPrice?: number;
-		maxPrice?: number;
-		categoryId?: string;
-	};
+	filter?: Record<string, any>;
 	search?: string;
 
 	context?: {

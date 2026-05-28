@@ -2,7 +2,7 @@ import { BaseRepository, type IBaseRepository } from '@src/core/base/base.reposi
 import type { TProduct, TProductCreate, TProductUpdate } from './product.shema.js';
 import { categories, products } from '@src/db/index.js';
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
-import { and, desc, eq, ilike, or, SQL, sql } from 'drizzle-orm';
+import { and, desc, eq, gte, ilike, lte, or, SQL, sql } from 'drizzle-orm';
 import { EProductStatus } from './product.enum.js';
 import type { AnyPgTable } from 'drizzle-orm/pg-core';
 import { AppError } from '@src/core/utils/app-error.util.js';
@@ -42,6 +42,26 @@ export class ProductRepository
 			createdAt: record.products.createdAt,
 			updatedAt: record.products.updatedAt,
 		};
+	}
+
+	protected buildAdditionalFilters(filter: any): SQL[] {
+		const filters: SQL[] = [];
+
+		if (!filter) return filters;
+
+		if (filter?.categoryId) {
+			filters.push(eq(this.table.categoryId, filter.categoryId));
+		}
+
+		if (filter?.minPrice) {
+			filters.push(gte(this.table.price, filter.minPrice));
+		}
+
+		if (filter?.maxPrice) {
+			filters.push(lte(this.table.price, filter.maxPrice));
+		}
+
+		return filters;
 	}
 
 	private getStockStatus(qty: number): EProductStatus {

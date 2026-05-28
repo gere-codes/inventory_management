@@ -226,7 +226,11 @@ export abstract class BaseRepository<
 		};
 	}
 
-	async findAll(options: IQueryOptions): Promise<T[]> {
+	protected buildAdditionalFilters(filters: any): SQL[] {
+		return [];
+	}
+
+	protected buildFilters(options: IQueryOptions): SQL[] {
 		const { filter, search, context } = options;
 
 		const filters: SQL[] = [];
@@ -236,23 +240,25 @@ export abstract class BaseRepository<
 		}
 
 		if (search) {
-			filters.push(eq(this.table.name, `%${search}%`));
+			filters.push(ilike(this.table.name, `${search}%`));
 		}
 
-		if (filter?.minPrice && 'price' in this.table) {
-			const priceColumn = (this.table as any).price;
-			filters.push(gte(priceColumn, filter.minPrice));
+		const additionaFilters = this.buildAdditionalFilters(filter);
+
+		if (additionaFilters.length > 0) {
+			filters.push(...additionaFilters);
 		}
 
-		if (filter?.maxPrice && 'price' in this.table) {
-			const priceColumn = (this.table as any).price;
-			filters.push(lte(priceColumn, filter.maxPrice));
-		}
+		return filters;
+	}
 
-		const whereClause = filters.length > 0 ? and(...filters) : undefined;
+	async findAll(options: IQueryOptions): Promise<T[]> {
+		const whereClause = this.buildFilters(options);
 
-		const query = this.getBaseQuery();
-		const results = (await query.where(whereClause).orderBy(desc(this.table.createdAt))) as T[];
+		const results = (await this.getBaseQuery()
+			.where(whereClause)
+			.orderBy(desc(this.table.createdAt))
+			.limit(1000)) as T[];
 
 		return results.map((result) => this.format(result));
 	}

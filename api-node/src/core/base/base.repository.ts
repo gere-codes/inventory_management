@@ -252,8 +252,8 @@ export abstract class BaseRepository<
 		const whereClause = filters.length > 0 ? and(...filters) : undefined;
 
 		const query = this.getBaseQuery();
-		const results = await query.where(whereClause).orderBy(desc(this.table.createdAt));
+		const results = (await query.where(whereClause).orderBy(desc(this.table.createdAt))) as T[];
 
-		return results;
+		return results.map((result) => this.format(result));
 	}
 }

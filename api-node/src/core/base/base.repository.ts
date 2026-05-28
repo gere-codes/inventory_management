@@ -2,7 +2,7 @@ import { and, desc, eq, gte, ilike, lte, SQL, sql, type AnyTable, type ColumnBas
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import type { AnyPgTable, PgColumn, PgSelect, PgSelectBase, PgTable } from 'drizzle-orm/pg-core';
 import { AppError } from '@utils';
-import type { PaginatedResult, QueryOptions } from '../types/general.js';
+import type { IQueryOptions, PaginatedResult, QueryOptions } from '../types/general.js';
 
 export interface IBaseRepository<T, TCreate, TUpdate> {
 	getAll(userId: string): Promise<T[]>;
@@ -13,6 +13,7 @@ export interface IBaseRepository<T, TCreate, TUpdate> {
 	search(userId: string, term: string, page: number, limit: number): Promise<PaginatedResult<T>>;
 	paginate(userId: string, page?: number, limit?: number): Promise<PaginatedResult<T>>;
 	findMany(options: QueryOptions): Promise<PaginatedResult<T>>;
+	findAll(options: IQueryOptions): Promise<T[]>;
 }
 
 type AnyUserIdColumn = PgColumn<ColumnBaseConfig<'string', string>>;
@@ -223,5 +224,36 @@ export abstract class BaseRepository<
 				itemsPerPage: limit,
 			},
 		};
+	}
+
+	async findAll(options: IQueryOptions): Promise<T[]> {
+		const { filter, search, context } = options;
+
+		const filters: SQL[] = [];
+
+		if (context?.userId) {
+			filters.push(eq(this.table.userId, sql`${context.userId}`));
+		}
+
+		if (search) {
+			filters.push(eq(this.table.name, `%${search}%`));
+		}
+
+		if (filter?.minPrice && 'price' in this.table) {
+			const priceColumn = (this.table as any).price;
+			filters.push(gte(priceColumn, filter.minPrice));
+		}
+
+		if (filter?.maxPrice && 'price' in this.table) {
+			const priceColumn = (this.table as any).price;
+			filters.push(lte(priceColumn, filter.maxPrice));
+		}
+
+		const whereClause = filters.length > 0 ? and(...filters) : undefined;
+
+		const query = this.getBaseQuery();
+		const results = await query.where(whereClause).orderBy(desc(this.table.createdAt));
+
+		return results;
 	}
 }

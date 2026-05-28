@@ -17,3 +17,21 @@ export interface QueryOptions {
 	minPrice?: number;
 	maxPrice?: number;
 }
+export interface IQueryOptions {
+	pagination?: {
+		page?: number;
+		limit?: number;
+		disabled?: boolean;
+	};
+
+	filter?: {
+		minPrice?: number;
+		maxPrice?: number;
+		categoryId?: string;
+	};
+	search?: string;
+
+	context?: {
+		userId?: string;
+	};
+}

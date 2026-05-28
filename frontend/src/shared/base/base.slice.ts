@@ -8,7 +8,7 @@ import {
 	type Reducer,
 } from '@reduxjs/toolkit';
 import type { BaseThunks } from './base.thunks';
-import type { PaginatedResult } from '../types';
+import type { ICollectionResult, PaginatedResult } from '../types';
 import { castDraft } from 'immer';
 
 interface Pagination {
@@ -30,6 +30,7 @@ export type BaseState<T, TExtra = {}> = {
 	};
 
 	pagination: Pagination;
+	paginations?: ICollectionResult<T>['pagination'];
 } & TExtra;
 
 export const baseSlice = <
@@ -172,6 +173,21 @@ export const baseSlice = <
 					state.pagination = action.payload.pagination as typeof state.pagination;
 				})
 				.addCase(thunks.paginate.rejected, (state, action) => {
+					state.list.status = 'failed';
+					state.list.error = (action.payload as string) || 'An error occurred';
+				})
+				// Get Collection
+				.addCase(thunks.getCollection.pending, (state) => {
+					state.list.status = 'loading';
+					state.list.error = null;
+				})
+				.addCase(thunks.getCollection.fulfilled, (state, action: PayloadAction<ICollectionResult<T>>) => {
+					state.list.status = 'succeeded';
+					state.list.error = null;
+					state.list.data = castDraft(action.payload.data);
+					state.paginations = action.payload.pagination as typeof state.paginations;
+				})
+				.addCase(thunks.getCollection.rejected, (state, action) => {
 					state.list.status = 'failed';
 					state.list.error = (action.payload as string) || 'An error occurred';
 				});

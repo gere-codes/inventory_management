@@ -1,7 +1,7 @@
 import { createAsyncThunk, type AsyncThunk } from '@reduxjs/toolkit';
 import type { IBaseService } from './base.service';
 import { isAxiosError } from 'axios';
-import type { PaginatedResult } from '../types';
+import type { ICollectionResult, IPrams, PaginatedResult } from '../types';
 
 export abstract class BaseThunks<
 	T,
@@ -24,6 +24,7 @@ export abstract class BaseThunks<
 	public delete: AsyncThunk<T, string, {}>;
 	public paginate: AsyncThunk<PaginatedResult<T>, { page: number; limit: number }, {}>;
 	public search: AsyncThunk<PaginatedResult<T>, { term: string; page: number; limit: number }, {}>;
+	public getCollection: AsyncThunk<ICollectionResult<T>, IPrams, {}>;
 
 	constructor(
 		protected resource: string,
@@ -98,6 +99,17 @@ export abstract class BaseThunks<
 					return await service.paginate(page, limit);
 				} catch (error) {
 					return rejectWithValue(this.handleError(error, `Error occurred while paginating ${resource}`));
+				}
+			},
+		);
+
+		this.getCollection = createAsyncThunk<ICollectionResult<T>, IPrams>(
+			`${resource}/`,
+			async (params, { rejectWithValue }) => {
+				try {
+					return await service.getCollection(params);
+				} catch (error) {
+					return rejectWithValue(this.handleError(error, `Error occurred while fetching ${resource}s`));
 				}
 			},
 		);

@@ -14,6 +14,7 @@ export interface IBaseRepository<T, TCreate, TUpdate> {
 	paginate(userId: string, page?: number, limit?: number): Promise<PaginatedResult<T>>;
 	findMany(options: QueryOptions): Promise<PaginatedResult<T>>;
 	findAll(options: IQueryOptions): Promise<T[]>;
+	findAllAndCount(optoins: IQueryOptions): Promise<PaginatedResult<T>>;
 }
 
 type AnyUserIdColumn = PgColumn<ColumnBaseConfig<'string', string>>;
@@ -226,11 +227,11 @@ export abstract class BaseRepository<
 		};
 	}
 
-	protected buildAdditionalFilters(filters: any): SQL[] {
+	protected buildAdditionalFilters(filter: any): SQL[] {
 		return [];
 	}
 
-	protected buildFilters(options: IQueryOptions): SQL[] {
+	protected buildFilters(options: IQueryOptions): SQL<unknown> | undefined {
 		const { filter, search, context } = options;
 
 		const filters: SQL[] = [];
@@ -248,8 +249,7 @@ export abstract class BaseRepository<
 		if (additionaFilters.length > 0) {
 			filters.push(...additionaFilters);
 		}
-
-		return filters;
+		return filters.length > 0 ? and(...filters) : undefined;
 	}
 
 	async findAll(options: IQueryOptions): Promise<T[]> {
@@ -261,5 +261,38 @@ export abstract class BaseRepository<
 			.limit(1000)) as T[];
 
 		return results.map((result) => this.format(result));
+	}
+
+	async findAllAndCount(options: IQueryOptions): Promise<PaginatedResult<T>> {
+		const { pagination } = options;
+
+		const { page = 1, limit = 10 } = pagination || { page: 1, limit: 10 };
+		const offset = (page - 1) * limit;
+
+		const whereClause = this.buildFilters(options);
+
+		const [results, countResult] = await Promise.all([
+			this.getBaseQuery()
+				.where(whereClause)
+				.orderBy(desc(this.table.createdAt))
+				.limit(limit)
+				.offset(offset) as Promise<T[]>,
+			this.db
+				.select({ count: sql<number>`count(*)` })
+				.from(this.table as AnyPgTable)
+				.where(whereClause),
+		]);
+
+		const total = Number(countResult[0]?.count ?? 0);
+
+		return {
+			data: results.map((result) => this.format(result)),
+			pagination: {
+				totalItems: total,
+				currentPage: page,
+				totalPages: Math.ceil(total / limit),
+				itemsPerPage: limit,
+			},
+		};
 	}
 }

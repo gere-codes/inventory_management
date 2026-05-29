@@ -13,3 +13,8 @@ orderRoutes.get('/search', orderController.search);
 orderRoutes.get('/:id', orderController.getById);
 
 export default orderRoutes;
+
+// Public route
+
+export const publicOrderRoutes = Router();
+publicOrderRoutes.get('/', orderController.getCollection);

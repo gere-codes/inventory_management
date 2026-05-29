@@ -58,11 +58,13 @@ export const CategoriesPage = () => {
 	};
 
 	const handlePageChange = (pageNum: number) => {
-		dispatch(setCurrentCategoryPage(pageNum));
+		searchParams.set('page', String(pageNum));
+		setSearchParams(searchParams);
 	};
 
 	const handlePerPageChange = (perPage: number) => {
-		dispatch(setCategoriesPerPage(perPage));
+		searchParams.set('limit', String(perPage));
+		setSearchParams(searchParams);
 	};
 
 	//debounce

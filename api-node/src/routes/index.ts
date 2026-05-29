@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { authRoutes } from '@modules/auth/index.js';
 import productRoutes, { publicProductRoutes } from '@modules/product/product.route.js';
-import categoryRoutes from '@modules/category/category.route.js';
+import categoryRoutes, { publicCategoryRoutes } from '@modules/category/category.route.js';
 import supplierRoutes from '@modules/supplier/supplier.route.js';
 import orderRoutes from '@src/modules/order/order.route.js';
 import { protect } from '@modules/auth/auth.middleware.js';
@@ -13,6 +13,7 @@ apiRoutes.use('/auth', authRoutes);
 
 // Public Routes
 apiRoutes.use('/public/product', publicProductRoutes);
+apiRoutes.use('/public/category', publicCategoryRoutes);
 
 // Protect Routes
 const protectedRouter = Router();

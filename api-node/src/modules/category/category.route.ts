@@ -13,4 +13,8 @@ categoryRoutes.delete('/:id', categoryController.delete);
 
 categoryRoutes.get('/:id', categoryController.getById);
 
+export const publicCategoryRoutes = Router();
+
+publicCategoryRoutes.get('/', categoryController.getCollection);
+
 export default categoryRoutes;

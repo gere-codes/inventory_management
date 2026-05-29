@@ -12,8 +12,8 @@ import type { ICollectionResult, PaginatedResult } from '../types';
 import { castDraft } from 'immer';
 
 interface Pagination {
-	currentPage: number;
-	itemsPerPage: number;
+	page: number;
+	limit: number;
 	totalPages: number;
 	totalItems: number;
 }
@@ -30,7 +30,6 @@ export type BaseState<T, TExtra = {}> = {
 	};
 
 	pagination: Pagination;
-	paginations?: ICollectionResult<T>['pagination'];
 } & TExtra;
 
 export const baseSlice = <
@@ -185,7 +184,7 @@ export const baseSlice = <
 					state.list.status = 'succeeded';
 					state.list.error = null;
 					state.list.data = castDraft(action.payload.data);
-					state.paginations = action.payload.pagination as typeof state.paginations;
+					state.pagination = action.payload.pagination as typeof state.pagination;
 				})
 				.addCase(thunks.getCollection.rejected, (state, action) => {
 					state.list.status = 'failed';

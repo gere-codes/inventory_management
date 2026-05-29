@@ -1,5 +1,5 @@
 import { privateInstance } from '../api/instance.api';
-import type { PaginatedResult } from '../types';
+import type { ICollectionResult, IPrams, PaginatedResult } from '../types';
 import z from 'zod';
 
 export interface IBaseService<T, TCreate, TUpdate, TCreateBody = TCreate, TUpdateBody = TUpdate> {
@@ -10,6 +10,7 @@ export interface IBaseService<T, TCreate, TUpdate, TCreateBody = TCreate, TUpdat
 	delete(id: string): Promise<T>;
 	paginate(page: number, limit: number): Promise<PaginatedResult<T>>;
 	search(term: string, page: number, limit: number): Promise<PaginatedResult<T>>;
+	getCollection(params?: IPrams): Promise<ICollectionResult<T>>;
 }
 export abstract class BaseService<
 	T,
@@ -92,6 +93,44 @@ export abstract class BaseService<
 		return {
 			data: z.array(this.schema).parse(result.data.data.data),
 			pagination: result.data.data.pagination,
+		};
+	}
+
+	async getCollection(params: IPrams): Promise<ICollectionResult<T>> {
+		const urlPrams = new URLSearchParams();
+
+		if (params) {
+			if (params?.pagination) {
+				urlPrams.append('page', params.pagination.page.toString());
+				urlPrams.append('limit', params.pagination.limit.toString());
+				urlPrams.append('paginationDisabled', params.pagination.disabled.toString());
+			}
+
+			if (params?.search) {
+				urlPrams.append('search', params.search);
+			}
+
+			if (params?.filter) {
+				Object.entries(params.filter).forEach(([key, value]) => {
+					if (value !== undefined && value !== null) {
+						if (typeof value === 'object') {
+							urlPrams.append(key, JSON.stringify(value));
+						} else {
+							urlPrams.append(key, String(value));
+						}
+					}
+				});
+			}
+		}
+
+		const queryString = urlPrams.toString();
+		const url = queryString ? `/public/${this.resource}?${queryString}` : `/public/${this.resource}`;
+
+		const response = await privateInstance.get(url);
+
+		return {
+			data: z.array(this.schema).parse(response.data.data.data),
+			pagination: response.data.data?.pagination,
 		};
 	}
 }

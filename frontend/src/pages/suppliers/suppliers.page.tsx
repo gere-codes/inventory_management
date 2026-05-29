@@ -72,10 +72,16 @@ export const SuppliersPage = () => {
 
 	const handlePageChange = (pageNum: number) => {
 		dispatch(setSupplierCurrentPage(pageNum));
+
+		searchParams.set('page', String(pageNum));
+		setSearchParams(searchParams);
 	};
 
 	const handlePerPageChange = (perPage: number) => {
 		dispatch(setSuppliersPerPage(perPage));
+
+		searchParams.set('limit', String(perPage));
+		setSearchParams(searchParams);
 	};
 
 	return (

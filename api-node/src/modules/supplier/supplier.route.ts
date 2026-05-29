@@ -13,3 +13,8 @@ supplierRoutes.get('/search', supplierController.search);
 supplierRoutes.get('/:id', supplierController.getById);
 
 export default supplierRoutes;
+
+// public route
+export const publicSupplieryRoutes = Router();
+
+publicSupplieryRoutes.get('/', supplierController.getCollection);

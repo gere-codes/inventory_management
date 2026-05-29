@@ -20,7 +20,7 @@ export const ProductForm = ({ mode, productData }: Props) => {
 	const { categories, isLoading } = useCategories();
 	const [previewUrl, setPreviewUrl] = useState<string[] | null>(null);
 
-	const { currentPage, itemsPerPage, totalItems, totalPages } = useAppSelector(selectProductsPagination);
+	const { limit, page, totalItems, totalPages } = useAppSelector(selectProductsPagination);
 
 	const dispatch = useAppDispatch();
 
@@ -62,7 +62,7 @@ export const ProductForm = ({ mode, productData }: Props) => {
 			await dispatch(productThunk.update({ id: data.id, body: formData }));
 		} else {
 			await dispatch(productThunk.create(formData));
-			await dispatch(productThunk.paginate({ page: currentPage, limit: itemsPerPage }));
+			await dispatch(productThunk.getCollection({ pagination: { limit, page, disabled: false } }));
 		}
 		dispatch(closeModal());
 	};

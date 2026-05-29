@@ -2,7 +2,7 @@ import { and, desc, eq, gte, ilike, lte, SQL, sql, type AnyTable, type ColumnBas
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import type { AnyPgTable, PgColumn, PgSelect, PgSelectBase, PgTable } from 'drizzle-orm/pg-core';
 import { AppError } from '@utils';
-import type { IQueryOptions, PaginatedResult, QueryOptions } from '../types/general.js';
+import type { ICollectionResult, IQueryOptions, PaginatedResult, QueryOptions } from '../types/general.js';
 
 export interface IBaseRepository<T, TCreate, TUpdate> {
 	getAll(userId: string): Promise<T[]>;
@@ -13,7 +13,7 @@ export interface IBaseRepository<T, TCreate, TUpdate> {
 	search(userId: string, term: string, page: number, limit: number): Promise<PaginatedResult<T>>;
 	paginate(userId: string, page?: number, limit?: number): Promise<PaginatedResult<T>>;
 	findAll(options: IQueryOptions): Promise<T[]>;
-	findManyAndCount(optoins: IQueryOptions): Promise<PaginatedResult<T>>;
+	findManyAndCount(optoins: IQueryOptions): Promise<ICollectionResult<T>>;
 }
 
 type AnyUserIdColumn = PgColumn<ColumnBaseConfig<'string', string>>;
@@ -208,7 +208,7 @@ export abstract class BaseRepository<
 		return results.map((result) => this.format(result));
 	}
 
-	async findManyAndCount(options: IQueryOptions): Promise<PaginatedResult<T>> {
+	async findManyAndCount(options: IQueryOptions): Promise<ICollectionResult<T>> {
 		const { pagination } = options;
 
 		const { page = 1, limit = 10 } = pagination || { page: 1, limit: 10 };
@@ -233,10 +233,10 @@ export abstract class BaseRepository<
 		return {
 			data: results.map((result) => this.format(result)),
 			pagination: {
+				page,
+				limit,
 				totalItems: total,
-				currentPage: page,
 				totalPages: Math.ceil(total / limit),
-				itemsPerPage: limit,
 			},
 		};
 	}

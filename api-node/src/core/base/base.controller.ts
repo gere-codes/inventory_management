@@ -154,7 +154,7 @@ export abstract class BaseController<
 			pagination: {
 				page: Number(page) || 1,
 				limit: Number(limit) || 10,
-				disabled: paginate === 'false',
+				paginationDisabled: paginate === 'false',
 			},
 			search: (search as string) || '',
 			filter: rawFilters as any,

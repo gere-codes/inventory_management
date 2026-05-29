@@ -8,6 +8,16 @@ export interface PaginatedResult<T> {
 	};
 }
 
+export interface ICollectionResult<T> {
+	data: T[];
+	pagination: {
+		page: number;
+		limit: number;
+		totalItems: number;
+		totalPages: number;
+	};
+}
+
 export interface QueryOptions {
 	page?: number;
 	limit?: number;
@@ -21,7 +31,7 @@ export interface IQueryOptions {
 	pagination?: {
 		page?: number;
 		limit?: number;
-		disabled?: boolean;
+		paginationDisabled?: boolean;
 	};
 
 	filter?: Record<string, any>;

@@ -1,6 +1,6 @@
 import type { IBaseRepository } from './base.repository.js';
 import z from 'zod';
-import type { IQueryOptions, PaginatedResult, QueryOptions } from '../types/general.js';
+import type { ICollectionResult, IQueryOptions, PaginatedResult, QueryOptions } from '../types/general.js';
 
 export interface IBaseService<T, TCreate, TUpdate> {
 	getAll(userId: string): Promise<T[]>;
@@ -10,7 +10,7 @@ export interface IBaseService<T, TCreate, TUpdate> {
 	delete(userId: string, id: string): Promise<T>;
 	paginate(userId: string, page: number, limit: number): Promise<PaginatedResult<T>>;
 	search(userId: string, term: string, page: number, limit: number): Promise<PaginatedResult<T>>;
-	getCollection(options: IQueryOptions): Promise<PaginatedResult<T> | T[]>;
+	getCollection(options: IQueryOptions): Promise<ICollectionResult<T> | T[]>;
 }
 export abstract class BaseService<
 	T,
@@ -90,20 +90,17 @@ export abstract class BaseService<
 		};
 	}
 
-	async getCollection({ pagination, search, filter }: any) {
-		if (pagination.disabled) {
-			return await this.repository.findAll({ search, filter });
+	async getCollection(options: IQueryOptions): Promise<ICollectionResult<T> | T[]> {
+		if (options?.pagination?.paginationDisabled) {
+			const response = await this.repository.findAll(options);
+			return response;
 		}
 
-		const { data, pagination: paginatedResult } = await this.repository.findManyAndCount({
-			pagination,
-			search,
-			filter,
-		});
+		const { data, pagination } = await this.repository.findManyAndCount(options);
 
 		return {
 			data: z.array(this.schema).parse(data),
-			pagination: paginatedResult,
+			pagination: { ...pagination },
 		};
 	}
 }

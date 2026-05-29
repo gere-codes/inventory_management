@@ -23,7 +23,7 @@ export const OrderForm = ({ mode, orderData }: Props) => {
 	const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 	const isReadOnlyField = orderData?.type === EOrderType.REORDER;
 
-	const { currentPage, itemsPerPage, totalItems, totalPages } = useAppSelector(selectOrderPagination);
+	const { limit, page, totalItems, totalPages } = useAppSelector(selectOrderPagination);
 
 	const dispatch = useAppDispatch();
 
@@ -84,12 +84,7 @@ export const OrderForm = ({ mode, orderData }: Props) => {
 				await dispatch(orderThunk.update({ id: data.id, body: formData }));
 			} else {
 				await dispatch(orderThunk.create(formData));
-				await dispatch(
-					orderThunk.paginate({
-						page: currentPage,
-						limit: itemsPerPage,
-					}),
-				);
+				await dispatch(orderThunk.getCollection({ pagination: { limit, page, disabled: false } }));
 			}
 			dispatch(closeModal());
 		} catch (error) {

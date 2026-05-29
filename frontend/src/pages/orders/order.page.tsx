@@ -5,23 +5,41 @@ import { Button } from '@ui';
 import { EModalMode, EModalType, openModal, Pagination, SearchBar } from '@common';
 import { OrderTable, orderThunk, selectOrderList, selectOrderPagination, type TOrder } from '@orders';
 import { setCurrentOrderPage, setOrdersPerPage } from '@/features/orders/order.slice';
+import { useSearchParams } from 'react-router';
 
 export const OrdersPage = () => {
 	const FIRST_PAGE = 1;
-	const [term, setTerm] = useState<string>('');
 
-	const { currentPage, itemsPerPage, totalItems, totalPages } = useAppSelector(selectOrderPagination);
+	const [term, setTerm] = useState<string>('');
+	const [searchParams, setSearchParams] = useSearchParams();
+
+	const { totalPages } = useAppSelector(selectOrderPagination);
 	const orders = useAppSelector(selectOrderList);
 	const dispatch = useAppDispatch();
+
+	const page = Number(searchParams.get('page')) || 1;
+	const limit = Number(searchParams.get('limit')) || 10;
+	const search = searchParams.get('search') || term;
 
 	const noop = () => {};
 
 	const debouncedSearch = useMemo(
 		() =>
 			debounce((term) => {
-				dispatch(orderThunk.search({ term, page: FIRST_PAGE, limit: itemsPerPage }));
+				dispatch(
+					orderThunk.getCollection({
+						pagination: { page: FIRST_PAGE, limit, disabled: false },
+						search: term,
+						filter: {},
+					}),
+				);
+
+				searchParams.set('page', String(FIRST_PAGE));
+				searchParams.set('search', term);
+
+				setSearchParams(searchParams);
 			}, 500),
-		[dispatch, itemsPerPage],
+		[dispatch, limit, searchParams, setSearchParams],
 	);
 
 	useEffect(() => {
@@ -31,8 +49,19 @@ export const OrdersPage = () => {
 	}, [debouncedSearch]);
 
 	useEffect(() => {
-		dispatch(orderThunk.paginate({ page: currentPage, limit: itemsPerPage }));
-	}, [dispatch, currentPage, itemsPerPage]);
+		const fetchTableData = async () => {
+			setTerm(search);
+			await dispatch(
+				orderThunk.getCollection({
+					pagination: { page, limit, disabled: false },
+					search,
+					filter: {},
+				}),
+			);
+		};
+
+		fetchTableData();
+	}, [dispatch, page, limit]);
 
 	const handleEdit = async (data: TOrder) => {
 		dispatch(openModal({ data, type: EModalType.ORDER, mode: EModalMode.EDIT }));
@@ -40,10 +69,16 @@ export const OrdersPage = () => {
 
 	const handlePageChange = async (perPage: number) => {
 		dispatch(setCurrentOrderPage(perPage));
+
+		searchParams.set('page', String(perPage));
+		setSearchParams(searchParams);
 	};
 
 	const handlePerPageChange = async (perPage: number) => {
 		dispatch(setOrdersPerPage(perPage));
+
+		searchParams.set('limit', String(perPage));
+		setSearchParams(searchParams);
 	};
 
 	return (
@@ -78,9 +113,9 @@ export const OrdersPage = () => {
 
 			{/* Pagination */}
 			<Pagination
-				currentPage={currentPage}
+				currentPage={page}
 				totalPages={totalPages}
-				itemsPerPage={itemsPerPage}
+				itemsPerPage={limit}
 				onPageChange={handlePageChange}
 				onPerPageChange={handlePerPageChange}
 			/>

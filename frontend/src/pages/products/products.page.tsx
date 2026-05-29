@@ -18,32 +18,63 @@ import { TbPackages } from 'react-icons/tb';
 import type { IconType } from 'react-icons';
 import { EOrderStatus, EOrderType, type TOrderForm } from '@orders';
 import { ECRUDMode } from '@enums';
+import { useSearchParams } from 'react-router';
 
 export const ProductsPage = () => {
 	const FIRST_PAGE = 1;
 
 	const [term, setTerm] = useState<string>('');
+	const [searchParams, setSearchParams] = useSearchParams();
 
 	const dispatch = useAppDispatch();
 	const products = useAppSelector(selectProducts);
-	const { currentPage, itemsPerPage, totalItems, totalPages } = useAppSelector(selectProductsPagination);
+	const { totalItems, totalPages } = useAppSelector(selectProductsPagination);
 
 	const productStats = useAppSelector(selectProductStats);
+
+	const page = Number(searchParams.get('page')) || 1;
+	const limit = Number(searchParams.get('limit')) || 10;
+	const search = searchParams.get('search') || term;
+	const categoryId = searchParams.get('categoryId') || '';
+
+	useEffect(() => {
+		const fetchTableData = async () => {
+			setTerm(search);
+			await dispatch(
+				productThunk.getCollection({
+					pagination: { page, limit, disabled: false },
+					search,
+					filter: { categoryId },
+				}),
+			);
+		};
+
+		fetchTableData();
+	}, [dispatch, page, limit, categoryId]);
 
 	useEffect(() => {
 		dispatch(productThunk.getStats());
 	}, [dispatch]);
 
-	useEffect(() => {
-		dispatch(productThunk.paginate({ page: currentPage, limit: itemsPerPage }));
-	}, [dispatch, currentPage, itemsPerPage]);
-
 	const debouncedSearch = useMemo(
 		() =>
 			debounce((term) => {
-				dispatch(productThunk.search({ term, page: FIRST_PAGE, limit: itemsPerPage }));
+				dispatch(
+					productThunk.getCollection({
+						pagination: { page: FIRST_PAGE, limit, disabled: false },
+						search: term,
+						filter: {
+							categoryId: categoryId,
+						},
+					}),
+				);
+
+				searchParams.set('page', String(FIRST_PAGE));
+				searchParams.set('search', term);
+
+				setSearchParams(searchParams);
 			}, 500),
-		[dispatch, itemsPerPage],
+		[dispatch, limit, categoryId, searchParams, setSearchParams],
 	);
 
 	useEffect(() => {
@@ -62,11 +93,17 @@ export const ProductsPage = () => {
 
 	const handlePageChange = (pageNum: number) => {
 		dispatch(setCurrentPage(pageNum));
+
+		searchParams.set('page', String(pageNum));
+		setSearchParams(searchParams);
 	};
 
 	const handlePerPageChange = (perPage: number) => {
 		dispatch(setItemsPerPage(perPage));
-		dispatch(setCurrentPage(currentPage));
+		dispatch(setCurrentPage(page));
+
+		searchParams.set('limit', String(perPage));
+		setSearchParams(searchParams);
 	};
 
 	const handleReorder = async (product: TProduct) => {
@@ -133,9 +170,9 @@ export const ProductsPage = () => {
 				</section>
 				{/* Pagination */}
 				<Pagination
-					currentPage={currentPage}
+					currentPage={page}
 					totalPages={totalPages}
-					itemsPerPage={itemsPerPage}
+					itemsPerPage={limit}
 					onPageChange={handlePageChange}
 					onPerPageChange={handlePerPageChange}
 				/>

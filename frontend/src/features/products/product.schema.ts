@@ -75,3 +75,15 @@ export const productStatsSchema = z.object({
 });
 
 export type TProductStats = z.infer<typeof productStatsSchema>;
+
+export const productUrlParamsSchema = z.object({
+	page: z.coerce.number().int().positive().default(1),
+	limit: z.coerce.number().int().positive().min(1).max(100).default(10),
+	search: z.string().optional().default(''),
+	categoryId: z.uuid(),
+	status: z.string().optional().default(''),
+	sort: z.enum(['asc', 'desc']).optional().default('asc'),
+	order: z.enum(['asc', 'desc']).optional().default('asc'),
+});
+
+export type TProductUrlParams = z.infer<typeof productUrlParamsSchema>;

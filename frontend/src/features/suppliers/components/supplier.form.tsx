@@ -27,7 +27,7 @@ export const SupplierForm = ({ mode, supplierData }: Props) => {
 		},
 	});
 
-	const { currentPage, itemsPerPage, totalItems, totalPages } = useAppSelector(selectSuppliersPagination);
+	const { page, limit, totalItems, totalPages } = useAppSelector(selectSuppliersPagination);
 
 	const dispatch = useAppDispatch();
 
@@ -46,7 +46,7 @@ export const SupplierForm = ({ mode, supplierData }: Props) => {
 			await dispatch(supplierThunk.update({ id: data.id, body }));
 		} else {
 			await dispatch(supplierThunk.create(body));
-			await dispatch(supplierThunk.paginate({ page: currentPage, limit: itemsPerPage }));
+			await dispatch(supplierThunk.getCollection({ pagination: { limit, page, disabled: false } }));
 		}
 		dispatch(closeModal());
 	};

@@ -7,20 +7,36 @@ import { debounce } from '@utils';
 import { Button } from '@ui';
 import type { TSupplier } from '@/features/suppliers/supplier.schema';
 import { setSupplierCurrentPage, setSuppliersPerPage } from '@/features/suppliers/supplier.slice';
+import { useSearchParams } from 'react-router';
 
 export const SuppliersPage = () => {
 	const FIRST_PAGE = 1;
 	const [term, setTerm] = useState<string>('');
+	const [searchParams, setSearchParams] = useSearchParams();
 
 	const suppliers = useAppSelector(selectSuppliersList);
-	const { currentPage, itemsPerPage, totalItems, totalPages } = useAppSelector(selectSuppliersPagination);
+	const { totalPages } = useAppSelector(selectSuppliersPagination);
 
-	const pagiination = useAppSelector(selectSuppliersPagination);
 	const dispatch = useAppDispatch();
 
+	const page = Number(searchParams.get('page')) || 1;
+	const limit = Number(searchParams.get('limit')) || 10;
+	const search = searchParams.get('search') || term;
+
 	useEffect(() => {
-		dispatch(supplierThunk.paginate({ page: pagiination.currentPage, limit: pagiination.itemsPerPage }));
-	}, [pagiination?.currentPage, pagiination?.itemsPerPage, dispatch]);
+		const fetchTableData = async () => {
+			setTerm(search);
+			await dispatch(
+				supplierThunk.getCollection({
+					pagination: { page, limit, disabled: false },
+					search,
+					filter: {},
+				}),
+			);
+		};
+
+		fetchTableData();
+	}, [dispatch, page, limit]);
 
 	const handleDelete = async (supplier: TSupplier) => {
 		dispatch(openModal({ data: supplier, type: EModalType.SUPPLIER, mode: EModalMode.DELETE }));
@@ -32,9 +48,20 @@ export const SuppliersPage = () => {
 	const debouncedSearch = useMemo(
 		() =>
 			debounce((term) => {
-				dispatch(supplierThunk.search({ term, page: FIRST_PAGE, limit: itemsPerPage }));
+				dispatch(
+					supplierThunk.getCollection({
+						pagination: { page: FIRST_PAGE, limit, disabled: false },
+						search: term,
+						filter: {},
+					}),
+				);
+
+				searchParams.set('page', String(FIRST_PAGE));
+				searchParams.set('search', term);
+
+				setSearchParams(searchParams);
 			}, 500),
-		[dispatch, itemsPerPage],
+		[dispatch, limit, searchParams, setSearchParams],
 	);
 
 	useEffect(() => {
@@ -85,9 +112,9 @@ export const SuppliersPage = () => {
 
 			{/* Pagination */}
 			<Pagination
-				currentPage={currentPage}
+				currentPage={page}
 				totalPages={totalPages}
-				itemsPerPage={itemsPerPage}
+				itemsPerPage={limit}
 				onPageChange={handlePageChange}
 				onPerPageChange={handlePerPageChange}
 			/>

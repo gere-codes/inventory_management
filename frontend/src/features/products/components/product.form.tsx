@@ -10,6 +10,7 @@ import { productThunk } from '../product.thunk';
 import { selectProductsPagination } from '../product.selectors';
 import { BASE_URL } from '@api';
 import { TiDelete } from 'react-icons/ti';
+import { useParams, useSearchParams } from 'react-router';
 
 interface Props {
 	mode: EModalMode.CREATE | EModalMode.EDIT;
@@ -19,6 +20,9 @@ interface Props {
 export const ProductForm = ({ mode, productData }: Props) => {
 	const { categories, isLoading } = useCategories();
 	const [previewUrl, setPreviewUrl] = useState<string[] | null>(null);
+
+	const [searchParams, setSearchParams] = useSearchParams();
+	const params = useParams();
 
 	const { limit, page, totalItems, totalPages } = useAppSelector(selectProductsPagination);
 
@@ -62,6 +66,10 @@ export const ProductForm = ({ mode, productData }: Props) => {
 			await dispatch(productThunk.update({ id: data.id, body: formData }));
 		} else {
 			await dispatch(productThunk.create(formData));
+
+			//Refetch the products after creating new product
+			const page = Number(searchParams.get('page')) || 1;
+			const limit = Number(searchParams.get('limit')) || 10;
 			await dispatch(productThunk.getCollection({ pagination: { limit, page, disabled: false } }));
 		}
 		dispatch(closeModal());

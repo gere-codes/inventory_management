@@ -31,7 +31,7 @@ export const CategoryForm = ({ mode, categoryData }: Props) => {
 		},
 	});
 
-	const { currentPage, itemsPerPage, totalItems, totalPages } = useAppSelector(selectCategoryPagination);
+	const { limit, page, totalItems, totalPages } = useAppSelector(selectCategoryPagination);
 
 	const dispatch = useAppDispatch();
 
@@ -62,7 +62,7 @@ export const CategoryForm = ({ mode, categoryData }: Props) => {
 			dispatch(categoryThunk.update({ id: data.id, body: formData }));
 		} else {
 			await dispatch(categoryThunk.create(formData));
-			await dispatch(categoryThunk.paginate({ page: currentPage, limit: itemsPerPage }));
+			await dispatch(categoryThunk.getCollection({ pagination: { limit, page, disabled: false } }));
 		}
 		dispatch(closeModal());
 	};

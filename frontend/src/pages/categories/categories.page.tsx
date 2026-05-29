@@ -13,25 +13,45 @@ import { DynamicPieChart, EModalMode, EModalType, openModal, Pagination, SearchB
 import { productThunk, selectProductStats } from '@products';
 import { debounce } from '@utils';
 import { Button } from '@ui';
+import { useSearchParams } from 'react-router';
 
 export const CategoriesPage = () => {
-	const [term, setTerm] = useState<string>('');
 	const FIRST_PAGE = 1;
+
+	const [term, setTerm] = useState<string>('');
+	const [searchParams, setSearchParams] = useSearchParams();
 
 	const dispatch = useAppDispatch();
 	const categories = useAppSelector(selectCategories);
 
-	const { currentPage, itemsPerPage, totalItems, totalPages } = useAppSelector(selectCategoryPagination);
+	const { totalItems, totalPages } = useAppSelector(selectCategoryPagination);
 
 	const productStats = useAppSelector(selectProductStats);
+
+	const page = Number(searchParams.get('page')) || 1;
+	const limit = Number(searchParams.get('limit')) || 10;
+	const search = searchParams.get('search') || term;
+	const categoryId = searchParams.get('categoryId') || '';
 
 	useEffect(() => {
 		dispatch(productThunk.getStats());
 	}, [dispatch]);
 
 	useEffect(() => {
-		dispatch(categoryThunk.paginate({ page: currentPage, limit: itemsPerPage }));
-	}, [dispatch, currentPage, itemsPerPage]);
+		const fetchTableData = async () => {
+			setTerm(search);
+
+			await dispatch(
+				categoryThunk.getCollection({
+					pagination: { page, limit, disabled: false },
+					search,
+					filter: { categoryId },
+				}),
+			);
+		};
+
+		fetchTableData();
+	}, [dispatch, page, limit, categoryId]);
 
 	const handleDelete = (category: TCategory) => {
 		dispatch(openModal({ data: category, mode: EModalMode.DELETE, type: EModalType.CATEGORY }));
@@ -49,9 +69,20 @@ export const CategoriesPage = () => {
 	const debouncedSearch = useMemo(
 		() =>
 			debounce((term) => {
-				dispatch(categoryThunk.search({ term, page: FIRST_PAGE, limit: itemsPerPage }));
+				dispatch(
+					categoryThunk.getCollection({
+						pagination: { page: FIRST_PAGE, limit, disabled: false },
+						search: term,
+						filter: {},
+					}),
+				);
+
+				searchParams.set('page', String(FIRST_PAGE));
+				searchParams.set('search', term);
+
+				setSearchParams(searchParams);
 			}, 500),
-		[dispatch, itemsPerPage],
+		[dispatch, limit, searchParams, setSearchParams],
 	);
 	useEffect(() => {
 		return () => {
@@ -108,9 +139,9 @@ export const CategoriesPage = () => {
 					</section>
 					{/* Pagination */}
 					<Pagination
-						currentPage={currentPage}
+						currentPage={page}
 						totalPages={totalPages}
-						itemsPerPage={itemsPerPage}
+						itemsPerPage={limit}
 						onPageChange={handlePageChange}
 						onPerPageChange={handlePerPageChange}
 					/>

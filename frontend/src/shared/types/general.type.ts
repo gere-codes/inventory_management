@@ -17,11 +17,11 @@ export interface ICollectionResult<T> {
 	};
 }
 
-export interface IPrams {
+export interface IParams {
 	pagination?: {
 		limit: number;
 		page: number;
-		disabled: boolean;
+		isPaginated: boolean;
 	};
 
 	search?: string;

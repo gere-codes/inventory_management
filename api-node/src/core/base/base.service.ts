@@ -91,9 +91,9 @@ export abstract class BaseService<
 	}
 
 	async getCollection(options: IQueryOptions): Promise<ICollectionResult<T> | T[]> {
-		if (options?.pagination?.paginationDisabled) {
+		if (options?.pagination?.isPaginated) {
 			const response = await this.repository.findAll(options);
-			return response;
+			return z.array(this.schema).parse(response);
 		}
 
 		const { data, pagination } = await this.repository.findManyAndCount(options);

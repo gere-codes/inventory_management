@@ -31,7 +31,7 @@ export interface IQueryOptions {
 	pagination?: {
 		page?: number;
 		limit?: number;
-		paginationDisabled?: boolean;
+		isPaginated?: boolean;
 	};
 
 	filter?: Record<string, any>;

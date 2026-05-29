@@ -1,8 +1,15 @@
 import { privateInstance } from '../api/instance.api';
-import type { ICollectionResult, IPrams, PaginatedResult } from '../types';
+import type { ICollectionResult, IParams, PaginatedResult } from '../types';
 import z from 'zod';
 
-export interface IBaseService<T, TCreate, TUpdate, TCreateBody = TCreate, TUpdateBody = TUpdate> {
+export interface IBaseService<
+	T,
+	TCreate,
+	TUpdate,
+	TCreateBody = TCreate,
+	TUpdateBody = TUpdate,
+	TParams extends IParams = IParams,
+> {
 	getAll(): Promise<T[]>;
 	getById(id: string): Promise<T>;
 	create(data: TCreateBody): Promise<T>;
@@ -10,7 +17,7 @@ export interface IBaseService<T, TCreate, TUpdate, TCreateBody = TCreate, TUpdat
 	delete(id: string): Promise<T>;
 	paginate(page: number, limit: number): Promise<PaginatedResult<T>>;
 	search(term: string, page: number, limit: number): Promise<PaginatedResult<T>>;
-	getCollection(params?: IPrams): Promise<ICollectionResult<T>>;
+	getCollection(params?: TParams): Promise<ICollectionResult<T>>;
 }
 export abstract class BaseService<
 	T,
@@ -18,22 +25,26 @@ export abstract class BaseService<
 	TUpdate,
 	TCreateBody = TCreate,
 	TUpdateBody = TUpdate,
-> implements IBaseService<T, TCreate, TUpdate, TCreateBody, TUpdateBody> {
+	TParams extends IParams = IParams,
+> implements IBaseService<T, TCreate, TUpdate, TCreateBody, TUpdateBody, TParams> {
 	protected readonly resource: string;
 	protected schema: z.ZodSchema<T>;
 	protected createSchema: z.ZodSchema<TCreate>;
 	protected updateSchema: z.ZodSchema<TUpdate>;
+	protected paramSchema?: z.ZodSchema<TParams>;
 
 	constructor(
 		resource: string,
 		schema: z.ZodSchema<T>,
 		createSchema: z.ZodSchema<TCreate>,
 		updateSchema: z.ZodSchema<TUpdate>,
+		paramSchema?: z.ZodSchema<TParams>,
 	) {
 		this.resource = resource;
 		this.schema = schema;
 		this.createSchema = createSchema;
 		this.updateSchema = updateSchema;
+		this.paramSchema = paramSchema;
 	}
 	async getAll(): Promise<T[]> {
 		const result = await privateInstance.get<{ success: boolean; data: T[] }>(`/${this.resource}`);
@@ -96,14 +107,14 @@ export abstract class BaseService<
 		};
 	}
 
-	async getCollection(params: IPrams): Promise<ICollectionResult<T>> {
+	async getCollection(params?: TParams): Promise<ICollectionResult<T>> {
 		const urlPrams = new URLSearchParams();
 
 		if (params) {
 			if (params?.pagination) {
 				urlPrams.append('page', params.pagination.page.toString());
 				urlPrams.append('limit', params.pagination.limit.toString());
-				urlPrams.append('paginationDisabled', params.pagination.disabled.toString());
+				urlPrams.append('isPaginated', params.pagination.isPaginated.toString());
 			}
 
 			if (params?.search) {

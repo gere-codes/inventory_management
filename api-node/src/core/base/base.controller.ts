@@ -148,13 +148,13 @@ export abstract class BaseController<
 
 	getCollection = catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 		const userId = req.user?.id;
-		const { page, limit, search, paginate, ...rawFilters } = req.query;
+		const { page, limit, search, isPaginated, ...rawFilters } = req.query;
 
 		const options: IQueryOptions = {
 			pagination: {
 				page: Number(page) || 1,
 				limit: Number(limit) || 10,
-				paginationDisabled: paginate === 'false',
+				isPaginated: isPaginated === 'false',
 			},
 			search: (search as string) || '',
 			filter: rawFilters as any,

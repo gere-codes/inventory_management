@@ -15,7 +15,7 @@ apiRoutes.use('/auth', authRoutes);
 apiRoutes.use('/public/product', publicProductRoutes);
 apiRoutes.use('/public/category', publicCategoryRoutes);
 apiRoutes.use('/public/supplier', publicSupplieryRoutes);
-apiRoutes.use('/public/supplier', publicOrderRoutes);
+apiRoutes.use('/public/order', publicOrderRoutes);
 
 // Protect Routes
 const protectedRouter = Router();

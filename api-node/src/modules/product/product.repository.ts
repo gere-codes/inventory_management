@@ -1,8 +1,8 @@
 import { BaseRepository, type IBaseRepository } from '@src/core/base/base.repository.js';
-import type { TProduct, TProductCreate, TProductUpdate } from './product.shema.js';
+import type { TProduct, TProductCreate, TProductQuery, TProductUpdate } from './product.shema.js';
 import { categories, products } from '@src/db/index.js';
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
-import { and, desc, eq, gte, ilike, lte, or, SQL, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, gte, ilike, lte, or, SQL, sql } from 'drizzle-orm';
 import { EProductStatus } from './product.enum.js';
 import type { AnyPgTable } from 'drizzle-orm/pg-core';
 import { AppError } from '@src/core/utils/app-error.util.js';
@@ -62,6 +62,19 @@ export class ProductRepository
 		}
 
 		return filters;
+	}
+
+	override buildSortClause(sort: TProductQuery['sort']) {
+		if (sort.field) {
+			if (sort.order === 'asc') {
+				const result = asc(this.table[sort.field]);
+				return result;
+			} else {
+				return desc(this.table[sort.field]);
+			}
+		} else {
+			return desc(this.table.createdAt);
+		}
 	}
 
 	private getStockStatus(qty: number): EProductStatus {

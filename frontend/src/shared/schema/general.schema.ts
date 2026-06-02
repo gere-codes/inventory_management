@@ -4,7 +4,7 @@ export const commonQuery = z.object({
 	isPaginated: z.boolean().default(true),
 	page: z.coerce.number().int().positive().default(1),
 	limit: z.coerce.number().int().positive().max(50).default(10),
-	order: z.string().default('desc'),
+	order: z.enum(['asc', 'desc']).default('desc'),
 	search: z.string().optional(),
 });
 export const baseQuerySchema = commonQuery.transform((raw) => ({

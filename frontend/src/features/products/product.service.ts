@@ -37,22 +37,6 @@ export class ProductService
 		const response = await privateInstance.put(`/product/${productId}/quantity`, { quantity });
 		return response.data.data;
 	}
-	protected queryBuilder(params: TProductQuery): URLSearchParams | null {
-		const urlParams = new URLSearchParams();
-
-		if (params) {
-			if (params.filter && typeof params.filter === 'object') {
-				Object.entries(params.filter).forEach(([key, value]) => {
-					if (value !== undefined && value !== null && value !== '') {
-						urlParams.append(key, String(value));
-					}
-				});
-			}
-			return urlParams;
-		}
-
-		return null;
-	}
 }
 
 export const productService = new ProductService('product');

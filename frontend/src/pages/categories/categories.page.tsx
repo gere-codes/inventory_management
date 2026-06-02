@@ -7,6 +7,7 @@ import {
 	setCategoriesPerPage,
 	setCurrentCategoryPage,
 	type TCategory,
+	categoryQuerySchema,
 } from '@categories';
 import { useAppDispatch, useAppSelector } from '@hooks';
 import { DynamicPieChart, EModalMode, EModalType, openModal, Pagination, SearchBar } from '@common';
@@ -41,17 +42,24 @@ export const CategoriesPage = () => {
 		const fetchTableData = async () => {
 			setTerm(search);
 
-			await dispatch(
-				categoryThunk.getCollection({
-					pagination: { page, limit, disabled: false },
-					search,
-					filter: { categoryId },
-				}),
-			);
+			const payload = {
+				search,
+				page,
+				limit,
+			};
+
+			const result = categoryQuerySchema.safeParse(payload);
+
+			if (!result.success) {
+				console.error(result.error);
+				return;
+			}
+
+			await dispatch(categoryThunk.getCollection(result.data));
 		};
 
 		fetchTableData();
-	}, [dispatch, page, limit, categoryId]);
+	}, [dispatch, page, limit]);
 
 	const handleDelete = (category: TCategory) => {
 		dispatch(openModal({ data: category, mode: EModalMode.DELETE, type: EModalType.CATEGORY }));
@@ -71,20 +79,27 @@ export const CategoriesPage = () => {
 	const debouncedSearch = useMemo(
 		() =>
 			debounce((term) => {
-				dispatch(
-					categoryThunk.getCollection({
-						pagination: { page: FIRST_PAGE, limit, disabled: false },
-						search: term,
-						filter: {},
-					}),
-				);
+				const payload = {
+					search: term,
+					page: FIRST_PAGE,
+					limit,
+				};
+
+				const result = categoryQuerySchema.safeParse(payload);
+
+				if (!result.success) {
+					console.error(result.error);
+					return;
+				}
+
+				dispatch(categoryThunk.getCollection(result.data));
 
 				searchParams.set('page', String(FIRST_PAGE));
 				searchParams.set('search', term);
 
 				setSearchParams(searchParams);
 			}, 500),
-		[dispatch, limit, searchParams, setSearchParams],
+		[dispatch, limit, searchParams, setSearchParams, page],
 	);
 	useEffect(() => {
 		return () => {

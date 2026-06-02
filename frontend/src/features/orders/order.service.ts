@@ -6,11 +6,13 @@ import {
 	orderSchema,
 	updateOrderSchema,
 	createOrderSchema,
+	type TOrdertQuery,
+	orderQuerySchema,
 } from './order.schema';
 
-class OrderService extends BaseService<TOrder, TCreateOrder, TUpdateOrder, FormData, FormData> {
+class OrderService extends BaseService<TOrder, TCreateOrder, TUpdateOrder, FormData, FormData, TOrdertQuery> {
 	constructor(resource: string) {
-		super(resource, orderSchema, createOrderSchema, updateOrderSchema);
+		super(resource, orderSchema, createOrderSchema, updateOrderSchema, orderQuerySchema);
 	}
 }
 

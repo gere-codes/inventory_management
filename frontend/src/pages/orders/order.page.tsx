@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from '@hooks';
 import { debounce } from '@utils';
 import { Button } from '@ui';
 import { EModalMode, EModalType, openModal, Pagination, SearchBar } from '@common';
-import { OrderTable, orderThunk, selectOrderList, selectOrderPagination, type TOrder } from '@orders';
+import { orderQuerySchema, OrderTable, orderThunk, selectOrderList, selectOrderPagination, type TOrder } from '@orders';
 import { setCurrentOrderPage, setOrdersPerPage } from '@/features/orders/order.slice';
 import { useSearchParams } from 'react-router';
 
@@ -20,26 +20,59 @@ export const OrdersPage = () => {
 	const page = Number(searchParams.get('page')) || 1;
 	const limit = Number(searchParams.get('limit')) || 10;
 	const search = searchParams.get('search') || term;
+	const categoryId = searchParams.get('categoryId') || undefined;
+
+	useEffect(() => {
+		const fetchTableData = async () => {
+			setTerm(search);
+
+			const payload = {
+				search,
+				page,
+				limit,
+				categoryId,
+				sort: 'createdAt',
+				order: 'desc',
+			};
+
+			const result = orderQuerySchema.safeParse(payload);
+			if (!result.success) {
+				console.error(result.error);
+				return;
+			}
+			await dispatch(orderThunk.getCollection(result.data));
+		};
+
+		fetchTableData();
+	}, [dispatch, page, limit, categoryId]);
 
 	const noop = () => {};
 
 	const debouncedSearch = useMemo(
 		() =>
 			debounce((term) => {
-				dispatch(
-					orderThunk.getCollection({
-						pagination: { page: FIRST_PAGE, limit, disabled: false },
-						search: term,
-						filter: {},
-					}),
-				);
+				const payload = {
+					search: term,
+					page: FIRST_PAGE,
+					limit,
+					categoryId,
+					sort: 'createdAt',
+					order: 'desc',
+				};
+
+				const result = orderQuerySchema.safeParse(payload);
+				if (!result.success) {
+					console.error(result.error);
+					return;
+				}
+				dispatch(orderThunk.getCollection(result.data));
 
 				searchParams.set('page', String(FIRST_PAGE));
 				searchParams.set('search', term);
 
 				setSearchParams(searchParams);
 			}, 500),
-		[dispatch, limit, searchParams, setSearchParams],
+		[dispatch, limit, categoryId, searchParams, setSearchParams],
 	);
 
 	useEffect(() => {
@@ -47,21 +80,6 @@ export const OrdersPage = () => {
 			debouncedSearch.cancel();
 		};
 	}, [debouncedSearch]);
-
-	useEffect(() => {
-		const fetchTableData = async () => {
-			setTerm(search);
-			await dispatch(
-				orderThunk.getCollection({
-					pagination: { page, limit, disabled: false },
-					search,
-					filter: {},
-				}),
-			);
-		};
-
-		fetchTableData();
-	}, [dispatch, page, limit]);
 
 	const handleEdit = async (data: TOrder) => {
 		dispatch(openModal({ data, type: EModalType.ORDER, mode: EModalMode.EDIT }));

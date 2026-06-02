@@ -1,4 +1,4 @@
-import { privateInstance } from '../api/instance.api';
+import { privateInstance, publicInstance } from '../api/instance.api';
 import type { TBaseQuery } from '../schema';
 import type { ICollectionResult, IParams, PaginatedResult } from '../types';
 import z from 'zod';
@@ -48,7 +48,37 @@ export abstract class BaseService<
 		this.paramSchema = paramSchema;
 	}
 
-	protected abstract queryBuilder(params: TQuery): URLSearchParams | null;
+	queryBuilder(params: TQuery): Record<string, any> {
+		const query: Record<string, any> = {};
+
+		if (!params) return query;
+
+		if (params.isPaginated !== undefined) {
+			query.isPaginated = Boolean(params.isPaginated);
+		}
+
+		if (params.pagination) {
+			const { page, limit, offset } = params.pagination;
+			if (page) query.page = page;
+			if (limit) query.limit = limit;
+			if (offset) query.offset = offset;
+		}
+
+		if (params.filter && typeof params.filter === 'object') {
+			Object.entries(params.filter).forEach(([key, value]) => {
+				if (value !== undefined && value !== null && value !== '') {
+					query[key] = value;
+				}
+			});
+		}
+
+		if (params.sort?.field) {
+			query.sort = params.sort.field;
+			query.order = params.sort.order || 'desc';
+		}
+
+		return query;
+	}
 
 	async getAll(): Promise<T[]> {
 		const result = await privateInstance.get<{ success: boolean; data: T[] }>(`/${this.resource}`);
@@ -110,35 +140,14 @@ export abstract class BaseService<
 	}
 
 	async getCollection(params: TQuery): Promise<ICollectionResult<T>> {
-		const urlParams = new URLSearchParams();
+		const queries = this.queryBuilder(params);
 
-		if (params) {
-			urlParams.append('isPaginated', params.isPaginated.toString());
-
-			if (params?.pagination) {
-				if (params.pagination.page) urlParams.append('page', String(params.pagination.page));
-				if (params.pagination.limit) urlParams.append('limit', String(params.pagination.limit));
-				if (params.pagination.offset) urlParams.append('offset', String(params.pagination.offset));
-			}
-
-			const additionalQuery = this.queryBuilder(params);
-
-			if (additionalQuery) {
-				additionalQuery.forEach((value, key) => {
-					urlParams.append(key, value);
-				});
-			}
-		}
-
-		const queryString = urlParams.toString();
-		const url = queryString ? `/public/${this.resource}?${queryString}` : `/public/${this.resource}`;
-
-		const response = await privateInstance.get(url);
+		const response = await publicInstance.get(`/public/${this.resource}`, { params: queries });
 		const { data, pagination } = response.data.data;
 
 		return {
 			data: z.array(this.schema).parse(data),
-			pagination: pagination,
+			pagination: pagination ?? null,
 		};
 	}
 }

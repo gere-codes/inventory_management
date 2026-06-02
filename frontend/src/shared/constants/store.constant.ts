@@ -12,8 +12,8 @@ export const createIinitialBaseState = <T>(): BaseState<T> => ({
 		error: null,
 	},
 	pagination: {
-		currentPage: 1,
-		itemsPerPage: 10,
+		page: 1,
+		limit: 10,
 		totalItems: 0,
 		totalPages: 1,
 	},

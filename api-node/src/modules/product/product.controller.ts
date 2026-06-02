@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import { BaseController, type IBaseController } from '@core/base/base.controller.js';
 import { ProductService, type IProductService } from './product.service.js';
-import type { TProduct, TProductCreate, TProductUpdate } from './product.shema.js';
+import { productQuerySchema, type TProduct, type TProductCreate, type TProductUpdate } from './product.shema.js';
 import { ProductRepository } from './product.repository.js';
 import { db } from '@src/db/index.js';
 import { LocalFileService } from '@services';
@@ -16,7 +16,7 @@ class ProductController extends BaseController<TProduct, TProductCreate, TProduc
 		const productService = new ProductService(productRepository);
 
 		const fileService = new LocalFileService();
-		super(productService, fileService);
+		super(productService, productQuerySchema, fileService);
 	}
 
 	getStats = catchAsync(async (req: Request, res: Response, next: NextFunction) => {

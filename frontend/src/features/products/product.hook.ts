@@ -2,7 +2,7 @@ import { useAppDispatch } from '@/shared/hooks';
 import { useCallback } from 'react';
 import { useSearchParams } from 'react-router';
 import { productThunk } from './product.thunk';
-import { productUrlParamsSchema, type TProductUrlParams } from './product.schema';
+import { productQuerySchema, type TProductQuery } from './product.schema';
 
 export const useProductTable = () => {
 	const [searchParams] = useSearchParams();
@@ -15,30 +15,14 @@ export const useProductTable = () => {
 			rawParams[key] = value;
 		});
 
-		const result = productUrlParamsSchema.safeParse(rawParams);
+		const result = productQuerySchema.safeParse(rawParams);
 
 		if (!result.success) {
 			console.warn('Invalid products URL params:', result.error);
-
-			throw Error('Invalid product URL param');
+			throw Error('Invalid product URL param', result.error);
 		}
 
-		const params: TProductUrlParams = result.data;
-
-		await dispatch(
-			productThunk.getCollection({
-				pagination: {
-					page: params.page,
-					limit: params.limit,
-					disabled: false,
-				},
-				search: params.search,
-				filter: {
-					categoryId: params.categoryId,
-					status: params.status,
-				},
-			}),
-		);
+		await dispatch(productThunk.getCollection(result.data));
 	}, [searchParams, dispatch]);
 
 	return { fetchProducts };

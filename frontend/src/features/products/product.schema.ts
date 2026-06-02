@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { EProductStatus } from './product.enum.js';
+import { baseQuerySchema, commonQuery } from '@/shared/schema/general.schema.js';
 const imageSchema = z.union([
 	z.instanceof(File).refine((f) => f.size <= 5 * 1024 * 1024, 'Max 5MB'),
 	z.string(),
@@ -76,14 +77,28 @@ export const productStatsSchema = z.object({
 
 export type TProductStats = z.infer<typeof productStatsSchema>;
 
-export const productUrlParamsSchema = z.object({
-	page: z.coerce.number().int().positive().default(1),
-	limit: z.coerce.number().int().positive().min(1).max(100).default(10),
-	search: z.string().optional().default(''),
-	categoryId: z.uuid(),
-	status: z.string().optional().default(''),
-	sort: z.enum(['asc', 'desc']).optional().default('asc'),
-	order: z.enum(['asc', 'desc']).optional().default('asc'),
-});
+export const productQuerySchema = commonQuery
+	.extend({
+		search: z.string().optional(),
+		categoryId: z.uuid().optional(),
+		sort: z.enum(['createdAt', 'price', 'name']).default('createdAt'),
+		order: z.enum(['asc', 'desc']).default('desc'),
+	})
+	.transform((raw) => ({
+		isPaginated: raw.isPaginated,
+		pagination: {
+			page: raw.page,
+			limit: raw.limit,
+			offset: (raw.page - 1) * raw.limit,
+		},
+		filter: {
+			search: raw.search,
+			categoryId: raw.categoryId,
+		},
+		sort: {
+			field: raw.sort,
+			order: raw.order,
+		},
+	}));
 
-export type TProductUrlParams = z.infer<typeof productUrlParamsSchema>;
+export type TProductQuery = z.infer<typeof productQuerySchema>;

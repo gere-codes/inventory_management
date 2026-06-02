@@ -1,7 +1,8 @@
 import { createAsyncThunk, type AsyncThunk } from '@reduxjs/toolkit';
 import type { IBaseService } from './base.service';
 import { isAxiosError } from 'axios';
-import type { ICollectionResult, IPrams, PaginatedResult } from '../types';
+import type { ICollectionResult, PaginatedResult } from '../types';
+import type { TBaseQuery } from '../schema';
 
 export abstract class BaseThunks<
 	T,
@@ -16,6 +17,7 @@ export abstract class BaseThunks<
 		TCreateBody,
 		TUpdateBody
 	>,
+	TQuery extends TBaseQuery = TBaseQuery,
 > {
 	public getAll: AsyncThunk<T[], void, {}>;
 	public getById: AsyncThunk<T, string, {}>;
@@ -24,7 +26,7 @@ export abstract class BaseThunks<
 	public delete: AsyncThunk<T, string, {}>;
 	public paginate: AsyncThunk<PaginatedResult<T>, { page: number; limit: number }, {}>;
 	public search: AsyncThunk<PaginatedResult<T>, { term: string; page: number; limit: number }, {}>;
-	public getCollection: AsyncThunk<ICollectionResult<T>, IPrams, {}>;
+	public getCollection: AsyncThunk<ICollectionResult<T>, TQuery, {}>;
 
 	constructor(
 		protected resource: string,
@@ -103,7 +105,7 @@ export abstract class BaseThunks<
 			},
 		);
 
-		this.getCollection = createAsyncThunk<ICollectionResult<T>, IPrams>(
+		this.getCollection = createAsyncThunk<ICollectionResult<T>, TQuery>(
 			`${resource}/`,
 			async (params, { rejectWithValue }) => {
 				try {

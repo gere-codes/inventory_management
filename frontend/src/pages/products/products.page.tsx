@@ -7,8 +7,8 @@ import {
 	ProductTable,
 	productThunk,
 	type TProduct,
-	setItemsPerPage,
 	selectProductStats,
+	productQuerySchema,
 } from '@products';
 import { Button } from '@ui';
 import { debounce } from '@utils';
@@ -26,27 +26,36 @@ export const ProductsPage = () => {
 	const [term, setTerm] = useState<string>('');
 	const [searchParams, setSearchParams] = useSearchParams();
 
+	const pagination = useAppSelector(selectProductsPagination);
 	const dispatch = useAppDispatch();
 	const products = useAppSelector(selectProducts);
-	const { totalItems, totalPages } = useAppSelector(selectProductsPagination);
 
 	const productStats = useAppSelector(selectProductStats);
 
 	const page = Number(searchParams.get('page')) || 1;
 	const limit = Number(searchParams.get('limit')) || 10;
 	const search = searchParams.get('search') || term;
-	const categoryId = searchParams.get('categoryId') || '';
+	const categoryId = searchParams.get('categoryId') || undefined;
 
 	useEffect(() => {
 		const fetchTableData = async () => {
 			setTerm(search);
-			await dispatch(
-				productThunk.getCollection({
-					pagination: { page, limit, disabled: false },
-					search,
-					filter: { categoryId },
-				}),
-			);
+
+			const payload = {
+				search,
+				page,
+				limit,
+				categoryId,
+				sort: 'createdAt',
+				order: 'desc',
+			};
+			const result = productQuerySchema.safeParse(payload);
+			if (!result.success) {
+				console.error(result.error);
+				return;
+			}
+
+			await dispatch(productThunk.getCollection(result.data));
 		};
 
 		fetchTableData();
@@ -59,15 +68,22 @@ export const ProductsPage = () => {
 	const debouncedSearch = useMemo(
 		() =>
 			debounce((term) => {
-				dispatch(
-					productThunk.getCollection({
-						pagination: { page: FIRST_PAGE, limit, disabled: false },
-						search: term,
-						filter: {
-							categoryId: categoryId,
-						},
-					}),
-				);
+				const payload = {
+					search: term,
+					page: FIRST_PAGE,
+					limit,
+					categoryId,
+					sort: 'createdAt',
+					order: 'desc',
+				};
+				const result = productQuerySchema.safeParse(payload);
+
+				if (!result.success) {
+					console.error(result);
+					return;
+				}
+
+				dispatch(productThunk.getCollection(result.data));
 
 				searchParams.set('page', String(FIRST_PAGE));
 				searchParams.set('search', term);
@@ -99,8 +115,9 @@ export const ProductsPage = () => {
 	};
 
 	const handlePerPageChange = (perPage: number) => {
-		dispatch(setItemsPerPage(perPage));
-		dispatch(setCurrentPage(page));
+		// dispatch(setItemsPerPage(perPage));
+		// dispatch(setCurrentPage(page));
+		console.log('handlePerPageChange', perPage);
 
 		searchParams.set('limit', String(perPage));
 		setSearchParams(searchParams);
@@ -171,7 +188,7 @@ export const ProductsPage = () => {
 				{/* Pagination */}
 				<Pagination
 					currentPage={page}
-					totalPages={totalPages}
+					totalPages={pagination?.totalPages}
 					itemsPerPage={limit}
 					onPageChange={handlePageChange}
 					onPerPageChange={handlePerPageChange}

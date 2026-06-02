@@ -53,10 +53,10 @@ export const baseSlice = <
 				state.list.error = null;
 			},
 			setCurrentPage: (state, action) => {
-				state.pagination.currentPage = action.payload;
+				state.pagination.page = action.payload;
 			},
 			setItemsPerPage: (state, action) => {
-				state.pagination.itemsPerPage = action.payload;
+				state.pagination.limit = action.payload;
 			},
 			...customeReducers,
 		},
@@ -169,7 +169,7 @@ export const baseSlice = <
 					state.list.status = 'succeeded';
 					state.list.error = null;
 					state.list.data = castDraft(action.payload.data);
-					state.pagination = action.payload.pagination as typeof state.pagination;
+					// state.pagination = action.payload.pagination as typeof state.pagination;
 				})
 				.addCase(thunks.paginate.rejected, (state, action) => {
 					state.list.status = 'failed';

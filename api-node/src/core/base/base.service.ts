@@ -1,8 +1,9 @@
 import type { IBaseRepository } from './base.repository.js';
 import z from 'zod';
 import type { ICollectionResult, IQueryOptions, PaginatedResult, QueryOptions } from '../types/general.js';
+import { baseQuerySchema, type TBaseQuery, type TContext } from '../schema/general.schema.js';
 
-export interface IBaseService<T, TCreate, TUpdate> {
+export interface IBaseService<T, TCreate, TUpdate, TQuery extends TBaseQuery = TBaseQuery> {
 	getAll(userId: string): Promise<T[]>;
 	getById(userId: string, id: string): Promise<T>;
 	create(userId: string, data: TCreate): Promise<T>;
@@ -10,14 +11,15 @@ export interface IBaseService<T, TCreate, TUpdate> {
 	delete(userId: string, id: string): Promise<T>;
 	paginate(userId: string, page: number, limit: number): Promise<PaginatedResult<T>>;
 	search(userId: string, term: string, page: number, limit: number): Promise<PaginatedResult<T>>;
-	getCollection(options: IQueryOptions): Promise<ICollectionResult<T> | T[]>;
+	getCollection(context: TContext, options?: TQuery): Promise<ICollectionResult<T> | T[]>;
 }
 export abstract class BaseService<
 	T,
 	TCreate,
 	TUpdate,
 	TRepository extends IBaseRepository<T, TCreate, TUpdate> = IBaseRepository<T, TCreate, TUpdate>,
-> implements IBaseService<T, TCreate, TUpdate> {
+	TQuery extends TBaseQuery = TBaseQuery,
+> implements IBaseService<T, TCreate, TUpdate, TQuery> {
 	protected repository: TRepository;
 	protected schema: z.ZodSchema<T>;
 	protected createSchema: z.ZodSchema<TCreate>;
@@ -90,13 +92,13 @@ export abstract class BaseService<
 		};
 	}
 
-	async getCollection(options: IQueryOptions): Promise<ICollectionResult<T> | T[]> {
-		if (options?.pagination?.isPaginated) {
-			const response = await this.repository.findAll(options);
+	async getCollection(context: TContext, options: TQuery): Promise<ICollectionResult<T> | T[]> {
+		if (Boolean(options.isPaginated) === false) {
+			const response = await this.repository.findAll(context, options);
 			return z.array(this.schema).parse(response);
 		}
 
-		const { data, pagination } = await this.repository.findManyAndCount(options);
+		const { data, pagination } = await this.repository.findManyAndCount(context, options);
 
 		return {
 			data: z.array(this.schema).parse(data),

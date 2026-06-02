@@ -1,10 +1,11 @@
-import { and, desc, eq, gte, ilike, lte, SQL, sql, type AnyTable, type ColumnBaseConfig } from 'drizzle-orm';
+import { and, asc, desc, eq, gte, ilike, lte, SQL, sql, type AnyTable, type ColumnBaseConfig } from 'drizzle-orm';
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import type { AnyPgTable, PgColumn, PgSelect, PgSelectBase, PgTable } from 'drizzle-orm/pg-core';
 import { AppError } from '@utils';
 import type { ICollectionResult, IQueryOptions, PaginatedResult, QueryOptions } from '../types/general.js';
+import type { TBaseQuery, TContext } from '../schema/general.schema.js';
 
-export interface IBaseRepository<T, TCreate, TUpdate> {
+export interface IBaseRepository<T, TCreate, TUpdate, TQuery extends TBaseQuery = TBaseQuery> {
 	getAll(userId: string): Promise<T[]>;
 	getById(userId: string, id: string): Promise<T | null>;
 	create(userId: string, data: TCreate): Promise<T | null>;
@@ -12,8 +13,8 @@ export interface IBaseRepository<T, TCreate, TUpdate> {
 	delete(userId: string, id: string): Promise<T>;
 	search(userId: string, term: string, page: number, limit: number): Promise<PaginatedResult<T>>;
 	paginate(userId: string, page?: number, limit?: number): Promise<PaginatedResult<T>>;
-	findAll(options: IQueryOptions): Promise<T[]>;
-	findManyAndCount(optoins: IQueryOptions): Promise<ICollectionResult<T>>;
+	findAll(context: TContext, options: TQuery): Promise<T[]>;
+	findManyAndCount(context: TContext, optoins: TQuery): Promise<ICollectionResult<T>>;
 }
 
 type AnyUserIdColumn = PgColumn<ColumnBaseConfig<'string', string>>;
@@ -33,7 +34,8 @@ export abstract class BaseRepository<
 	TCreate,
 	TUpdate,
 	TTable extends TableWithOtherProperties,
-> implements IBaseRepository<T, TCreate, TUpdate> {
+	TQuery extends TBaseQuery = TBaseQuery,
+> implements IBaseRepository<T, TCreate, TUpdate, TQuery> {
 	protected table: TTable;
 	protected db: NodePgDatabase;
 
@@ -176,17 +178,19 @@ export abstract class BaseRepository<
 		return [];
 	}
 
-	protected buildFilters(options: IQueryOptions): SQL<unknown> | undefined {
-		const { filter, search, context } = options;
+	protected buildFilters(context: TContext, options: TQuery): SQL<unknown> | undefined {
+		const { filter } = options;
 
 		const filters: SQL[] = [];
 
+		// context
 		if (context?.userId) {
-			filters.push(eq(this.table.userId, sql`${context.userId}`));
+			filters.push(eq(this.table.userId, sql`${context?.userId}`));
 		}
 
-		if (search) {
-			filters.push(ilike(this.table.name, `${search}%`));
+		// filter
+		if (filter?.search) {
+			filters.push(ilike(this.table.name, `${filter.search}%`));
 		}
 
 		const additionaFilters = this.buildAdditionalFilters(filter);
@@ -197,8 +201,16 @@ export abstract class BaseRepository<
 		return filters.length > 0 ? and(...filters) : undefined;
 	}
 
-	async findAll(options: IQueryOptions): Promise<T[]> {
-		const whereClause = this.buildFilters(options);
+	// sort
+	protected buildSortClause(sort: TQuery['sort']): SQL<unknown> {
+		if (sort && sort.order === 'asc') {
+			return asc(this.table.createdAt);
+		}
+		return desc(this.table.createdAt);
+	}
+
+	async findAll(context: TContext, options: TQuery): Promise<T[]> {
+		const whereClause = this.buildFilters(context, options);
 
 		const results = (await this.getBaseQuery()
 			.where(whereClause)
@@ -208,20 +220,17 @@ export abstract class BaseRepository<
 		return results.map((result) => this.format(result));
 	}
 
-	async findManyAndCount(options: IQueryOptions): Promise<ICollectionResult<T>> {
+	async findManyAndCount(context: TContext, options: TQuery): Promise<ICollectionResult<T>> {
 		const { pagination } = options;
 
 		const { page = 1, limit = 10 } = pagination || { page: 1, limit: 10 };
 		const offset = (page - 1) * limit;
 
-		const whereClause = this.buildFilters(options);
+		const whereClause = this.buildFilters(context, options);
+		const sortClause = this.buildSortClause(options?.sort);
 
 		const [results, countResult] = await Promise.all([
-			this.getBaseQuery()
-				.where(whereClause)
-				.orderBy(desc(this.table.createdAt))
-				.limit(limit)
-				.offset(offset) as Promise<T[]>,
+			this.getBaseQuery().where(whereClause).orderBy(sortClause).limit(limit).offset(offset) as Promise<T[]>,
 			this.db
 				.select({ count: sql<number>`count(*)` })
 				.from(this.table as AnyPgTable)

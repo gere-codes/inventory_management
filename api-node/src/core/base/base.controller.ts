@@ -2,7 +2,8 @@ import type { Request, Response, NextFunction } from 'express';
 import type { BaseService, IBaseService } from './base.service.js';
 import { catchAsync } from '@utils/index.js';
 import type { IFileService } from '@services';
-import type { IQueryOptions } from '../types/general.js';
+import type { TBaseQuery } from '../schema/general.schema.js';
+import z from 'zod';
 
 export interface IBaseController<T, TCreate, TUpdate> {
 	getAll(req: Request, res: Response, next: NextFunction): void;
@@ -20,9 +21,11 @@ export abstract class BaseController<
 	TCreate,
 	TUpdate,
 	TService extends IBaseService<T, TCreate, TUpdate> = IBaseService<T, TCreate, TUpdate>,
+	TQuery extends TBaseQuery = TBaseQuery,
 > implements IBaseController<T, TCreate, TUpdate> {
 	constructor(
 		protected service: TService,
+		protected querySchema: z.ZodSchema<TQuery>,
 		protected fileService?: IFileService,
 	) {}
 
@@ -148,21 +151,13 @@ export abstract class BaseController<
 
 	getCollection = catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 		const userId = req.user?.id;
-		const { page, limit, search, isPaginated, ...rawFilters } = req.query;
-
-		const options: IQueryOptions = {
-			pagination: {
-				page: Number(page) || 1,
-				limit: Number(limit) || 10,
-				isPaginated: isPaginated === 'false',
-			},
-			search: (search as string) || '',
-			filter: rawFilters as any,
-			context: {
-				userId,
-			},
+		const context = {
+			userId,
 		};
-		const response = await this.service.getCollection(options);
+
+		const options = this.querySchema.parse(req.query);
+
+		const response = await this.service.getCollection(context, options);
 
 		res.status(200).json({
 			success: true,

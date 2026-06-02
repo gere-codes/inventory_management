@@ -1,3 +1,4 @@
+import { commonQuery } from '@/shared/schema';
 import z, { uuid } from 'zod';
 const imageSchema = z.union([
 	z.instanceof(File).refine((f) => f.size <= 5 * 1024 * 1024, 'Max 5MB'),
@@ -48,3 +49,29 @@ export const orderFormSchema = z.discriminatedUnion('mode', [
 ]);
 
 export type TOrderForm = z.infer<typeof orderFormSchema>;
+
+export const orderQuerySchema = commonQuery
+	.extend({
+		search: z.string().optional(),
+		categoryId: z.uuid().optional(),
+		sort: z.enum(['createdAt', 'price', 'name']).default('createdAt'),
+		order: z.enum(['asc', 'desc']).default('desc'),
+	})
+	.transform((raw) => ({
+		isPaginated: raw.isPaginated,
+		pagination: {
+			page: raw.page,
+			limit: raw.limit,
+			offset: (raw.page - 1) * raw.limit,
+		},
+		filter: {
+			search: raw.search,
+			categoryId: raw.categoryId,
+		},
+		sort: {
+			field: raw.sort,
+			order: raw.order,
+		},
+	}));
+
+export type TOrdertQuery = z.infer<typeof orderQuerySchema>;

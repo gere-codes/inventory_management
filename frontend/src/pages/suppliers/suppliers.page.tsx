@@ -5,7 +5,7 @@ import { SupplierTable } from '@suppliers';
 import { EModalMode, EModalType, openModal, Pagination, SearchBar } from '@common';
 import { debounce } from '@utils';
 import { Button } from '@ui';
-import type { TSupplier } from '@/features/suppliers/supplier.schema';
+import { suppplierQuerySchema, type TSupplier } from '@/features/suppliers/supplier.schema';
 import { setSupplierCurrentPage, setSuppliersPerPage } from '@/features/suppliers/supplier.slice';
 import { useSearchParams } from 'react-router';
 
@@ -26,13 +26,20 @@ export const SuppliersPage = () => {
 	useEffect(() => {
 		const fetchTableData = async () => {
 			setTerm(search);
-			await dispatch(
-				supplierThunk.getCollection({
-					pagination: { page, limit, disabled: false },
-					search,
-					filter: {},
-				}),
-			);
+
+			const payload = {
+				search,
+				page,
+				limit,
+			};
+
+			const result = suppplierQuerySchema.safeParse(payload);
+
+			if (!result.success) {
+				console.error(result.error);
+				return;
+			}
+			await dispatch(supplierThunk.getCollection(result.data));
 		};
 
 		fetchTableData();
@@ -48,13 +55,19 @@ export const SuppliersPage = () => {
 	const debouncedSearch = useMemo(
 		() =>
 			debounce((term) => {
-				dispatch(
-					supplierThunk.getCollection({
-						pagination: { page: FIRST_PAGE, limit, disabled: false },
-						search: term,
-						filter: {},
-					}),
-				);
+				const payload = {
+					search: term,
+					page: FIRST_PAGE,
+					limit,
+				};
+
+				const result = suppplierQuerySchema.safeParse(payload);
+
+				if (!result.success) {
+					console.error(result.error);
+					return;
+				}
+				dispatch(supplierThunk.getCollection(result.data));
 
 				searchParams.set('page', String(FIRST_PAGE));
 				searchParams.set('search', term);

@@ -1,3 +1,4 @@
+import { commonQuery } from '@src/core/schema/general.schema.js';
 import { sanitized } from '@src/core/validation/sanitized.js';
 import z, { optional } from 'zod';
 
@@ -31,3 +32,29 @@ export const updateOrderSchema = commonFields.partial();
 export type TOrder = z.infer<typeof orderSchema>;
 export type TCreateOrder = z.infer<typeof createOrderSchema>;
 export type TUpdateOrder = z.infer<typeof updateOrderSchema>;
+
+export const orderQuerySchema = commonQuery
+	.extend({
+		search: z.string().optional(),
+		categoryId: z.uuid().optional(),
+		sort: z.enum(['createdAt', 'price', 'name']).default('createdAt'),
+		order: z.enum(['asc', 'desc']).default('desc'),
+	})
+	.transform((raw) => ({
+		isPaginated: raw.isPaginated,
+		pagination: {
+			page: raw.page,
+			limit: raw.limit,
+			offset: (raw.page - 1) * raw.limit,
+		},
+		filter: {
+			search: raw.search,
+			categoryId: raw.categoryId,
+		},
+		sort: {
+			field: raw.sort,
+			order: raw.order,
+		},
+	}));
+
+export type TOrderQuery = z.infer<typeof orderQuerySchema>;

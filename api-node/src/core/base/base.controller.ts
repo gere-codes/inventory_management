@@ -11,8 +11,7 @@ export interface IBaseController<T, TCreate, TUpdate> {
 	create(req: Request, res: Response, next: NextFunction): void;
 	update(req: Request, res: Response, next: NextFunction): void;
 	delete(req: Request, res: Response, next: NextFunction): void;
-	paginate(req: Request, res: Response, next: NextFunction): void;
-	search(req: Request, res: Response, next: NextFunction): void;
+
 	getCollection(req: Request, res: Response, next: NextFunction): void;
 }
 
@@ -119,33 +118,6 @@ export abstract class BaseController<
 		res.status(200).json({
 			success: true,
 			data: deletedProduct,
-		});
-	});
-
-	paginate = catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-		const userId = req.user?.id;
-		const page = Number(req.query.currentPage) || 1;
-		const limit = Number(req.query.itemsPerPage) || 10;
-
-		const result = await this.service.paginate(userId, page as number, limit as number);
-
-		res.status(200).json({
-			success: true,
-			data: result,
-		});
-	});
-
-	search = catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-		const userId = req.user?.id;
-		const page = Number(req.query.currentPage) || 1;
-		const limit = Number(req.query?.itemsPerPage) || 10;
-		const term = (req.query?.term as string) || '';
-
-		const result = await this.service.search(userId, term, page, limit);
-
-		res.status(200).json({
-			success: true,
-			data: result,
 		});
 	});
 

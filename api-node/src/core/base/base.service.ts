@@ -9,8 +9,6 @@ export interface IBaseService<T, TCreate, TUpdate, TQuery extends TBaseQuery = T
 	create(userId: string, data: TCreate): Promise<T>;
 	update(userId: string, id: string, data: TUpdate): Promise<T>;
 	delete(userId: string, id: string): Promise<T>;
-	paginate(userId: string, page: number, limit: number): Promise<PaginatedResult<T>>;
-	search(userId: string, term: string, page: number, limit: number): Promise<PaginatedResult<T>>;
 	getCollection(context: TContext, options?: TQuery): Promise<ICollectionResult<T> | T[]>;
 }
 export abstract class BaseService<
@@ -69,27 +67,6 @@ export abstract class BaseService<
 		const deletedItem = await this.repository.delete(userId, id);
 
 		return this.schema.parse(deletedItem);
-	}
-
-	async paginate(userId: string, page: number, limit: number): Promise<PaginatedResult<T>> {
-		const { data, pagination } = await this.repository.paginate(userId, page, limit);
-		const responseData = z.array(this.schema).parse(data);
-
-		return {
-			data: responseData,
-			pagination,
-		};
-	}
-
-	async search(userId: string, term: string, page: number, limit: number) {
-		const { data, pagination } = await this.repository.search(userId, term, page, limit);
-
-		const responseData = z.array(this.schema).parse(data);
-
-		return {
-			data: responseData,
-			pagination,
-		};
 	}
 
 	async getCollection(context: TContext, options: TQuery): Promise<ICollectionResult<T> | T[]> {

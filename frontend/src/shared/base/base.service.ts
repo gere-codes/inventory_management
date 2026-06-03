@@ -16,8 +16,6 @@ export interface IBaseService<
 	create(data: TCreateBody): Promise<T>;
 	update(id: string, data: TUpdateBody): Promise<T>;
 	delete(id: string): Promise<T>;
-	paginate(page: number, limit: number): Promise<PaginatedResult<T>>;
-	search(term: string, page: number, limit: number): Promise<PaginatedResult<T>>;
 	getCollection(params?: TQuery): Promise<ICollectionResult<T>>;
 }
 export abstract class BaseService<
@@ -103,40 +101,6 @@ export abstract class BaseService<
 	async delete(id: string): Promise<T> {
 		const result = await privateInstance.delete<{ success: boolean; data: T }>(`/${this.resource}/${id}`);
 		return this.schema.parse(result.data.data);
-	}
-
-	async paginate(page: number, limit: number): Promise<PaginatedResult<T>> {
-		const result = await privateInstance.get<{ success: boolean; data: PaginatedResult<T> }>(
-			`/${this.resource}/paginate`,
-			{
-				params: {
-					currentPage: page,
-					itemsPerPage: limit,
-				},
-			},
-		);
-
-		const data = z.array(this.schema).safeParse(result.data.data.data);
-
-		return {
-			data: z.array(this.schema).parse(result.data.data.data),
-			pagination: result.data.data.pagination,
-		};
-	}
-
-	async search(term: string, page: number, limit: number): Promise<PaginatedResult<T>> {
-		const result = await privateInstance.get(`/${this.resource}/search`, {
-			params: {
-				term,
-				currentPage: page,
-				itemsPerPage: limit,
-			},
-		});
-
-		return {
-			data: z.array(this.schema).parse(result.data.data.data),
-			pagination: result.data.data.pagination,
-		};
 	}
 
 	async getCollection(params: TQuery): Promise<ICollectionResult<T>> {

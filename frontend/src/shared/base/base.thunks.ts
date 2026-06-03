@@ -24,8 +24,6 @@ export abstract class BaseThunks<
 	public create: AsyncThunk<T, TCreateBody, {}>;
 	public update: AsyncThunk<T, { id: string; body: TUpdateBody }, {}>;
 	public delete: AsyncThunk<T, string, {}>;
-	public paginate: AsyncThunk<PaginatedResult<T>, { page: number; limit: number }, {}>;
-	public search: AsyncThunk<PaginatedResult<T>, { term: string; page: number; limit: number }, {}>;
 	public getCollection: AsyncThunk<ICollectionResult<T>, TQuery, {}>;
 
 	constructor(
@@ -82,28 +80,6 @@ export abstract class BaseThunks<
 				);
 			}
 		});
-
-		this.search = createAsyncThunk<PaginatedResult<T>, { term: string; page: number; limit: number }>(
-			`${resource}/search`,
-			async ({ term, page, limit }, { rejectWithValue }) => {
-				try {
-					return await service.search(term, page, limit);
-				} catch (error) {
-					return rejectWithValue(this.handleError(error, `Error occurred while serarching for ${resource}`));
-				}
-			},
-		);
-
-		this.paginate = createAsyncThunk<PaginatedResult<T>, { page: number; limit: number }>(
-			`${resource}/paginate`,
-			async ({ page, limit }, { rejectWithValue }) => {
-				try {
-					return await service.paginate(page, limit);
-				} catch (error) {
-					return rejectWithValue(this.handleError(error, `Error occurred while paginating ${resource}`));
-				}
-			},
-		);
 
 		this.getCollection = createAsyncThunk<ICollectionResult<T>, TQuery>(
 			`${resource}/`,

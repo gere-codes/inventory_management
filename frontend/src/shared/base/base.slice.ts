@@ -146,35 +146,6 @@ export const baseSlice = <
 					state.list.error = (action.payload as string) || 'An error occurred';
 				})
 
-				// search
-				.addCase(thunks.search.pending, (state) => {
-					state.list.status = 'loading';
-				})
-				.addCase(thunks.search.fulfilled, (state, action: PayloadAction<PaginatedResult<T>>) => {
-					state.list.status = 'succeeded';
-					state.list.error = null;
-					state.list.data = castDraft(action.payload.data);
-				})
-				.addCase(thunks.search.rejected, (state, action) => {
-					state.list.status = 'failed';
-					state.list.error = (action.payload as string) || 'An error occurred';
-				})
-
-				// Get paginated
-				.addCase(thunks.paginate.pending, (state) => {
-					state.list.status = 'loading';
-					state.list.error = null;
-				})
-				.addCase(thunks.paginate.fulfilled, (state, action: PayloadAction<PaginatedResult<T>>) => {
-					state.list.status = 'succeeded';
-					state.list.error = null;
-					state.list.data = castDraft(action.payload.data);
-					// state.pagination = action.payload.pagination as typeof state.pagination;
-				})
-				.addCase(thunks.paginate.rejected, (state, action) => {
-					state.list.status = 'failed';
-					state.list.error = (action.payload as string) || 'An error occurred';
-				})
 				// Get Collection
 				.addCase(thunks.getCollection.pending, (state) => {
 					state.list.status = 'loading';

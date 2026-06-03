@@ -11,8 +11,6 @@ export interface IBaseRepository<T, TCreate, TUpdate, TQuery extends TBaseQuery 
 	create(userId: string, data: TCreate): Promise<T | null>;
 	update(userId: string, id: string, data: TUpdate): Promise<T>;
 	delete(userId: string, id: string): Promise<T>;
-	search(userId: string, term: string, page: number, limit: number): Promise<PaginatedResult<T>>;
-	paginate(userId: string, page?: number, limit?: number): Promise<PaginatedResult<T>>;
 	findAll(context: TContext, options: TQuery): Promise<T[]>;
 	findManyAndCount(context: TContext, optoins: TQuery): Promise<ICollectionResult<T>>;
 }
@@ -105,73 +103,6 @@ export abstract class BaseRepository<
 		await this.db.delete(this.table as AnyPgTable).where(whereConditions);
 
 		return record;
-	}
-
-	async paginate(userId: string, page: number = 1, limit: number = 10): Promise<PaginatedResult<T>> {
-		const offset = (page - 1) * limit;
-
-		const results = await this.db
-			.select()
-			.from(this.table as AnyPgTable)
-			.where(eq(this.table.userId, userId))
-			.orderBy(desc(this.table.createdAt))
-			.limit(limit)
-			.offset(offset);
-
-		const countResult = await this.db
-			.select({ count: sql<number>`count(*)` })
-			.from(this.table as AnyPgTable)
-			.where(eq(this.table.userId, userId));
-
-		const total = countResult[0]?.count ?? 0;
-
-		return {
-			data: results.map((result) => this.format(result)),
-			pagination: {
-				totalItems: Number(total),
-				currentPage: page,
-				totalPages: Math.ceil(total / limit),
-				itemsPerPage: limit,
-			},
-		};
-	}
-
-	public async search(userId: string, term: string, page: number, limit: number): Promise<PaginatedResult<T>> {
-		const offset = (page - 1) * limit;
-
-		const conditions: (SQL | undefined)[] = [eq(this.table.userId, userId)];
-
-		const trimmedTerm = term.trim();
-		if (term?.trim()) {
-			conditions.push(ilike(this.table.name, `%${trimmedTerm}%`));
-		}
-
-		const whereConditions = and(...conditions);
-
-		const rows = await this.db
-			.select()
-			.from(this.table as AnyPgTable)
-			.where(whereConditions)
-			.orderBy(desc(this.table.createdAt))
-			.limit(limit)
-			.offset(offset);
-
-		const countResult = await this.db
-			.select({ count: sql<number>`cast(count(*) as integer)` })
-			.from(this.table as AnyPgTable)
-			.where(whereConditions);
-
-		const total = countResult[0]?.count ?? 0;
-
-		return {
-			data: rows.map((row) => this.format(row)),
-			pagination: {
-				totalItems: total,
-				currentPage: page,
-				totalPages: Math.ceil(total / limit),
-				itemsPerPage: limit,
-			},
-		};
 	}
 
 	protected buildAdditionalFilters(filter: any): SQL[] {

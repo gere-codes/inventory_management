@@ -102,3 +102,6 @@ export const productQuerySchema = commonQuery
 	}));
 
 export type TProductQuery = z.infer<typeof productQuerySchema>;
+
+export type TProductQueryInput = z.input<typeof productQuerySchema>;
+export type TProductQueryOutput = z.output<typeof productQuerySchema>;

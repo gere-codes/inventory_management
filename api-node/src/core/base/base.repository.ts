@@ -148,10 +148,7 @@ export abstract class BaseRepository<
 	}
 
 	async findManyAndCount(context: TContext, options: TQuery): Promise<ICollectionResult<T>> {
-		const { pagination } = options;
-
-		const { page = 1, limit = 10 } = pagination || { page: 1, limit: 10 };
-		const offset = (page - 1) * limit;
+		const { page, limit, offset } = options.pagination;
 
 		const whereClause = this.buildFilters(context, options);
 		const sortClause = this.buildSortClause(options?.sort);
@@ -165,14 +162,16 @@ export abstract class BaseRepository<
 		]);
 
 		const total = Number(countResult[0]?.count ?? 0);
+		const totalPages = Math.ceil(total / limit);
+		const normalizedPage = totalPages > 0 && page > totalPages ? totalPages : page;
 
 		return {
 			data: results.map((result) => this.format(result)),
 			pagination: {
-				page,
+				page: normalizedPage,
 				limit,
 				totalItems: total,
-				totalPages: Math.ceil(total / limit),
+				totalPages,
 			},
 		};
 	}

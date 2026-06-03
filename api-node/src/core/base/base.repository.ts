@@ -1,6 +1,6 @@
 import { and, asc, desc, eq, ilike, SQL, sql, type ColumnBaseConfig } from 'drizzle-orm';
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
-import type { AnyPgTable, PgColumn, PgTable } from 'drizzle-orm/pg-core';
+import type { AnyPgTable, PgColumn, PgSelectDynamic, PgTable } from 'drizzle-orm/pg-core';
 import { AppError } from '@utils';
 import type { ICollectionResult } from '../types/general.js';
 import type { TBaseQuery, TContext } from '../schema/general.schema.js';
@@ -13,7 +13,7 @@ export interface IBaseRepository<T, TCreate, TUpdate, TQuery extends TBaseQuery 
 	findOne(id: string): Promise<T>;
 	findById(id: string): Promise<any | null>;
 	findAll(context: TContext, options: TQuery): Promise<T[]>;
-	findManyAndCount(context: TContext, optoins: TQuery): Promise<ICollectionResult<T>>;
+	findManyAndCount(context: TContext, options: TQuery): Promise<ICollectionResult<T>>;
 }
 
 type AnyUserIdColumn = PgColumn<ColumnBaseConfig<'string', string>>;
@@ -37,6 +37,7 @@ export abstract class BaseRepository<
 > implements IBaseRepository<T, TCreate, TUpdate, TQuery> {
 	protected table: TTable;
 	protected db: NodePgDatabase;
+	protected MAX_ITEMS = 1000;
 
 	constructor(table: TTable, db: NodePgDatabase) {
 		this.table = table;
@@ -45,8 +46,11 @@ export abstract class BaseRepository<
 
 	protected abstract format(record: any): T;
 
-	protected getBaseQuery(): any {
-		return this.db.select().from(this.table as AnyPgTable);
+	protected getBaseQuery(): PgSelectDynamic<any> {
+		return this.db
+			.select()
+			.from(this.table as AnyPgTable)
+			.$dynamic();
 	}
 
 	async findById(id: string): Promise<typeof this.table.$inferSelect | null> {
@@ -138,7 +142,7 @@ export abstract class BaseRepository<
 		const results = (await this.getBaseQuery()
 			.where(whereClause)
 			.orderBy(desc(this.table.createdAt))
-			.limit(1000)) as T[];
+			.limit(this.MAX_ITEMS)) as T[];
 
 		return results.map((result) => this.format(result));
 	}

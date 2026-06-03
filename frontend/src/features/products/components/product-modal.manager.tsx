@@ -13,7 +13,7 @@ interface Props {
 export const ProductModalManager = ({ productData, mode }: Props) => {
 	const dispatch = useAppDispatch();
 	const products = useAppSelector(selectProducts);
-	const { currentPage, itemsPerPage } = useAppSelector(selectProductsPagination);
+	const { page, limit } = useAppSelector(selectProductsPagination);
 
 	const close = () => {
 		dispatch(closeModal());
@@ -22,11 +22,11 @@ export const ProductModalManager = ({ productData, mode }: Props) => {
 	const handleDelete = async () => {
 		if (!productData?.id) return;
 		await dispatch(productThunk.delete(productData.id)).unwrap();
-		const nextPage = currentPage !== 1 && products.length === 1 ? currentPage - 1 : currentPage;
+		const nextPage = page !== 1 && products.length === 1 ? page - 1 : page;
 		dispatch(
 			productThunk.paginate({
 				page: nextPage,
-				limit: itemsPerPage,
+				limit: limit,
 			}),
 		);
 

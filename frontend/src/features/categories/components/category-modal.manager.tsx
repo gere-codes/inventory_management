@@ -14,7 +14,7 @@ export const CategoryModalManager = ({ mode, categoryData }: Props) => {
 	const dispatch = useAppDispatch();
 	const categories = useAppSelector(selectCategories);
 
-	const { currentPage, itemsPerPage } = useAppSelector(selectCategoryPagination);
+	const { page, limit } = useAppSelector(selectCategoryPagination);
 
 	const close = () => {
 		dispatch(closeModal());
@@ -23,11 +23,11 @@ export const CategoryModalManager = ({ mode, categoryData }: Props) => {
 	const handleDelete = async () => {
 		if (!categoryData?.id) return;
 		await dispatch(categoryThunk.delete(categoryData.id)).unwrap();
-		const nextPage = currentPage !== 1 && categories.length === 1 ? currentPage - 1 : currentPage;
+		const nextPage = page !== 1 && categories.length === 1 ? page - 1 : page;
 		dispatch(
 			categoryThunk.paginate({
 				page: nextPage,
-				limit: itemsPerPage,
+				limit: limit,
 			}),
 		);
 

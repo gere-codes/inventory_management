@@ -2,10 +2,11 @@ import type { IBaseRepository } from './base.repository.js';
 import z from 'zod';
 import type { ICollectionResult, IQueryOptions, PaginatedResult, QueryOptions } from '../types/general.js';
 import { baseQuerySchema, type TBaseQuery, type TContext } from '../schema/general.schema.js';
+import { AppError } from '../utils/app-error.util.js';
 
 export interface IBaseService<T, TCreate, TUpdate, TQuery extends TBaseQuery = TBaseQuery> {
 	getAll(userId: string): Promise<T[]>;
-	getById(userId: string, id: string): Promise<T>;
+	getById(id: string): Promise<T>;
 	create(userId: string, data: TCreate): Promise<T>;
 	update(userId: string, id: string, data: TUpdate): Promise<T>;
 	delete(userId: string, id: string): Promise<T>;
@@ -37,34 +38,48 @@ export abstract class BaseService<
 
 	async getAll(userId: string): Promise<T[]> {
 		const result = await this.repository.getAll(userId);
-
 		return z.array(this.schema).parse(result);
 	}
 
-	async getById(id: string, userId: string): Promise<T> {
-		const result = await this.repository.getById(id, userId);
-
+	async getById(id: string): Promise<T> {
+		const result = await this.repository.findOne(id);
 		return this.schema.parse(result);
 	}
 
 	async create(userId: string, data: TCreate): Promise<T> {
 		const parsedData = await this.createSchema.parseAsync(data);
 
-		const result = await this.repository.create(userId, parsedData);
+		const fullPayload = { ...parsedData, userId };
 
-		return this.schema.parse(result);
+		const id = await this.repository.create(fullPayload);
+
+		const item = await this.repository.findOne(id);
+
+		return this.schema.parse(item);
 	}
 
-	async update(id: string, userId: string, data: TUpdate): Promise<T> {
+	async update(userId: string, id: string, data: TUpdate): Promise<T> {
 		const parsedData = await this.updateSchema.parseAsync(data);
 
-		const result = await this.repository.update(id, userId, parsedData);
+		const item = await this.repository.findById(id);
 
-		return this.schema.parse(result);
+		if (!item) throw new Error('Item not found');
+
+		if (item.userId !== userId) throw new AppError(401, 'Unauthorized');
+
+		await this.repository.update(id, parsedData);
+
+		const updatedItem = await this.repository.findOne(id);
+
+		return this.schema.parse(updatedItem);
 	}
 
 	async delete(userId: string, id: string): Promise<T> {
-		const deletedItem = await this.repository.delete(userId, id);
+		const item = await this.repository.findById(id);
+		if (item.userId !== userId) throw new AppError(401, 'Unauthorized');
+
+		const deletedItem = await this.repository.findOne(id);
+		await this.repository.delete(id);
 
 		return this.schema.parse(deletedItem);
 	}

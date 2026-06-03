@@ -1,16 +1,17 @@
-import { and, asc, desc, eq, gte, ilike, lte, SQL, sql, type AnyTable, type ColumnBaseConfig } from 'drizzle-orm';
+import { and, asc, desc, eq, ilike, SQL, sql, type ColumnBaseConfig } from 'drizzle-orm';
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
-import type { AnyPgTable, PgColumn, PgSelect, PgSelectBase, PgTable } from 'drizzle-orm/pg-core';
+import type { AnyPgTable, PgColumn, PgTable } from 'drizzle-orm/pg-core';
 import { AppError } from '@utils';
-import type { ICollectionResult, IQueryOptions, PaginatedResult, QueryOptions } from '../types/general.js';
+import type { ICollectionResult } from '../types/general.js';
 import type { TBaseQuery, TContext } from '../schema/general.schema.js';
 
 export interface IBaseRepository<T, TCreate, TUpdate, TQuery extends TBaseQuery = TBaseQuery> {
 	getAll(userId: string): Promise<T[]>;
-	getById(userId: string, id: string): Promise<T | null>;
-	create(userId: string, data: TCreate): Promise<T | null>;
-	update(userId: string, id: string, data: TUpdate): Promise<T>;
-	delete(userId: string, id: string): Promise<T>;
+	create(data: TCreate): Promise<string>;
+	update(id: string, data: TUpdate): Promise<void>;
+	delete(id: string): Promise<void>;
+	findOne(id: string): Promise<T>;
+	findById(id: string): Promise<any | null>;
 	findAll(context: TContext, options: TQuery): Promise<T[]>;
 	findManyAndCount(context: TContext, optoins: TQuery): Promise<ICollectionResult<T>>;
 }
@@ -48,11 +49,21 @@ export abstract class BaseRepository<
 		return this.db.select().from(this.table as AnyPgTable);
 	}
 
-	protected async findOne(where: SQL | undefined): Promise<T> {
-		const result = await this.getBaseQuery().where(where).limit(1);
-		if (!result) {
-			throw new AppError(404, 'Item not found');
-		}
+	async findById(id: string): Promise<typeof this.table.$inferSelect | null> {
+		const result = await this.db
+			.select()
+			.from(this.table as AnyPgTable)
+			.where(eq(this.table.id, id))
+			.limit(1);
+
+		return result[0] || null;
+	}
+
+	async findOne(id: string): Promise<T> {
+		const result = await this.getBaseQuery().where(eq(this.table.id, id)).limit(1);
+
+		if (!result || result.length === 0) throw new AppError(404, 'Item not found');
+
 		return this.format(result[0]);
 	}
 
@@ -65,44 +76,25 @@ export abstract class BaseRepository<
 		return results.map((result) => this.format(result));
 	}
 
-	async getById(userId: string, id: string): Promise<T> {
-		const whereConditions = and(eq(this.table.id, id), eq(this.table.userId, userId));
-		return await this.findOne(whereConditions);
-	}
-
-	async create(userId: string, data: TCreate): Promise<T | null> {
-		const [record] = await this.db
-			.insert(this.table)
-			.values({ ...data, userId })
-			.returning({ id: this.table.id });
+	async create(data: TCreate): Promise<string> {
+		const [record] = await this.db.insert(this.table).values(data).returning({ id: this.table.id });
 
 		if (!record) throw new AppError(400, 'Item was not created');
 
-		const whereConditions = and(eq(this.table.id, record.id), eq(this.table.userId, userId));
-		return await this.findOne(whereConditions);
+		return record.id as string;
 	}
 
-	async update(userId: string, id: string, data: TUpdate): Promise<T> {
-		const [record] = await this.db
+	async update(id: string, data: TUpdate): Promise<void> {
+		await this.db
 			.update(this.table as AnyPgTable)
 			.set(data as any)
-			.where(and(eq(this.table.userId, userId), eq(this.table.id, id)))
-			.returning({ id: this.table.id });
-
-		if (!record) throw new AppError(400, 'Item was not updated');
-		const whereConditions = and(eq(this.table.id, record.id), eq(this.table.userId, userId));
-
-		return await this.findOne(whereConditions);
+			.where(eq(this.table.id, id));
+		return;
 	}
 
-	async delete(userId: string, id: string): Promise<T> {
-		const whereConditions = and(eq(this.table.id, id), eq(this.table.userId, userId));
-
-		const record = await this.findOne(whereConditions);
-
-		await this.db.delete(this.table as AnyPgTable).where(whereConditions);
-
-		return record;
+	async delete(id: string): Promise<void> {
+		await this.db.delete(this.table as AnyPgTable).where(eq(this.table.id, id));
+		return;
 	}
 
 	protected buildAdditionalFilters(filter: any): SQL[] {

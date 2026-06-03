@@ -41,7 +41,7 @@ export abstract class BaseController<
 	getById = catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 		const userId = req.user.id;
 		const { id } = req.params;
-		const result = await this.service.getById(id as string, userId);
+		const result = await this.service.getById(id as string);
 
 		res.status(200).json({
 			success: true,

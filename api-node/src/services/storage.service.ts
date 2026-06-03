@@ -4,6 +4,7 @@ import { join } from 'path';
 
 export interface IFileService {
 	upload(file: Express.Multer.File): Promise<string>;
+	delete(filename: string): Promise<void>;
 }
 
 export class LocalFileService implements IFileService {

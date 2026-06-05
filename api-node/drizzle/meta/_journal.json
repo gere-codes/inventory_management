@@ -43,6 +43,13 @@
       "when": 1779846893125,
       "tag": "0005_uneven_kang",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1780593061850,
+      "tag": "0006_woozy_boomerang",
+      "breakpoints": true
     }
   ]
 }

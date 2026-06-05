@@ -5,8 +5,8 @@ import { upload } from '@middlewares';
 const orderRoutes = Router();
 
 orderRoutes.get('/', orderController.getAll);
-orderRoutes.post('/', upload.single('image'), orderController.create);
-orderRoutes.put('/:id', upload.single('image'), orderController.update);
+orderRoutes.post('/', upload.array('images', 4), orderController.create);
+orderRoutes.put('/:id', upload.array('images', 4), orderController.update);
 
 orderRoutes.get('/:id', orderController.getById);
 

@@ -24,7 +24,7 @@ export class OrderRespository
 			sku: record.sku,
 			status: record.status,
 			type: record.type,
-			image: record?.image,
+			images: record?.images,
 			createdAt: record?.createdAt,
 			updatedAt: record?.updatedAt,
 		};

@@ -54,18 +54,28 @@ export abstract class BaseController<
 		const { body } = req;
 		let payload = { ...body };
 
-		// Handling a single image
+		// handling a single image
 		if (req.file && this.fileService) {
 			let image: string = '';
 			image = await this.fileService.upload(req.file);
 			payload.image = image;
 		}
 
-		// Handling an array of images
+		// handling an array of string images for re-order case
+		let existingImages: string[] = [];
+		if (body?.images) {
+			if (Array.isArray(body.images)) {
+				existingImages = body.images;
+			} else if (typeof body.images === 'string') {
+				existingImages = [body.images];
+			}
+		}
+		payload.images = existingImages;
+		// handling an array of images
+		let newImages: string[] = [];
 		if (req.files && Array.isArray(req.files) && req.files.length > 0 && this.fileService) {
-			let images: string[] = [];
-			images = await Promise.all(req.files.map((file) => this.fileService!.upload(file)));
-			payload.images = images;
+			newImages = await Promise.all(req.files.map((file) => this.fileService!.upload(file)));
+			payload.images = newImages;
 		}
 
 		const result = await this.service.create(userId, payload);

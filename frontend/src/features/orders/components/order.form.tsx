@@ -9,9 +9,10 @@ import { BASE_URL } from '@api';
 import { Button, InputField, TextareaField } from '@ui';
 import { CategorySelect, useCategories } from '@categories';
 import { closeModal, EModalMode } from '@common';
-import { orderFormSchema, type TOrder, type TOrderForm } from '../order.schema';
+import { orderFormSchema, orderQuerySchema, type TOrder, type TOrderForm } from '../order.schema';
 import { EOrderStatus, EOrderType } from '../order.enums';
 import { productThunk } from '@products';
+import { useSearchParams } from 'react-router';
 
 interface Props {
 	mode: EModalMode.CREATE | EModalMode.EDIT;
@@ -20,10 +21,17 @@ interface Props {
 
 export const OrderForm = ({ mode, orderData }: Props) => {
 	const { categories, isLoading } = useCategories();
-	const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-	const isReadOnlyField = orderData?.type === EOrderType.REORDER;
+	const [term, setTerm] = useState<string>('');
 
-	const { limit, page, totalItems, totalPages } = useAppSelector(selectOrderPagination);
+	const [previewUrl, setPreviewUrl] = useState<string[] | null>(null);
+	const isReadOnlyField = orderData?.type === EOrderType.REORDER;
+	const [searchParams, setSearchParams] = useSearchParams();
+
+	const { totalItems, totalPages } = useAppSelector(selectOrderPagination);
+	const page = Number(searchParams.get('page')) || 1;
+	const limit = Number(searchParams.get('limit')) || 10;
+	const search = searchParams.get('search') || term;
+	const categoryId = searchParams.get('categoryId') || undefined;
 
 	const dispatch = useAppDispatch();
 
@@ -60,8 +68,15 @@ export const OrderForm = ({ mode, orderData }: Props) => {
 
 		Object.entries(payload).forEach(([key, value]) => {
 			if (value === null || value === undefined) return;
-			if (value instanceof File) {
-				formData.append(key, value);
+
+			if (Array.isArray(value)) {
+				value.forEach((item) => {
+					if (item instanceof File) {
+						formData.append(key, item);
+					} else if (typeof item === 'string') {
+						formData.append(key, item);
+					}
+				});
 			} else {
 				formData.append(key, value.toString());
 			}
@@ -84,7 +99,20 @@ export const OrderForm = ({ mode, orderData }: Props) => {
 				await dispatch(orderThunk.update({ id: data.id, body: formData }));
 			} else {
 				await dispatch(orderThunk.create(formData));
-				await dispatch(orderThunk.getCollection({ pagination: { limit, page, disabled: false } }));
+
+				const result = orderQuerySchema.safeParse({
+					search,
+					limit,
+					page,
+					categoryId,
+					sort: 'createdAt',
+					order: 'desc',
+				});
+				if (!result.success) {
+					console.error(result.error);
+					return;
+				}
+				await dispatch(orderThunk.getCollection(result.data));
 			}
 			dispatch(closeModal());
 		} catch (error) {
@@ -92,7 +120,7 @@ export const OrderForm = ({ mode, orderData }: Props) => {
 		}
 	};
 
-	const imageFile = watch('image');
+	const imageFile = watch('images');
 
 	// revoke url when component unmounts
 	useEffect(() => {
@@ -101,13 +129,14 @@ export const OrderForm = ({ mode, orderData }: Props) => {
 			return;
 		}
 
-		const objectUrl = URL.createObjectURL(imageFile);
-		setPreviewUrl(objectUrl);
+		const objectUrls = imageFile
+			.filter((image) => image instanceof File)
+			.map((image) => URL.createObjectURL(image));
+
+		setPreviewUrl(objectUrls);
 
 		return () => {
-			if (imageFile && imageFile instanceof File) {
-				URL.revokeObjectURL(objectUrl);
-			}
+			objectUrls.forEach((url) => URL.revokeObjectURL(url));
 		};
 	}, [imageFile]);
 
@@ -119,54 +148,71 @@ export const OrderForm = ({ mode, orderData }: Props) => {
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
 				{/* image */}
 				<Controller
-					name="image"
+					name="images"
 					control={control}
 					render={({ field: { onChange, value, ...field } }) => {
 						return (
-							<div className="border border-gray-200 rounded h-24 w-24 relative">
-								{imageFile ? (
-									<div className="relative">
-										<button
-											onClick={() => setValue('image', '')}
-											className="absolute -top-2 -right-2 text-gray-600 hover:text-gray-800"
-										>
-											<TiDelete size={25} />
-										</button>
-										<img
-											src={
-												imageFile instanceof File
-													? URL.createObjectURL(imageFile)
-													: `${BASE_URL}${imageFile}`
-											}
-											alt="Preview"
-											className="object-center aspect-square h-full w-full"
-										/>
-									</div>
-								) : (
-									<>
+							<div className="flex flex-wrap gap-2">
+								{/* Render existing image previews */}
+								{imageFile &&
+									imageFile.map((image, index) => (
+										<div className="border border-gray-200 rounded h-24 w-24 relative" key={index}>
+											<button
+												type="button"
+												disabled={isReadOnlyField}
+												onClick={() => {
+													// Filter out the deleted image by its index
+													const updatedImages = imageFile.filter((_, i) => i !== index);
+													setValue('images', updatedImages);
+												}}
+												className="absolute -top-2 -right-2 text-gray-600 hover:text-gray-800 z-10 bg-white rounded-full"
+											>
+												<TiDelete size={25} />
+											</button>
+											<img
+												src={
+													image instanceof File
+														? URL.createObjectURL(image)
+														: `${BASE_URL}${image}`
+												}
+												alt={`Preview ${index + 1}`}
+												className="object-cover h-full w-full rounded"
+											/>
+										</div>
+									))}
+
+								{/* Render upload slot ONLY if total images are less than 4 */}
+								{(!imageFile || imageFile.length < 4) && (
+									<div className="border border-gray-200 border-dashed rounded h-24 w-24 relative flex items-center justify-center hover:bg-gray-50 transition-colors">
 										<input
 											{...field}
 											type="file"
 											id="image"
 											name="image"
-											className="h-full w-full opacity-0 absolute"
+											className="h-full w-full opacity-0 absolute cursor-pointer z-10"
 											accept="image/jpeg, image/png"
 											multiple={false}
 											onChange={(e) => {
 												const file = e.target.files && e.target.files[0];
-
 												if (file) {
-													setValue('image', file);
+													const currentImages = imageFile || [];
+													setValue('images', [...currentImages, file]);
 												}
 											}}
 										/>
 										<label
 											htmlFor="image"
-											className="h-full w-full flex items-center justify-center cursor-pointer"
+											className="h-full w-full flex flex-col items-center justify-center cursor-pointer text-center p-1"
 										>
-											<span className="text-gray-500 text-xs">Upload Image</span>
+											<span className="text-gray-400 text-lg font-light">+</span>
+											<span className="text-gray-500 text-[10px] leading-tight">
+												Upload Image
+											</span>
+											<span className="text-gray-400 text-[9px]">
+												({imageFile?.length || 0}/4)
+											</span>
 										</label>
-									</>
+									</div>
 								)}
 							</div>
 						);

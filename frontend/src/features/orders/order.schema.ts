@@ -6,6 +6,9 @@ const imageSchema = z.union([
 	z.null(),
 	z.undefined(),
 ]);
+
+const imagesSchema = z.array(imageSchema).optional().nullable();
+
 export const orderSchema = z.object({
 	id: z.uuid(),
 	productId: z.uuid().optional().nullable(),
@@ -16,7 +19,7 @@ export const orderSchema = z.object({
 	categoryId: z.uuid(),
 	category: z.string().optional().nullable(),
 	sku: z.string().min(3).max(36),
-	image: imageSchema.optional().nullable(),
+	images: imagesSchema,
 	status: z.enum(['pending', 'cancelled', 'received']),
 	type: z.enum(['new', 'reorder']),
 	createdAt: z.string(),

@@ -138,5 +138,10 @@ export const useProductQuery = () => {
 		setTerm(searchQuery);
 	}, [searchQuery]);
 
+	// Fetch the product stats
+	useEffect(() => {
+		dispatch(productThunk.getStats());
+	}, [dispatch]);
+
 	return { filters, setParam, resetFilters, fetchProducts, debouncedSearch, handleTerm, term, setLimit, setPage };
 };

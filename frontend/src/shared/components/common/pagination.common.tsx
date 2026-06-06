@@ -3,18 +3,21 @@ interface Props {
 	currentPage: number;
 	totalPages: number;
 	itemsPerPage?: number;
+	totalItems: number;
 	onPerPageChange?: (value: 10 | 25 | 50) => void;
 	onPageChange?: (page: number) => void;
 }
 export const Pagination: React.FC<Props> = ({
 	currentPage = 1,
-	totalPages = 1,
 	itemsPerPage = 10,
+	totalItems,
+	totalPages: totals,
 	onPerPageChange,
 	onPageChange,
 }: Props) => {
 	const perPageOptions = [10, 25, 50];
 
+	const totalPages = Math.ceil(totalItems / Number(itemsPerPage));
 	const safeTotalPages = totalPages < 1 ? 1 : totalPages;
 
 	return (

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@hooks';
 import { SearchBar, Pagination, openModal, EModalType, EModalMode, DynamicPieChart } from '@common';
 import {
@@ -8,23 +8,18 @@ import {
 	productThunk,
 	type TProduct,
 	selectProductStats,
-	productQuerySchema,
 } from '@products';
 import { Button } from '@ui';
-import { debounce } from '@utils';
-import { setCurrentPage } from '@products';
+
 import { LuPackageMinus, LuPackageOpen } from 'react-icons/lu';
 import { TbPackages } from 'react-icons/tb';
 import type { IconType } from 'react-icons';
 import { EOrderStatus, EOrderType, type TOrderForm } from '@orders';
 import { ECRUDMode } from '@enums';
-import { useSearchParams } from 'react-router';
+import { useProductQuery } from '@/features/products/product.hook';
 
 export const ProductsPage = () => {
-	const FIRST_PAGE = 1;
-
-	const [term, setTerm] = useState<string>('');
-	const [searchParams, setSearchParams] = useSearchParams();
+	const { filters, setParam, debouncedSearch, handleTerm, term, setLimit, setPage } = useProductQuery();
 
 	const pagination = useAppSelector(selectProductsPagination);
 	const dispatch = useAppDispatch();
@@ -32,72 +27,9 @@ export const ProductsPage = () => {
 
 	const productStats = useAppSelector(selectProductStats);
 
-	const page = Number(searchParams.get('page')) || 1;
-	const limit = Number(searchParams.get('limit')) || 10;
-	const search = searchParams.get('search') || term;
-	const categoryId = searchParams.get('categoryId') || undefined;
-
-	useEffect(() => {
-		const fetchTableData = async () => {
-			setTerm(search);
-
-			const payload = {
-				search,
-				page,
-				limit,
-				categoryId,
-				sort: 'createdAt',
-				order: 'desc',
-			};
-			const result = productQuerySchema.safeParse(payload);
-			if (!result.success) {
-				console.error(result.error);
-				return;
-			}
-
-			await dispatch(productThunk.getCollection(result.data));
-		};
-
-		fetchTableData();
-	}, [dispatch, page, limit, categoryId]);
-
 	useEffect(() => {
 		dispatch(productThunk.getStats());
 	}, [dispatch]);
-
-	const debouncedSearch = useMemo(
-		() =>
-			debounce((term) => {
-				const payload = {
-					search: term,
-					page: FIRST_PAGE,
-					limit,
-					categoryId,
-					sort: 'createdAt',
-					order: 'desc',
-				};
-				const result = productQuerySchema.safeParse(payload);
-
-				if (!result.success) {
-					console.error(result);
-					return;
-				}
-
-				dispatch(productThunk.getCollection(result.data));
-
-				searchParams.set('page', String(FIRST_PAGE));
-				searchParams.set('search', term);
-
-				setSearchParams(searchParams);
-			}, 500),
-		[dispatch, limit, categoryId, searchParams, setSearchParams],
-	);
-
-	useEffect(() => {
-		return () => {
-			debouncedSearch.cancel();
-		};
-	}, [debouncedSearch]);
 
 	const handleDelete = async (product: TProduct) => {
 		dispatch(openModal({ data: product, type: EModalType.PRODUCT, mode: EModalMode.DELETE }));
@@ -107,20 +39,12 @@ export const ProductsPage = () => {
 		dispatch(openModal({ data: product, type: EModalType.PRODUCT, mode: EModalMode.EDIT }));
 	};
 
-	const handlePageChange = (pageNum: number) => {
-		dispatch(setCurrentPage(pageNum));
-
-		searchParams.set('page', String(pageNum));
-		setSearchParams(searchParams);
+	const handlePageChange = (page: number) => {
+		setPage(page);
 	};
 
 	const handlePerPageChange = (perPage: number) => {
-		// dispatch(setItemsPerPage(perPage));
-		// dispatch(setCurrentPage(page));
-		console.log('handlePerPageChange', perPage);
-
-		searchParams.set('limit', String(perPage));
-		setSearchParams(searchParams);
+		setLimit(perPage);
 	};
 
 	const handleReorder = async (product: TProduct) => {
@@ -159,7 +83,7 @@ export const ProductsPage = () => {
 							<SearchBar
 								value={term}
 								onSearch={(newValue) => {
-									setTerm(newValue);
+									handleTerm(newValue);
 									debouncedSearch(newValue);
 								}}
 								placeholder="Search..."
@@ -187,9 +111,10 @@ export const ProductsPage = () => {
 				</section>
 				{/* Pagination */}
 				<Pagination
-					currentPage={page}
+					currentPage={filters.pagination.page}
 					totalPages={pagination?.totalPages}
-					itemsPerPage={limit}
+					itemsPerPage={filters.pagination.limit}
+					totalItems={pagination.totalItems}
 					onPageChange={handlePageChange}
 					onPerPageChange={handlePerPageChange}
 				/>

@@ -4,11 +4,15 @@ import { useSearchParams } from 'react-router';
 import { productThunk } from './product.thunk';
 import {
 	productQuerySchema,
+	type TProduct,
 	type TProductQuery,
 	type TProductQueryInput,
 	type TProductQueryOutput,
 } from './product.schema';
 import { debounce } from '@/shared/utils';
+import { EModalMode, EModalType, openModal } from '@/shared/components/common';
+import { EOrderStatus, EOrderType, type TOrderForm } from '../orders';
+import { ECRUDMode } from '@/shared/enums';
 
 const FIRST_PAGE = 1;
 
@@ -144,4 +148,55 @@ export const useProductQuery = () => {
 	}, [dispatch]);
 
 	return { filters, setParam, resetFilters, fetchProducts, debouncedSearch, handleTerm, term, setLimit, setPage };
+};
+
+export const useProductHandlers = ({
+	setLimit,
+	setPage,
+}: {
+	setLimit: (limit: number) => void;
+	setPage: (page: number) => void;
+}) => {
+	const dispatch = useAppDispatch();
+
+	const handleDelete = async (product: TProduct) => {
+		dispatch(openModal({ data: product, type: EModalType.PRODUCT, mode: EModalMode.DELETE }));
+	};
+
+	const handleEdit = async (product: TProduct) => {
+		dispatch(openModal({ data: product, type: EModalType.PRODUCT, mode: EModalMode.EDIT }));
+	};
+	const handleReorder = async (product: TProduct) => {
+		const data: TOrderForm = {
+			...product,
+			productId: product.id,
+			quantity: 1,
+			mode: ECRUDMode.CREATE,
+			status: EOrderStatus.PENDING,
+			type: EOrderType.REORDER,
+		};
+
+		dispatch(openModal({ data, type: EModalType.ORDER, mode: EModalMode.CREATE }));
+	};
+
+	const handlePageChange = (page: number) => {
+		setPage(page);
+	};
+
+	const handleLimitChange = (limit: number) => {
+		setLimit(limit);
+	};
+
+	const handleAddProduct = () => {
+		dispatch(openModal({ data: null, mode: EModalMode.CREATE, type: EModalType.PRODUCT }));
+	};
+
+	return {
+		handleDelete,
+		handleEdit,
+		handlePageChange,
+		handleLimitChange,
+		handleReorder,
+		handleAddProduct,
+	};
 };

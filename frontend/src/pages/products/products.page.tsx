@@ -1,64 +1,25 @@
-import { useEffect } from 'react';
-import { useAppDispatch, useAppSelector } from '@hooks';
-import { SearchBar, Pagination, openModal, EModalType, EModalMode, DynamicPieChart } from '@common';
-import {
-	selectProducts,
-	selectProductsPagination,
-	ProductTable,
-	productThunk,
-	type TProduct,
-	selectProductStats,
-} from '@products';
+import {} from 'react';
+import { useAppSelector } from '@hooks';
+import { SearchBar, Pagination } from '@common';
+import { selectProducts, selectProductsPagination, ProductTable, selectProductStats } from '@products';
 import { Button } from '@ui';
 
 import { LuPackageMinus, LuPackageOpen } from 'react-icons/lu';
 import { TbPackages } from 'react-icons/tb';
 import type { IconType } from 'react-icons';
-import { EOrderStatus, EOrderType, type TOrderForm } from '@orders';
-import { ECRUDMode } from '@enums';
-import { useProductQuery } from '@/features/products/product.hook';
+import { useProductHandlers, useProductQuery } from '@/features/products/product.hook';
 
 export const ProductsPage = () => {
 	const { filters, setParam, debouncedSearch, handleTerm, term, setLimit, setPage } = useProductQuery();
+	const { handleDelete, handleEdit, handleLimitChange, handlePageChange, handleReorder, handleAddProduct } =
+		useProductHandlers({
+			setLimit,
+			setPage,
+		});
 
 	const pagination = useAppSelector(selectProductsPagination);
-	const dispatch = useAppDispatch();
 	const products = useAppSelector(selectProducts);
-
 	const productStats = useAppSelector(selectProductStats);
-
-	useEffect(() => {
-		dispatch(productThunk.getStats());
-	}, [dispatch]);
-
-	const handleDelete = async (product: TProduct) => {
-		dispatch(openModal({ data: product, type: EModalType.PRODUCT, mode: EModalMode.DELETE }));
-	};
-
-	const handleEdit = async (product: TProduct) => {
-		dispatch(openModal({ data: product, type: EModalType.PRODUCT, mode: EModalMode.EDIT }));
-	};
-
-	const handlePageChange = (page: number) => {
-		setPage(page);
-	};
-
-	const handlePerPageChange = (perPage: number) => {
-		setLimit(perPage);
-	};
-
-	const handleReorder = async (product: TProduct) => {
-		const data: TOrderForm = {
-			...product,
-			productId: product.id,
-			quantity: 1,
-			mode: ECRUDMode.CREATE,
-			status: EOrderStatus.PENDING,
-			type: EOrderType.REORDER,
-		};
-
-		dispatch(openModal({ data, type: EModalType.ORDER, mode: EModalMode.CREATE }));
-	};
 
 	return (
 		<section className="pt-4 flex flex-col h-full">
@@ -93,9 +54,7 @@ export const ProductsPage = () => {
 						<Button
 							className="w-fit flex items-center gap-1 text-white"
 							style={{ width: 138, height: 40 }}
-							onClick={() =>
-								dispatch(openModal({ data: null, mode: EModalMode.CREATE, type: EModalType.PRODUCT }))
-							}
+							onClick={handleAddProduct}
 						>
 							+ Add Product
 						</Button>
@@ -116,7 +75,7 @@ export const ProductsPage = () => {
 					itemsPerPage={filters.pagination.limit}
 					totalItems={pagination.totalItems}
 					onPageChange={handlePageChange}
-					onPerPageChange={handlePerPageChange}
+					onPerPageChange={handleLimitChange}
 				/>
 			</section>
 		</section>

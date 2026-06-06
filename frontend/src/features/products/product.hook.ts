@@ -1,18 +1,12 @@
-import { useAppDispatch } from '@/shared/hooks';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router';
+import { useAppDispatch } from '@hooks';
 import { productThunk } from './product.thunk';
-import {
-	productQuerySchema,
-	type TProduct,
-	type TProductQuery,
-	type TProductQueryInput,
-	type TProductQueryOutput,
-} from './product.schema';
-import { debounce } from '@/shared/utils';
-import { EModalMode, EModalType, openModal } from '@/shared/components/common';
+import { productQuerySchema, type TProduct, type TProductQueryInput, type TProductQueryOutput } from './product.schema';
+import { debounce } from '@utils';
+import { EModalMode, EModalType, openModal } from '@common';
 import { EOrderStatus, EOrderType, type TOrderForm } from '../orders';
-import { ECRUDMode } from '@/shared/enums';
+import { ECRUDMode } from '@enums';
 
 const FIRST_PAGE = 1;
 

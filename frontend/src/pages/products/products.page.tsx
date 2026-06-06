@@ -1,13 +1,19 @@
 import {} from 'react';
-import { useAppSelector } from '@hooks';
-import { SearchBar, Pagination } from '@common';
-import { selectProducts, selectProductsPagination, ProductTable, selectProductStats } from '@products';
-import { Button } from '@ui';
-
+import type { IconType } from 'react-icons';
 import { LuPackageMinus, LuPackageOpen } from 'react-icons/lu';
 import { TbPackages } from 'react-icons/tb';
-import type { IconType } from 'react-icons';
-import { useProductHandlers, useProductQuery } from '@/features/products/product.hook';
+
+import { useAppSelector } from '@hooks';
+import { SearchBar, Pagination } from '@common';
+import {
+	selectProducts,
+	selectProductsPagination,
+	ProductTable,
+	selectProductStats,
+	useProductHandlers,
+	useProductQuery,
+} from '@products';
+import { Button } from '@ui';
 
 export const ProductsPage = () => {
 	const { filters, setParam, debouncedSearch, handleTerm, term, setLimit, setPage } = useProductQuery();

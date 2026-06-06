@@ -61,7 +61,7 @@ export abstract class BaseController<
 			payload.image = image;
 		}
 
-		// handling an array of string images for re-order case
+		// handling an existing images for re-order case
 		let existingImages: string[] = [];
 		if (body?.images) {
 			if (Array.isArray(body.images)) {

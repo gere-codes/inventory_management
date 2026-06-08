@@ -3,24 +3,18 @@ import z from 'zod';
 export const commonQuery = z.object({
 	isPaginated: z.boolean().default(true),
 	page: z.coerce.number().int().positive().default(1),
-	limit: z.coerce.number().int().positive().max(50).default(10),
+	limit: z.coerce.number().int().positive().min(10).max(50).default(10),
 	order: z.enum(['asc', 'desc']).default('desc'),
 	search: z.string().optional(),
+	offset: z.number().optional(),
+	sort: 'createdAt',
 });
-export const baseQuerySchema = commonQuery.transform((raw) => ({
-	isPaginated: raw.isPaginated,
-	pagination: {
-		page: raw.page,
-		limit: raw.limit,
-		offset: (raw.page - 1) * raw.limit,
-	},
-	filter: {
-		search: raw.search,
-	},
-	sort: {
-		field: 'createdAt',
-		order: raw.order,
-	},
-}));
+
+export const withOffset = <T extends { page: number; limit: number }>(data: T) => ({
+	...data,
+	offset: (data.page - 1) * data.limit,
+});
+
+export const baseQuerySchema = commonQuery.transform(withOffset);
 
 export type TBaseQuery = z.infer<typeof baseQuerySchema>;

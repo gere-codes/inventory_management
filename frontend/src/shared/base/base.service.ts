@@ -51,29 +51,11 @@ export abstract class BaseService<
 
 		if (!params) return query;
 
-		if (params.isPaginated !== undefined) {
-			query.isPaginated = Boolean(params.isPaginated);
-		}
-
-		if (params.pagination) {
-			const { page, limit, offset } = params.pagination;
-			if (page) query.page = page;
-			if (limit) query.limit = limit;
-			if (offset) query.offset = offset;
-		}
-
-		if (params.filter && typeof params.filter === 'object') {
-			Object.entries(params.filter).forEach(([key, value]) => {
-				if (value !== undefined && value !== null && value !== '') {
-					query[key] = value;
-				}
-			});
-		}
-
-		if (params.sort?.field) {
-			query.sort = params.sort.field;
-			query.order = params.sort.order || 'desc';
-		}
+		Object.entries(params).forEach(([key, value]) => {
+			if (value !== undefined && value !== null) {
+				query[key] = value;
+			}
+		});
 
 		return query;
 	}

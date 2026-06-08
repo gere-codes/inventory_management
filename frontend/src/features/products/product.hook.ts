@@ -97,10 +97,10 @@ export const useProductQuery = () => {
 		() =>
 			debounce((term: string) => {
 				const payload = {
+					...filters,
 					search: term,
 					page: FIRST_PAGE,
 				};
-				console.log(payload);
 				const result = productQuerySchema.safeParse(payload);
 
 				if (!result.success) {

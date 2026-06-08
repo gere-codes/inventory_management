@@ -1,5 +1,5 @@
 import { EModalMode } from '@/shared/components/common';
-import { commonQuery } from '@/shared/schema';
+import { commonQuery, withOffset } from '@/shared/schema';
 import z from 'zod';
 
 export const supplierCreateSchema = z.object({
@@ -51,20 +51,6 @@ export const suppplierQuerySchema = commonQuery
 		search: z.string().optional(),
 		sort: z.enum(['createdAt', 'name']).default('createdAt'),
 	})
-	.transform((raw) => ({
-		isPaginated: raw.isPaginated,
-		pagination: {
-			page: raw.page,
-			limit: raw.limit,
-			offset: (raw.page - 1) * raw.limit,
-		},
-		filter: {
-			search: raw.search,
-		},
-		sort: {
-			field: raw.sort,
-			order: raw.order,
-		},
-	}));
+	.transform(withOffset);
 
 export type TSupplierQuery = z.infer<typeof suppplierQuerySchema>;

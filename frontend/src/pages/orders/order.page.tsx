@@ -13,7 +13,7 @@ export const OrdersPage = () => {
 	const [term, setTerm] = useState<string>('');
 	const [searchParams, setSearchParams] = useSearchParams();
 
-	const { totalPages } = useAppSelector(selectOrderPagination);
+	const { totalPages, totalItems } = useAppSelector(selectOrderPagination);
 	const orders = useAppSelector(selectOrderList);
 	const dispatch = useAppDispatch();
 
@@ -131,6 +131,7 @@ export const OrdersPage = () => {
 
 			{/* Pagination */}
 			<Pagination
+				totalItems={totalItems}
 				currentPage={page}
 				totalPages={totalPages}
 				itemsPerPage={limit}

@@ -1,4 +1,4 @@
-import { commonQuery } from '@/shared/schema';
+import { commonQuery, withOffset } from '@/shared/schema';
 import z, { nullable } from 'zod';
 const imageSchema = z.union([
 	z.instanceof(File).refine((f) => f.size <= 5 * 1024 * 1024, 'Max 5MB'),
@@ -45,20 +45,6 @@ export const categoryQuerySchema = commonQuery
 		search: z.string().optional(),
 		sort: z.enum(['createdAt', 'name']).default('createdAt'),
 	})
-	.transform((raw) => ({
-		isPaginated: raw.isPaginated,
-		pagination: {
-			page: raw.page,
-			limit: raw.limit,
-			offset: (raw.page - 1) * raw.limit,
-		},
-		filter: {
-			search: raw.search,
-		},
-		sort: {
-			field: raw.sort,
-			order: raw.order,
-		},
-	}));
+	.transform(withOffset);
 
 export type TCategoryQuery = z.infer<typeof categoryQuerySchema>;

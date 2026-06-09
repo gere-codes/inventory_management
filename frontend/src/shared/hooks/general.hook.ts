@@ -27,3 +27,55 @@ export const useQueryParams = <TQuery extends TBaseQuery = TBaseQuery>({
 
 	return { filters, searchParams };
 };
+
+export const usePaginationParams = <TQuery extends TBaseQuery = TBaseQuery>({
+	setSearchParams,
+}: {
+	setSearchParams: SetURLSearchParams;
+}) => {
+	// Dynamic setter
+	const setParam = <K extends Extract<keyof TQuery, string>>(key: K, value: TQuery[K]) => {
+		setSearchParams((prev) => {
+			const newParams = new URLSearchParams(prev);
+
+			if (value === undefined || value === null || value === '') {
+				newParams.delete(key);
+			} else {
+				newParams.set(key, String(value));
+			}
+
+			return newParams;
+		});
+	};
+
+	// Sets a limit to the number of items per page
+	const setLimit = (limit: number) => {
+		setSearchParams((prev) => {
+			const newParams = new URLSearchParams(prev);
+			newParams.set('limit', String(limit));
+			newParams.set('page', String(FIRST_PAGE));
+			return newParams;
+		});
+	};
+
+	// Sets the current page as paginating
+	const setPage = (page: number) => {
+		setSearchParams((prev) => {
+			const newParams = new URLSearchParams(prev);
+			newParams.set('page', String(page));
+			return newParams;
+		});
+	};
+
+	// Rests the URL params
+	const resetFilters = () => {
+		setSearchParams(new URLSearchParams());
+	};
+
+	return {
+		setParam,
+		setPage,
+		setLimit,
+		resetFilters,
+	};
+};

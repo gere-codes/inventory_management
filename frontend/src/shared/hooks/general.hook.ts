@@ -110,3 +110,87 @@ export const useDebouncedCallback = <T extends (...args: any[]) => any>(callback
 		engineRef.current?.run(...args);
 	}, []);
 };
+
+interface IUseCollectionFilter<TEntity, TQuery extends TBaseQuery = TBaseQuery> {
+	schema: z.ZodSchema<TQuery>;
+	thunkAction: AsyncThunk<any, TQuery, any>;
+	selectData: (state: any) => TEntity[];
+	selectStatus: (state: any) => string;
+	selectPagination: (state: any) => any;
+}
+
+export const useCollectionFilter = <TEntity, TQuery extends TBaseQuery = TBaseQuery>({
+	schema,
+	thunkAction,
+	selectData,
+	selectStatus,
+	selectPagination,
+}: IUseCollectionFilter<TEntity, TQuery>) => {
+	const dispatch = useAppDispatch();
+	const [searchParams, setSearchParams] = useSearchParams();
+	const [searchTerm, setSearchTerm] = useState<string>('');
+
+	const data = useAppSelector(selectData);
+	const status = useAppSelector(selectStatus);
+	const pagination = useAppSelector(selectPagination);
+
+	const { filters } = useQueryParams<TQuery>({ schema, searchParams });
+	const {
+		setParam,
+		setPage,
+		setLimit,
+		resetFilters: clearUrlFilters,
+	} = usePaginationParams<TQuery>({ setSearchParams });
+
+	// Persists the search term state
+	const searchParam = searchParams.get('search') || '';
+	useEffect(() => {
+		setSearchTerm(searchParam);
+	}, [searchParam]);
+
+	const fetchData = useCallback(() => {
+		dispatch(thunkAction(filters as unknown as TQuery & undefined));
+	}, [filters, dispatch, thunkAction]);
+
+	useEffect(() => {
+		fetchData();
+	}, [fetchData]);
+
+	const debouncedSearchUpdate = useDebouncedCallback((nextTerm: string) => {
+		setSearchParams((prev) => {
+			const newParams = new URLSearchParams(prev);
+
+			if (!nextTerm) {
+				newParams.delete('search');
+			} else {
+				newParams.set('search', nextTerm);
+			}
+
+			newParams.set('page', '1');
+			return newParams;
+		});
+	}, 500);
+
+	const handleSearchChange = (value: string) => {
+		setSearchTerm(value);
+		debouncedSearchUpdate(value);
+	};
+
+	return {
+		searchTerm,
+		filters,
+		data,
+		status,
+		pagination,
+
+		fetchData,
+		handleSearchChange,
+		setPage,
+		setLimit,
+		setParam,
+		resetFilters: () => {
+			setSearchTerm('');
+			clearUrlFilters();
+		},
+	};
+};

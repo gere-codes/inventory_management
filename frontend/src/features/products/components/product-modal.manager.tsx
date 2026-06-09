@@ -1,7 +1,6 @@
 import { closeModal, Confirmation, EModalMode } from '@common';
 import type { TProduct, TProductFormValues } from '../product.schema';
-import { useAppDispatch, useAppSelector } from '@hooks';
-import { selectProducts, selectProductsPagination } from '../product.selectors';
+import { useAppDispatch } from '@hooks';
 import { productThunk } from '../product.thunk';
 import { ProductForm } from './product.form';
 
@@ -12,8 +11,6 @@ interface Props {
 
 export const ProductModalManager = ({ productData, mode }: Props) => {
 	const dispatch = useAppDispatch();
-	const products = useAppSelector(selectProducts);
-	const { page, limit } = useAppSelector(selectProductsPagination);
 
 	const close = () => {
 		dispatch(closeModal());
@@ -22,14 +19,6 @@ export const ProductModalManager = ({ productData, mode }: Props) => {
 	const handleDelete = async () => {
 		if (!productData?.id) return;
 		await dispatch(productThunk.delete(productData.id)).unwrap();
-		const nextPage = page !== 1 && products.length === 1 ? page - 1 : page;
-		dispatch(
-			productThunk.paginate({
-				page: nextPage,
-				limit: limit,
-			}),
-		);
-
 		close();
 	};
 

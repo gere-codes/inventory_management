@@ -171,9 +171,20 @@ export const useCollectionFilter = <TEntity, TQuery extends TBaseQuery = TBaseQu
 		});
 	}, 500);
 
+	// Handle Search change
 	const handleSearchChange = (value: string) => {
 		setSearchTerm(value);
 		debouncedSearchUpdate(value);
+	};
+
+	// handle pagination
+	const handlePageChange = (page: number) => {
+		setPage(page);
+	};
+
+	// handle limit
+	const handleLimitChange = (page: number) => {
+		setLimit(page);
 	};
 
 	return {
@@ -188,6 +199,8 @@ export const useCollectionFilter = <TEntity, TQuery extends TBaseQuery = TBaseQu
 		setPage,
 		setLimit,
 		setParam,
+		handlePageChange,
+		handleLimitChange,
 		resetFilters: () => {
 			setSearchTerm('');
 			clearUrlFilters();

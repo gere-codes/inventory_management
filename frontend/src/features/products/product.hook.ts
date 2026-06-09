@@ -16,6 +16,8 @@ export const useProductFilter = () => {
 		handleSearchChange,
 		pagination,
 		resetFilters,
+		handlePageChange,
+		handleLimitChange,
 		setParam,
 		status,
 		data,
@@ -33,6 +35,8 @@ export const useProductFilter = () => {
 		setPage,
 		fetchData,
 		searchTerm,
+		handlePageChange,
+		handleLimitChange,
 		handleSearchChange,
 		pagination,
 		resetFilters,
@@ -42,15 +46,7 @@ export const useProductFilter = () => {
 	};
 };
 
-export const useProductHandlers = ({
-	setLimit,
-	setPage,
-	fetchData,
-}: {
-	setLimit: (limit: number) => void;
-	setPage: (page: number) => void;
-	fetchData: () => void;
-}) => {
+export const useProductHandlers = ({ fetchData }: { fetchData: () => void }) => {
 	const dispatch = useAppDispatch();
 
 	const handleDelete = async (product: TProduct) => {
@@ -75,14 +71,6 @@ export const useProductHandlers = ({
 		dispatch(openModal({ data, type: EModalType.ORDER, mode: EModalMode.CREATE }));
 	};
 
-	const handlePageChange = (page: number) => {
-		setPage(page);
-	};
-
-	const handleLimitChange = (limit: number) => {
-		setLimit(limit);
-	};
-
 	const handleAddProduct = () => {
 		dispatch(openModal({ data: null, mode: EModalMode.CREATE, type: EModalType.PRODUCT }));
 	};
@@ -90,8 +78,6 @@ export const useProductHandlers = ({
 	return {
 		handleDelete,
 		handleEdit,
-		handlePageChange,
-		handleLimitChange,
 		handleReorder,
 		handleAddProduct,
 	};

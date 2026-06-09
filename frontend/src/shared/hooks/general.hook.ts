@@ -8,13 +8,9 @@ import type { AsyncThunk } from '@reduxjs/toolkit';
 
 const FIRST_PAGE = 1;
 
-export const useQueryParams = <TQuery extends TBaseQuery = TBaseQuery>({
-	schema,
-	searchParams,
-}: {
-	schema: z.ZodSchema<TQuery>;
-	searchParams: URLSearchParams;
-}) => {
+export const useQueryParams = <TQuery extends TBaseQuery = TBaseQuery>({ schema }: { schema: z.ZodSchema<TQuery> }) => {
+	const [searchParams, setSearchParams] = useSearchParams();
+
 	const filters = useMemo(() => {
 		try {
 			const queryParams = Object.fromEntries(searchParams.entries());
@@ -25,7 +21,26 @@ export const useQueryParams = <TQuery extends TBaseQuery = TBaseQuery>({
 		}
 	}, [searchParams, schema]);
 
-	return { filters, searchParams };
+	return { filters, searchParams, setSearchParams };
+};
+
+export const useFetchData = <TQuery extends TBaseQuery = TBaseQuery>({
+	schema,
+	thunkAction,
+}: {
+	schema: z.ZodSchema<TQuery>;
+	thunkAction: AsyncThunk<any, TQuery, any>;
+}) => {
+	const dispatch = useAppDispatch();
+	const { filters } = useQueryParams({ schema });
+
+	const fetchData = useCallback(() => {
+		dispatch(thunkAction(filters as unknown as TQuery & undefined));
+	}, [dispatch, filters, thunkAction]);
+
+	return {
+		fetchData,
+	};
 };
 
 export const usePaginationParams = <TQuery extends TBaseQuery = TBaseQuery>({
@@ -127,14 +142,13 @@ export const useCollectionFilter = <TEntity, TQuery extends TBaseQuery = TBaseQu
 	selectPagination,
 }: IUseCollectionFilter<TEntity, TQuery>) => {
 	const dispatch = useAppDispatch();
-	const [searchParams, setSearchParams] = useSearchParams();
 	const [searchTerm, setSearchTerm] = useState<string>('');
 
 	const data = useAppSelector(selectData);
 	const status = useAppSelector(selectStatus);
 	const pagination = useAppSelector(selectPagination);
 
-	const { filters } = useQueryParams<TQuery>({ schema, searchParams });
+	const { filters, searchParams, setSearchParams } = useQueryParams<TQuery>({ schema });
 	const {
 		setParam,
 		setPage,

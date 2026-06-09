@@ -43,3 +43,21 @@ export const useOrderFilter = () => {
 		data,
 	};
 };
+
+export const useOrderHanlders = ({ fetchData }: { fetchData: () => void }) => {
+	const dispatch = useAppDispatch();
+
+	const handleEdit = async (order: TOrder) => {
+		dispatch(openModal({ data: order, type: EModalType.ORDER, mode: EModalMode.EDIT }));
+		fetchData();
+	};
+	const handleAdd = async () => {
+		dispatch(openModal({ data: null, type: EModalType.ORDER, mode: EModalMode.CREATE }));
+		fetchData();
+	};
+
+	return {
+		handleEdit,
+		handleAdd,
+	};
+};

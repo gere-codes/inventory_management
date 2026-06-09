@@ -79,3 +79,34 @@ export const usePaginationParams = <TQuery extends TBaseQuery = TBaseQuery>({
 		resetFilters,
 	};
 };
+
+export const useDebouncedCallback = <T extends (...args: any[]) => any>(callback: T, delay: number) => {
+	const callbackRef = useRef(callback);
+	useEffect(() => {
+		callbackRef.current = callback;
+	}, [callback]);
+
+	const engineRef = useRef<{
+		run: (...args: Parameters<T>) => void;
+		cancel: () => void;
+	} | null>(null);
+
+	useEffect(() => {
+		const inst = debounce((...args: Parameters<T>) => {
+			callbackRef.current(...args);
+		}, delay);
+
+		engineRef.current = {
+			run: inst,
+			cancel: inst.cancel,
+		};
+
+		return () => {
+			inst.cancel();
+		};
+	}, [delay]);
+
+	return useCallback((...args: Parameters<T>) => {
+		engineRef.current?.run(...args);
+	}, []);
+};

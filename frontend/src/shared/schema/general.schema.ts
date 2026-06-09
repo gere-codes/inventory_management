@@ -6,7 +6,6 @@ export const commonQuery = z.object({
 	limit: z.coerce.number().int().positive().min(10).max(50).default(10),
 	order: z.enum(['asc', 'desc']).default('desc'),
 	search: z.string().optional(),
-	offset: z.number().optional(),
 	sort: 'createdAt',
 });
 

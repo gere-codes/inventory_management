@@ -5,26 +5,21 @@ import { TbPackages } from 'react-icons/tb';
 
 import { useAppSelector } from '@hooks';
 import { SearchBar, Pagination } from '@common';
-import {
-	selectProducts,
-	selectProductsPagination,
-	ProductTable,
-	selectProductStats,
-	useProductHandlers,
-	useProductQuery,
-} from '@products';
+import { ProductTable, selectProductStats, useProductHandlers } from '@products';
 import { Button } from '@ui';
+import { useProductFilter } from '@/features/products/product.hook';
 
 export const ProductsPage = () => {
-	const { filters, setParam, debouncedSearch, handleTerm, term, setLimit, setPage } = useProductQuery();
+	const { filters, setLimit, setPage, fetchData, searchTerm, handleSearchChange, pagination, status, data } =
+		useProductFilter();
+
 	const { handleDelete, handleEdit, handleLimitChange, handlePageChange, handleReorder, handleAddProduct } =
 		useProductHandlers({
 			setLimit,
 			setPage,
+			fetchData,
 		});
 
-	const pagination = useAppSelector(selectProductsPagination);
-	const products = useAppSelector(selectProducts);
 	const productStats = useAppSelector(selectProductStats);
 
 	return (
@@ -48,10 +43,10 @@ export const ProductsPage = () => {
 						<div className="flex flex-col gap-2 flex-1">
 							<h2 className="text-xl font-bold">Products List</h2>
 							<SearchBar
-								value={term}
+								value={searchTerm}
 								onSearch={(newValue) => {
-									handleTerm(newValue);
-									debouncedSearch(newValue);
+									// handleTerm(newValue);
+									handleSearchChange(newValue);
 								}}
 								placeholder="Search..."
 							/>
@@ -67,12 +62,7 @@ export const ProductsPage = () => {
 					</section>
 
 					{/* Table */}
-					<ProductTable
-						products={products}
-						onDelete={handleDelete}
-						onEdit={handleEdit}
-						onOrder={handleReorder}
-					/>
+					<ProductTable products={data} onDelete={handleDelete} onEdit={handleEdit} onOrder={handleReorder} />
 				</section>
 				{/* Pagination */}
 				<Pagination

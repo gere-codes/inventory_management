@@ -1,6 +1,6 @@
 import { suppplierQuerySchema, type TSupplier } from './supplier.schema';
 import { selectSuppliersList, selectSuppliersPagination, selectSuppliersStatus } from './supplier.selectors';
-import { closeModal } from '@common';
+import { closeModal, EModalMode, EModalType, openModal } from '@common';
 import { useAppDispatch, useAppSelector, useCollectionFilter } from '@hooks';
 import { supplierThunk } from './supplier.thunk';
 
@@ -55,5 +55,25 @@ export const useSupplierFilter = () => {
 		setParam,
 		status,
 		data,
+	};
+};
+
+export const useSupplierHanlders = () => {
+	const dispatch = useAppDispatch();
+
+	const handleEdit = async (order: TSupplier) => {
+		dispatch(openModal({ data: order, type: EModalType.SUPPLIER, mode: EModalMode.EDIT }));
+	};
+	const handleDelete = async (order: TSupplier) => {
+		dispatch(openModal({ data: order, type: EModalType.SUPPLIER, mode: EModalMode.DELETE }));
+	};
+	const handleAdd = async () => {
+		dispatch(openModal({ data: null, type: EModalType.SUPPLIER, mode: EModalMode.CREATE }));
+	};
+
+	return {
+		handleEdit,
+		handleAdd,
+		handleDelete,
 	};
 };

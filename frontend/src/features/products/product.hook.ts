@@ -4,7 +4,12 @@ import { productQuerySchema, type TProduct } from './product.schema';
 import { EModalMode, EModalType, openModal } from '@common';
 import { EOrderStatus, EOrderType, type TOrderForm } from '../orders';
 import { ECRUDMode } from '@enums';
-import { selectProducts, selectProductsPagination, selectProductsStatus } from './product.selectors';
+import {
+	selectProducts,
+	selectProductsPagination,
+	selectProductsStatus,
+	selectProductStats,
+} from './product.selectors';
 
 export const useProductFilter = () => {
 	const {
@@ -16,8 +21,7 @@ export const useProductFilter = () => {
 		handleSearchChange,
 		pagination,
 		resetFilters,
-		handlePageChange,
-		handleLimitChange,
+
 		setParam,
 		status,
 		data,
@@ -35,8 +39,6 @@ export const useProductFilter = () => {
 		setPage,
 		fetchData,
 		searchTerm,
-		handlePageChange,
-		handleLimitChange,
 		handleSearchChange,
 		pagination,
 		resetFilters,
@@ -83,6 +85,12 @@ export const useProductHandlers = () => {
 };
 
 export const useProductData = () => {
-	const { fetchData } = useFetchData({ schema: productQuerySchema, thunkAction: productThunk.getCollection });
-	return fetchData;
+	const { fetchData, data, pagination, status } = useFetchData({
+		schema: productQuerySchema,
+		thunkAction: productThunk.getCollection,
+		selectData: selectProducts,
+		selectPagination: selectProductsPagination,
+		selectStatus: selectProductsStatus,
+	});
+	return { fetchData, data, pagination, status };
 };

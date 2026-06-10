@@ -9,10 +9,10 @@ import { selectSuppliersPagination } from '../supplier.selectors';
 
 interface Props {
 	mode: EModalMode.CREATE | EModalMode.EDIT;
-	supplierData: TSupplier;
+	initialData: TSupplier;
 }
 
-export const SupplierForm = ({ mode, supplierData }: Props) => {
+export const SupplierForm = ({ mode, initialData }: Props) => {
 	const {
 		register,
 		handleSubmit,
@@ -23,7 +23,7 @@ export const SupplierForm = ({ mode, supplierData }: Props) => {
 
 		defaultValues: {
 			mode: mode,
-			...supplierData,
+			...initialData,
 		},
 	});
 
@@ -46,7 +46,6 @@ export const SupplierForm = ({ mode, supplierData }: Props) => {
 			await dispatch(supplierThunk.update({ id: data.id, body }));
 		} else {
 			await dispatch(supplierThunk.create(body));
-			await dispatch(supplierThunk.getCollection({ pagination: { limit, page, disabled: false } }));
 		}
 		dispatch(closeModal());
 	};

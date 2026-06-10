@@ -1,7 +1,7 @@
 import { suppplierQuerySchema, type TSupplier } from './supplier.schema';
 import { selectSuppliersList, selectSuppliersPagination, selectSuppliersStatus } from './supplier.selectors';
 import { closeModal, EModalMode, EModalType, openModal } from '@common';
-import { useAppDispatch, useAppSelector, useCollectionFilter } from '@hooks';
+import { useAppDispatch, useAppSelector, useCollectionFilter, useFetchData } from '@hooks';
 import { supplierThunk } from './supplier.thunk';
 
 export const useSupplierManager = (supplierData: TSupplier) => {
@@ -76,4 +76,9 @@ export const useSupplierHanlders = () => {
 		handleAdd,
 		handleDelete,
 	};
+};
+
+export const useSupplierData = () => {
+	const { fetchData } = useFetchData({ schema: suppplierQuerySchema, thunkAction: supplierThunk.getCollection });
+	return fetchData;
 };

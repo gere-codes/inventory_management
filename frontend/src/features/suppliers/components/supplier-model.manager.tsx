@@ -1,7 +1,8 @@
 import type { TSupplier } from '../supplier.schema';
 import { SupplierForm } from './supplier.form';
-import { Confirmation, EModalMode } from '@common';
-import { useSupplierManager } from '../supplier.hook';
+import { Confirmation, EModalMode, EntityModalManager } from '@common';
+import { useSupplierData, useSupplierManager } from '../supplier.hook';
+import { supplierThunk } from '../supplier.thunk';
 
 interface Props {
 	mode: EModalMode;
@@ -9,22 +10,16 @@ interface Props {
 }
 
 export const SupplierModalManager = ({ mode, supplierData }: Props) => {
-	const { close, handleDelete } = useSupplierManager(supplierData);
+	const fetchSupplier = useSupplierData();
 
-	switch (mode) {
-		case EModalMode.DELETE:
-			return (
-				<Confirmation
-					title="Delete Supplier?"
-					name={supplierData.name}
-					onCancel={close}
-					onConfirm={handleDelete}
-				/>
-			);
-		case EModalMode.CREATE:
-		case EModalMode.EDIT:
-			return <SupplierForm supplierData={supplierData} mode={mode} />;
-		default:
-			return null;
-	}
+	return (
+		<EntityModalManager
+			mode={mode}
+			initialData={supplierData}
+			entityName="Supplier"
+			deleteThunk={supplierThunk.delete}
+			fetchData={fetchSupplier}
+			FormComponent={SupplierForm}
+		/>
+	);
 };

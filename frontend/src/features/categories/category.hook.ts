@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useAppDispatch, useAppSelector, useCollectionFilter } from '@hooks';
+import { useAppDispatch, useAppSelector, useCollectionFilter, useFetchData } from '@hooks';
 import { selectCategories, selectCategoryPagination, selectCategoryStatus } from './category.selectors';
 import { categoryThunk } from './category.thunk';
 import { categoryQuerySchema, type TCategory } from './category.schema';
@@ -82,4 +82,9 @@ export const useCategoryHandlers = () => {
 		handleAdd,
 		handleDelete,
 	};
+};
+
+export const useCategoryData = () => {
+	const { fetchData } = useFetchData({ schema: categoryQuerySchema, thunkAction: categoryThunk.getCollection });
+	return fetchData;
 };

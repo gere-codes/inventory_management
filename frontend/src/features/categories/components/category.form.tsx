@@ -11,10 +11,10 @@ import { TiDelete } from 'react-icons/ti';
 
 interface Props {
 	mode: EModalMode.CREATE | EModalMode.EDIT;
-	categoryData: TCategory;
+	initialData: TCategory;
 }
 
-export const CategoryForm = ({ mode, categoryData }: Props) => {
+export const CategoryForm = ({ mode, initialData }: Props) => {
 	const {
 		register,
 		handleSubmit,
@@ -27,7 +27,7 @@ export const CategoryForm = ({ mode, categoryData }: Props) => {
 		mode: 'onBlur',
 		values: {
 			mode: mode,
-			...categoryData,
+			...initialData,
 		},
 	});
 
@@ -62,7 +62,6 @@ export const CategoryForm = ({ mode, categoryData }: Props) => {
 			dispatch(categoryThunk.update({ id: data.id, body: formData }));
 		} else {
 			await dispatch(categoryThunk.create(formData));
-			await dispatch(categoryThunk.getCollection({ pagination: { limit, page, disabled: false } }));
 		}
 		dispatch(closeModal());
 	};

@@ -1,4 +1,4 @@
-import { useAppDispatch, useCollectionFilter } from '@hooks';
+import { useAppDispatch, useCollectionFilter, useFetchData } from '@hooks';
 import { productThunk } from './product.thunk';
 import { productQuerySchema, type TProduct } from './product.schema';
 import { EModalMode, EModalType, openModal } from '@common';
@@ -46,18 +46,17 @@ export const useProductFilter = () => {
 	};
 };
 
-export const useProductHandlers = ({ fetchData }: { fetchData: () => void }) => {
+export const useProductHandlers = () => {
 	const dispatch = useAppDispatch();
 
 	const handleDelete = async (product: TProduct) => {
 		dispatch(openModal({ data: product, type: EModalType.PRODUCT, mode: EModalMode.DELETE }));
-		fetchData();
 	};
 
 	const handleEdit = async (product: TProduct) => {
 		dispatch(openModal({ data: product, type: EModalType.PRODUCT, mode: EModalMode.EDIT }));
-		fetchData();
 	};
+
 	const handleReorder = async (product: TProduct) => {
 		const data: TOrderForm = {
 			...product,
@@ -81,4 +80,9 @@ export const useProductHandlers = ({ fetchData }: { fetchData: () => void }) => 
 		handleReorder,
 		handleAddProduct,
 	};
+};
+
+export const useProductData = () => {
+	const { fetchData } = useFetchData({ schema: productQuerySchema, thunkAction: productThunk.getCollection });
+	return fetchData;
 };

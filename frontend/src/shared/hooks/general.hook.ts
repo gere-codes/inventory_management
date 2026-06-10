@@ -34,8 +34,8 @@ export const useFetchData = <TQuery extends TBaseQuery = TBaseQuery>({
 	const dispatch = useAppDispatch();
 	const { filters } = useQueryParams({ schema });
 
-	const fetchData = useCallback(() => {
-		dispatch(thunkAction(filters as unknown as TQuery & undefined));
+	const fetchData = useCallback(async () => {
+		await dispatch(thunkAction(filters as unknown as TQuery & undefined));
 	}, [dispatch, filters, thunkAction]);
 
 	return {

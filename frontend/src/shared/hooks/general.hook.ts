@@ -24,15 +24,25 @@ export const useQueryParams = <TQuery extends TBaseQuery = TBaseQuery>({ schema 
 	return { filters, searchParams, setSearchParams };
 };
 
-export const useFetchData = <TQuery extends TBaseQuery = TBaseQuery>({
+export const useFetchData = <TEntity, TQuery extends TBaseQuery = TBaseQuery>({
 	schema,
 	thunkAction,
+	selectData,
+	selectStatus,
+	selectPagination,
 }: {
 	schema: z.ZodSchema<TQuery>;
 	thunkAction: AsyncThunk<any, TQuery, any>;
+	selectData: (state: any) => TEntity[];
+	selectStatus: (state: any) => string;
+	selectPagination: (state: any) => any;
 }) => {
 	const dispatch = useAppDispatch();
 	const { filters } = useQueryParams({ schema });
+
+	const data = useAppSelector(selectData);
+	const status = useAppSelector(selectStatus);
+	const pagination = useAppSelector(selectPagination);
 
 	const fetchData = useCallback(async () => {
 		await dispatch(thunkAction(filters as unknown as TQuery & undefined));
@@ -40,6 +50,9 @@ export const useFetchData = <TQuery extends TBaseQuery = TBaseQuery>({
 
 	return {
 		fetchData,
+		data,
+		status,
+		pagination,
 	};
 };
 

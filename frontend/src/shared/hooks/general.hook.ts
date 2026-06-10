@@ -199,14 +199,10 @@ export const useCollectionFilter = <TEntity, TQuery extends TBaseQuery = TBaseQu
 	selectStatus,
 	selectPagination,
 }: IUseCollectionFilter<TEntity, TQuery>) => {
-	const dispatch = useAppDispatch();
-	const [searchTerm, setSearchTerm] = useState<string>('');
-
-	const data = useAppSelector(selectData);
-	const status = useAppSelector(selectStatus);
-	const pagination = useAppSelector(selectPagination);
-
+	// Params
 	const { filters, searchParams, setSearchParams } = useQueryParams<TQuery>({ schema });
+
+	// Pagination
 	const {
 		setParam,
 		setPage,
@@ -214,74 +210,40 @@ export const useCollectionFilter = <TEntity, TQuery extends TBaseQuery = TBaseQu
 		resetFilters: clearUrlFilters,
 	} = usePaginationParams<TQuery>({ setSearchParams });
 
-	// Persists the search term state
-	const searchParam = searchParams.get('search') || '';
-	useEffect(() => {
-		setSearchTerm(searchParam);
-	}, [searchParam]);
-
-	const fetchData = useCallback(() => {
-		dispatch(thunkAction(filters as unknown as TQuery & undefined));
-	}, [filters, dispatch, thunkAction]);
-
+	// Fetch Data
+	const { fetchData, data, pagination, status } = useFetchData({
+		schema,
+		selectData,
+		selectStatus,
+		selectPagination,
+		thunkAction,
+	});
 	useEffect(() => {
 		fetchData();
 	}, [fetchData]);
 
-	// normalize pagination with the backend
-	const localPage = Number(searchParams.get('page')) || 1;
-	useEffect(() => {
-		if (pagination && pagination?.page != null && pagination.page !== localPage) {
-			setPage(pagination.page);
-		}
-	}, [pagination?.page]);
-
-	// Adds delay of 500ms before making a search request
-	const debouncedSearchUpdate = useDebouncedCallback((nextTerm: string) => {
-		setSearchParams((prev) => {
-			const newParams = new URLSearchParams(prev);
-
-			if (!nextTerm) {
-				newParams.delete('search');
-			} else {
-				newParams.set('search', nextTerm);
-			}
-
-			newParams.set('page', '1');
-			return newParams;
-		});
-	}, 500);
-
-	// Handle Search change
-	const handleSearchChange = (value: string) => {
-		setSearchTerm(value);
-		debouncedSearchUpdate(value);
-	};
-
-	// handle pagination
-	const handlePageChange = (page: number) => {
-		setPage(page);
-	};
-
-	// handle limit
-	const handleLimitChange = (limit: number) => {
-		setLimit(limit);
-	};
+	// Seach
+	const { handleSearchChange, searchTerm } = useSearch({ searchParams, setSearchParams });
 
 	return {
+		// Search
 		searchTerm,
+		handleSearchChange,
+
+		// filters and pagination
+		setParam,
+		setPage,
+		setLimit,
 		filters,
+
+		// data
 		data,
 		status,
 		pagination,
 
+		// Actions
 		fetchData,
-		handleSearchChange,
-		setParam,
-		handlePageChange,
-		handleLimitChange,
 		resetFilters: () => {
-			setSearchTerm('');
 			clearUrlFilters();
 		},
 	};

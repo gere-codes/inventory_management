@@ -126,6 +126,51 @@ export const useDebouncedCallback = <T extends (...args: any[]) => any>(callback
 	}, []);
 };
 
+// Search with debounce
+export const useSearch = ({
+	searchParams,
+	setSearchParams,
+	delay = 500,
+}: {
+	searchParams: URLSearchParams;
+	setSearchParams: SetURLSearchParams;
+	delay?: number;
+}) => {
+	const [searchTerm, setSearchTerm] = useState<string>('');
+
+	// Persists the searchTerm state
+	const searchParam = searchParams.get('search') || '';
+	useEffect(() => {
+		setSearchTerm(searchParam);
+	}, [searchParam]);
+
+	const debouncedSearchUpdate = useDebouncedCallback((nextTerm: string) => {
+		setSearchParams((prev) => {
+			const newParams = new URLSearchParams(prev);
+
+			if (!nextTerm) {
+				newParams.delete('search');
+			} else {
+				newParams.set('search', nextTerm);
+			}
+
+			newParams.set('page', '1');
+			return newParams;
+		});
+	}, delay);
+
+	// Handle Search change
+	const handleSearchChange = (value: string) => {
+		setSearchTerm(value);
+		debouncedSearchUpdate(value);
+	};
+
+	return {
+		handleSearchChange,
+		searchTerm,
+	};
+};
+
 interface IUseCollectionFilter<TEntity, TQuery extends TBaseQuery = TBaseQuery> {
 	schema: z.ZodSchema<TQuery>;
 	thunkAction: AsyncThunk<any, TQuery, any>;

@@ -10,21 +10,10 @@ import { Button } from '@ui';
 import { useProductFilter } from '@/features/products/product.hook';
 
 export const ProductsPage = () => {
-	const {
-		filters,
-		fetchData,
-		searchTerm,
-		handleSearchChange,
-		pagination,
-		status,
-		data,
-		handleLimitChange,
-		handlePageChange,
-	} = useProductFilter();
+	const { filters, searchTerm, handleSearchChange, pagination, status, data, handleLimitChange, handlePageChange } =
+		useProductFilter();
 
-	const { handleDelete, handleEdit, handleReorder, handleAddProduct } = useProductHandlers({
-		fetchData,
-	});
+	const { handleDelete, handleEdit, handleReorder, handleAddProduct } = useProductHandlers();
 
 	const productStats = useAppSelector(selectProductStats);
 

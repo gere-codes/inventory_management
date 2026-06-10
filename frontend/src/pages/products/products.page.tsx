@@ -5,9 +5,8 @@ import { TbPackages } from 'react-icons/tb';
 
 import { useAppSelector } from '@hooks';
 import { SearchBar, Pagination } from '@common';
-import { ProductTable, selectProductStats, useProductHandlers } from '@products';
+import { ProductTable, selectProductStats, useProductHandlers, useProductFilter } from '@products';
 import { Button } from '@ui';
-import { useProductFilter } from '@/features/products/product.hook';
 
 export const ProductsPage = () => {
 	const { filters, searchTerm, handleSearchChange, pagination, status, data, handleLimitChange, handlePageChange } =

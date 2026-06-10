@@ -9,4 +9,4 @@ export { productThunk } from './product.thunk';
 export { ProductTable } from './components/product.table';
 export { ProductForm } from './components/product.form';
 export { ProductModalManager } from './components/product-modal.manager';
-export { useProductHandlers } from './product.hook';
+export * from './product.hook';

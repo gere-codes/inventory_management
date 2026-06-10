@@ -14,17 +14,12 @@ import { useParams, useSearchParams } from 'react-router';
 
 interface Props {
 	mode: EModalMode.CREATE | EModalMode.EDIT;
-	productData: TProduct;
+	initialData: TProduct;
 }
 
-export const ProductForm = ({ mode, productData }: Props) => {
+export const ProductForm = ({ mode, initialData }: Props) => {
 	const { categories, isLoading } = useCategories();
 	const [previewUrl, setPreviewUrl] = useState<string[] | null>(null);
-
-	const [searchParams, setSearchParams] = useSearchParams();
-	const params = useParams();
-
-	const { limit, page, totalItems, totalPages } = useAppSelector(selectProductsPagination);
 
 	const dispatch = useAppDispatch();
 
@@ -40,7 +35,7 @@ export const ProductForm = ({ mode, productData }: Props) => {
 		mode: 'onBlur',
 		defaultValues: {
 			mode,
-			...productData,
+			...initialData,
 		},
 	});
 
@@ -66,11 +61,6 @@ export const ProductForm = ({ mode, productData }: Props) => {
 			await dispatch(productThunk.update({ id: data.id, body: formData }));
 		} else {
 			await dispatch(productThunk.create(formData));
-
-			//Refetch the products after creating new product
-			const page = Number(searchParams.get('page')) || 1;
-			const limit = Number(searchParams.get('limit')) || 10;
-			await dispatch(productThunk.getCollection({ pagination: { limit, page, disabled: false } }));
 		}
 		dispatch(closeModal());
 	};

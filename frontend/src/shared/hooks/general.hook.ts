@@ -170,6 +170,15 @@ export const useCollectionFilter = <TEntity, TQuery extends TBaseQuery = TBaseQu
 		fetchData();
 	}, [fetchData]);
 
+	// normalize pagination with the backend
+	const localPage = Number(searchParams.get('page')) || 1;
+	useEffect(() => {
+		if (pagination && pagination?.page != null && pagination.page !== localPage) {
+			setPage(pagination.page);
+		}
+	}, [pagination?.page]);
+
+	// Adds delay of 500ms before making a search request
 	const debouncedSearchUpdate = useDebouncedCallback((nextTerm: string) => {
 		setSearchParams((prev) => {
 			const newParams = new URLSearchParams(prev);
@@ -197,8 +206,8 @@ export const useCollectionFilter = <TEntity, TQuery extends TBaseQuery = TBaseQu
 	};
 
 	// handle limit
-	const handleLimitChange = (page: number) => {
-		setLimit(page);
+	const handleLimitChange = (limit: number) => {
+		setLimit(limit);
 	};
 
 	return {
@@ -210,8 +219,6 @@ export const useCollectionFilter = <TEntity, TQuery extends TBaseQuery = TBaseQu
 
 		fetchData,
 		handleSearchChange,
-		setPage,
-		setLimit,
 		setParam,
 		handlePageChange,
 		handleLimitChange,

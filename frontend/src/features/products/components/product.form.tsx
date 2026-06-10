@@ -3,14 +3,14 @@ import { useForm, useWatch, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { closeModal, EModalMode } from '@common';
 import { Button, InputField, TextareaField } from '@ui';
-import { productFormSchema, type TProduct, type TProductCreate, type TProductFormValues } from '../product.schema';
-import { useAppDispatch, useAppSelector } from '@hooks';
-import { CategorySelect, categoryThunk, selectCategories, useCategories } from '@categories';
+import { productFormSchema, type TProduct, type TProductFormValues } from '../product.schema';
+import { useAppDispatch } from '@hooks';
+import { CategorySelect, useCategories } from '@categories';
 import { productThunk } from '../product.thunk';
-import { selectProductsPagination } from '../product.selectors';
 import { BASE_URL } from '@api';
 import { TiDelete } from 'react-icons/ti';
 import { useParams, useSearchParams } from 'react-router';
+import { useProductData } from '../product.hook';
 
 interface Props {
 	mode: EModalMode.CREATE | EModalMode.EDIT;
@@ -18,10 +18,11 @@ interface Props {
 }
 
 export const ProductForm = ({ mode, initialData }: Props) => {
+	const fetchProduct = useProductData();
+	const dispatch = useAppDispatch();
+
 	const { categories, isLoading } = useCategories();
 	const [previewUrl, setPreviewUrl] = useState<string[] | null>(null);
-
-	const dispatch = useAppDispatch();
 
 	const {
 		register,
@@ -61,6 +62,7 @@ export const ProductForm = ({ mode, initialData }: Props) => {
 			await dispatch(productThunk.update({ id: data.id, body: formData }));
 		} else {
 			await dispatch(productThunk.create(formData));
+			await fetchProduct();
 		}
 		dispatch(closeModal());
 	};

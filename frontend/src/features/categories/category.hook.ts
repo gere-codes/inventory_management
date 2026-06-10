@@ -64,7 +64,7 @@ export const useCategoryFilter = () => {
 	};
 };
 
-export const useCategoryHanlders = () => {
+export const useCategoryHandlers = () => {
 	const dispatch = useAppDispatch();
 
 	const handleEdit = async (order: TCategory) => {

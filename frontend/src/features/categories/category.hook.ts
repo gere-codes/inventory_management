@@ -21,3 +21,43 @@ export const useCategories = () => {
 		isSuccess: status === 'succeeded',
 	};
 };
+
+export const useCategoryFilter = () => {
+	const {
+		filters,
+		setLimit,
+		setPage,
+		fetchData,
+		searchTerm,
+		handleSearchChange,
+		pagination,
+		resetFilters,
+		handlePageChange,
+		handleLimitChange,
+		setParam,
+		status,
+		data,
+	} = useCollectionFilter({
+		schema: categoryQuerySchema,
+		thunkAction: categoryThunk.getCollection,
+		selectData: selectCategories,
+		selectPagination: selectCategoryPagination,
+		selectStatus: selectCategoryStatus,
+	});
+
+	return {
+		filters,
+		setLimit,
+		setPage,
+		fetchData,
+		searchTerm,
+		handlePageChange,
+		handleLimitChange,
+		handleSearchChange,
+		pagination,
+		resetFilters,
+		setParam,
+		status,
+		data,
+	};
+};

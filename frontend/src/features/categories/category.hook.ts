@@ -1,7 +1,9 @@
 import { useEffect } from 'react';
-import { useAppDispatch, useAppSelector } from '@hooks';
-import { selectCategories, selectCategoryStatus } from './category.selectors';
+import { useAppDispatch, useAppSelector, useCollectionFilter } from '@hooks';
+import { selectCategories, selectCategoryPagination, selectCategoryStatus } from './category.selectors';
 import { categoryThunk } from './category.thunk';
+import { categoryQuerySchema, type TCategory } from './category.schema';
+import { EModalMode, EModalType, openModal } from '@/shared/components/common';
 
 export const useCategories = () => {
 	const dispatch = useAppDispatch();
@@ -59,5 +61,25 @@ export const useCategoryFilter = () => {
 		setParam,
 		status,
 		data,
+	};
+};
+
+export const useCategoryHanlders = () => {
+	const dispatch = useAppDispatch();
+
+	const handleEdit = async (order: TCategory) => {
+		dispatch(openModal({ data: order, type: EModalType.CATEGORY, mode: EModalMode.EDIT }));
+	};
+	const handleDelete = async (order: TCategory) => {
+		dispatch(openModal({ data: order, type: EModalType.CATEGORY, mode: EModalMode.DELETE }));
+	};
+	const handleAdd = async () => {
+		dispatch(openModal({ data: null, type: EModalType.CATEGORY, mode: EModalMode.CREATE }));
+	};
+
+	return {
+		handleEdit,
+		handleAdd,
+		handleDelete,
 	};
 };

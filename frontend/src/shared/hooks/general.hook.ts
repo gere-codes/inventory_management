@@ -222,7 +222,6 @@ export const useCollectionFilter = <TEntity, TQuery extends TBaseQuery = TBaseQu
 	} = usePaginationParams<TQuery>({ setSearchParams });
 
 	// Fetch Data
-	const frontendPage = Number(searchParams.get('page') ?? 1);
 	const { fetchData, data, pagination, status } = useFetchData({
 		schema,
 		selectData,
@@ -230,6 +229,7 @@ export const useCollectionFilter = <TEntity, TQuery extends TBaseQuery = TBaseQu
 		selectPagination,
 		thunkAction,
 		onPageNormalized: (backendPage) => {
+			const frontendPage = Number(searchParams.get('page') ?? 1);
 			if (backendPage !== frontendPage) {
 				setPage(backendPage);
 			}

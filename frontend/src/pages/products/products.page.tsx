@@ -60,9 +60,9 @@ export const ProductsPage = () => {
 				{/* Pagination */}
 				<Pagination
 					currentPage={filters.page}
-					totalPages={pagination?.totalPages}
 					itemsPerPage={filters.limit}
-					totalItems={pagination.totalItems}
+					totalPages={pagination?.totalPages}
+					totalItems={pagination?.totalItems}
 					onPageChange={setPage}
 					onPerPageChange={setLimit}
 				/>

@@ -8,15 +8,9 @@ import {
 	type Reducer,
 } from '@reduxjs/toolkit';
 import type { BaseThunks } from './base.thunks';
-import type { ICollectionResult, PaginatedResult } from '../types';
+import type { ICollectionResult, IPagination, PaginatedResult } from '../types';
 import { castDraft } from 'immer';
 
-interface Pagination {
-	page: number;
-	limit: number;
-	totalPages: number;
-	totalItems: number;
-}
 export type BaseState<T, TExtra = {}> = {
 	list: {
 		data: T[];
@@ -29,7 +23,7 @@ export type BaseState<T, TExtra = {}> = {
 		error: string | null;
 	};
 
-	pagination: Pagination;
+	pagination: IPagination;
 } & TExtra;
 
 export const baseSlice = <

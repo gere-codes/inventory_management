@@ -18,7 +18,7 @@ interface Props {
 }
 
 export const ProductForm = ({ mode, initialData }: Props) => {
-	const fetchProduct = useProductData();
+	const { fetchData } = useProductData();
 	const dispatch = useAppDispatch();
 
 	const { categories, isLoading } = useCategories();
@@ -62,7 +62,7 @@ export const ProductForm = ({ mode, initialData }: Props) => {
 			await dispatch(productThunk.update({ id: data.id, body: formData }));
 		} else {
 			await dispatch(productThunk.create(formData));
-			await fetchProduct();
+			await fetchData();
 		}
 		dispatch(closeModal());
 	};

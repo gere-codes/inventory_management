@@ -7,14 +7,16 @@ export interface PaginatedResult<T> {
 		itemsPerPage: number;
 	};
 }
+
+export interface IPagination {
+	page: number;
+	limit: number;
+	totalPages: number;
+	totalItems: number;
+}
 export interface ICollectionResult<T> {
 	data: T[];
-	pagination?: {
-		page: number;
-		limit: number;
-		totalItems: number;
-		totalPages: number;
-	};
+	pagination?: IPagination;
 }
 
 export interface IParams {

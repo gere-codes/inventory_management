@@ -11,7 +11,7 @@ interface Props {
 }
 
 export const ProductModalManager = ({ productData, mode }: Props) => {
-	const { fetchData, data, pagination, status } = useProductData();
+	const { fetchData } = useProductData();
 
 	return (
 		<EntityModalManager

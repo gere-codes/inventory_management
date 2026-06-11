@@ -1,6 +1,6 @@
 import type { AsyncThunk } from '@reduxjs/toolkit';
 import { EModalMode } from './modal/modal.enum';
-import { useAppDispatch } from '@/shared/hooks';
+import { useAppDispatch } from '@hooks';
 import { closeModal } from './modal/modal.slice';
 import { Confirmation } from './modal/modal.conformation';
 
@@ -22,7 +22,6 @@ export const EntityModalManager = <T extends { id: string; name: string }>({
 	FormComponent,
 }: Props<T>) => {
 	const dispatch = useAppDispatch();
-
 	const close = () => {
 		dispatch(closeModal());
 	};

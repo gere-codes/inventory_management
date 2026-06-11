@@ -30,12 +30,14 @@ export const useFetchData = <TEntity, TQuery extends TBaseQuery = TBaseQuery>({
 	selectData,
 	selectStatus,
 	selectPagination,
+	onPageNormalized,
 }: {
 	schema: z.ZodSchema<TQuery>;
 	thunkAction: AsyncThunk<any, TQuery, any>;
 	selectData: (state: any) => TEntity[];
 	selectStatus: (state: any) => string;
 	selectPagination: (state: any) => any;
+	onPageNormalized?: (backendPage: number) => void;
 }) => {
 	const dispatch = useAppDispatch();
 	const { filters } = useQueryParams({ schema });
@@ -47,6 +49,15 @@ export const useFetchData = <TEntity, TQuery extends TBaseQuery = TBaseQuery>({
 	const fetchData = useCallback(async () => {
 		await dispatch(thunkAction(filters as unknown as TQuery & undefined));
 	}, [dispatch, filters, thunkAction]);
+
+	useEffect(() => {
+		if (status !== 'succeeded') return;
+		if (!pagination) return;
+
+		if (onPageNormalized) {
+			onPageNormalized(pagination.page);
+		}
+	}, [status, pagination.page]);
 
 	return {
 		fetchData,
@@ -211,12 +222,18 @@ export const useCollectionFilter = <TEntity, TQuery extends TBaseQuery = TBaseQu
 	} = usePaginationParams<TQuery>({ setSearchParams });
 
 	// Fetch Data
+	const frontendPage = Number(searchParams.get('page') ?? 1);
 	const { fetchData, data, pagination, status } = useFetchData({
 		schema,
 		selectData,
 		selectStatus,
 		selectPagination,
 		thunkAction,
+		onPageNormalized: (backendPage) => {
+			if (backendPage !== frontendPage) {
+				setPage(backendPage);
+			}
+		},
 	});
 	useEffect(() => {
 		fetchData();

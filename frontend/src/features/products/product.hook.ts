@@ -85,12 +85,12 @@ export const useProductHandlers = () => {
 };
 
 export const useProductData = () => {
-	const { fetchData, data, pagination, status } = useFetchData({
+	const products = useFetchData({
 		schema: productQuerySchema,
 		thunkAction: productThunk.getCollection,
 		selectData: selectProducts,
 		selectPagination: selectProductsPagination,
 		selectStatus: selectProductsStatus,
 	});
-	return { fetchData, data, pagination, status };
+	return products;
 };

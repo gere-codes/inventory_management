@@ -28,8 +28,6 @@ export const useSupplierFilter = () => {
 		handleSearchChange,
 		pagination,
 		resetFilters,
-		handlePageChange,
-		handleLimitChange,
 		setParam,
 		status,
 		data,
@@ -47,8 +45,6 @@ export const useSupplierFilter = () => {
 		setPage,
 		fetchData,
 		searchTerm,
-		handlePageChange,
-		handleLimitChange,
 		handleSearchChange,
 		pagination,
 		resetFilters,
@@ -79,6 +75,12 @@ export const useSupplierHanlders = () => {
 };
 
 export const useSupplierData = () => {
-	const { fetchData } = useFetchData({ schema: suppplierQuerySchema, thunkAction: supplierThunk.getCollection });
-	return fetchData;
+	const supplierData = useFetchData({
+		schema: suppplierQuerySchema,
+		thunkAction: supplierThunk.getCollection,
+		selectData: selectSuppliersList,
+		selectPagination: selectSuppliersPagination,
+		selectStatus: selectSuppliersStatus,
+	});
+	return supplierData;
 };

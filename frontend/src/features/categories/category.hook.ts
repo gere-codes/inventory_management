@@ -34,8 +34,6 @@ export const useCategoryFilter = () => {
 		handleSearchChange,
 		pagination,
 		resetFilters,
-		handlePageChange,
-		handleLimitChange,
 		setParam,
 		status,
 		data,
@@ -53,8 +51,6 @@ export const useCategoryFilter = () => {
 		setPage,
 		fetchData,
 		searchTerm,
-		handlePageChange,
-		handleLimitChange,
 		handleSearchChange,
 		pagination,
 		resetFilters,
@@ -85,6 +81,12 @@ export const useCategoryHandlers = () => {
 };
 
 export const useCategoryData = () => {
-	const { fetchData } = useFetchData({ schema: categoryQuerySchema, thunkAction: categoryThunk.getCollection });
-	return fetchData;
+	const categories = useFetchData({
+		schema: categoryQuerySchema,
+		thunkAction: categoryThunk.getCollection,
+		selectData: selectCategories,
+		selectPagination: selectCategoryPagination,
+		selectStatus: selectCategoryStatus,
+	});
+	return categories;
 };

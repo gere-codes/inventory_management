@@ -10,7 +10,7 @@ interface Props {
 }
 
 export const CategoryModalManager = ({ mode, categoryData }: Props) => {
-	const fetchCategories = useCategoryData();
+	const { fetchData } = useCategoryData();
 
 	return (
 		<EntityModalManager
@@ -18,7 +18,7 @@ export const CategoryModalManager = ({ mode, categoryData }: Props) => {
 			initialData={categoryData}
 			entityName="Category"
 			deleteThunk={categoryThunk.delete}
-			fetchData={fetchCategories}
+			fetchData={fetchData}
 			FormComponent={CategoryForm}
 		/>
 	);

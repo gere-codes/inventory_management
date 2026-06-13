@@ -1,5 +1,5 @@
 {
-  "id": "e7c93e5b-855d-4c7c-a449-ec00f3b990e7",
+  "id": "1fff6e0c-0906-4b2f-8d27-1bf2adaa2533",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -27,6 +27,18 @@
           "primaryKey": false,
           "notNull": true
         },
+        "image": {
+          "name": "image",
+          "type": "varchar(500)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "slug": {
+          "name": "slug",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
         "description": {
           "name": "description",
           "type": "varchar(225)",
@@ -48,7 +60,23 @@
           "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "slug_idx": {
+          "name": "slug_idx",
+          "columns": [
+            {
+              "expression": "slug",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "categories_user_id_users_id_fk": {
           "name": "categories_user_id_users_id_fk",
@@ -65,7 +93,15 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "categories_slug_unique": {
+          "name": "categories_slug_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "slug"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -87,12 +123,6 @@
           "primaryKey": false,
           "notNull": false
         },
-        "description": {
-          "name": "description",
-          "type": "varchar(1000)",
-          "primaryKey": false,
-          "notNull": false
-        },
         "product_id": {
           "name": "product_id",
           "type": "uuid",
@@ -110,6 +140,12 @@
           "type": "varchar(36)",
           "primaryKey": false,
           "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "varchar(1000)",
+          "primaryKey": false,
+          "notNull": false
         },
         "price": {
           "name": "price",
@@ -131,11 +167,12 @@
           "primaryKey": false,
           "notNull": true
         },
-        "image_url": {
-          "name": "image_url",
-          "type": "varchar(500)",
+        "images": {
+          "name": "images",
+          "type": "text[]",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true,
+          "default": "'{}'::text[]"
         },
         "status": {
           "name": "status",
@@ -209,15 +246,7 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "orders_sku_unique": {
-          "name": "orders_sku_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "sku"
-          ]
-        }
-      },
+      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -277,11 +306,12 @@
           "primaryKey": false,
           "notNull": true
         },
-        "image_url": {
-          "name": "image_url",
-          "type": "varchar(500)",
+        "images": {
+          "name": "images",
+          "type": "text[]",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true,
+          "default": "'{}'::text[]"
         },
         "created_at": {
           "name": "created_at",

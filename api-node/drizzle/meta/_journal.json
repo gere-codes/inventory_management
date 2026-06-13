@@ -5,50 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1778795965384,
-      "tag": "0000_chilly_justice",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1778812566620,
-      "tag": "0001_lame_deadpool",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1778957570773,
-      "tag": "0002_lowly_colossus",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1778957774427,
-      "tag": "0003_quick_paladin",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1779564265232,
-      "tag": "0004_spooky_mercury",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1779846893125,
-      "tag": "0005_uneven_kang",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1780593061850,
-      "tag": "0006_woozy_boomerang",
+      "when": 1781319473969,
+      "tag": "0000_brown_meteorite",
       "breakpoints": true
     }
   ]

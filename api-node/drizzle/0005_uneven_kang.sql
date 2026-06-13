@@ -1,1 +1,0 @@
-ALTER TABLE "categories" ADD COLUMN "image" varchar(500) NOT NULL;

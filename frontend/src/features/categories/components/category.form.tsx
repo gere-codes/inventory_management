@@ -128,6 +128,7 @@ export const CategoryForm = ({ mode, initialData }: Props) => {
 				/>
 				<section className="flex gap-4 flex-col">
 					<InputField {...register('name')} label="Name" id="name" error={errors.name?.message} />
+					<InputField {...register('slung')} label="Name" id="name" error={errors.name?.message} />
 					<TextareaField
 						{...register('description')}
 						label="Description"

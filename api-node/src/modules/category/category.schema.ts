@@ -5,7 +5,7 @@ import z from 'zod';
 export const categoryCreateSchema = z.object({
 	name: sanitized(z.string().min(2)),
 	image: z.string(),
-	slung: z.string().max(100),
+	slug: z.string().max(100),
 	description: sanitized(z.string()).nullable().optional(),
 });
 

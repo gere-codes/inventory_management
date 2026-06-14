@@ -21,7 +21,7 @@ export class CategoryRepository
 			id: record.id,
 			name: record.name,
 			image: record.image,
-			slung: record.slung,
+			slug: record.slug,
 			description: record.description,
 			createdAt: record.createdAt,
 			updatedAt: record.updatedAt,

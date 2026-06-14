@@ -11,7 +11,7 @@ export const categorySchema = z.object({
 	id: z.uuid(),
 	name: z.string().min(2),
 	image: imageSchema,
-	slung: z.string().max(100),
+	slug: z.string().max(100),
 	description: z.string().nullable().optional(),
 	createdAt: z.string().optional(),
 	updatedAt: z.string().optional(),

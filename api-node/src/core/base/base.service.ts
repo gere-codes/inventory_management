@@ -84,10 +84,10 @@ export abstract class BaseService<
 		return this.schema.parse(deletedItem);
 	}
 
-	async getCollection(context: TContext, options: TQuery): Promise<ICollectionResult<T> | T[]> {
+	async getCollection(context: TContext, options: TQuery): Promise<ICollectionResult<T>> {
 		if (Boolean(options.isPaginated) === false) {
 			const response = await this.repository.findAll(context, options);
-			return z.array(this.schema).parse(response);
+			return { data: z.array(this.schema).parse(response) };
 		}
 
 		const { data, pagination } = await this.repository.findManyAndCount(context, options);

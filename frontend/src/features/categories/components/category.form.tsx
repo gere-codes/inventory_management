@@ -8,6 +8,7 @@ import { categoryThunk } from '../category.thunk';
 import { selectCategoryPagination } from '../category.selectors';
 import { BASE_URL } from '@api';
 import { TiDelete } from 'react-icons/ti';
+import { useCategoryData } from '../category.hook';
 
 interface Props {
 	mode: EModalMode.CREATE | EModalMode.EDIT;
@@ -15,6 +16,7 @@ interface Props {
 }
 
 export const CategoryForm = ({ mode, initialData }: Props) => {
+	const { fetchData } = useCategoryData();
 	const {
 		register,
 		handleSubmit,
@@ -62,6 +64,7 @@ export const CategoryForm = ({ mode, initialData }: Props) => {
 			dispatch(categoryThunk.update({ id: data.id, body: formData }));
 		} else {
 			await dispatch(categoryThunk.create(formData));
+			await fetchData();
 		}
 		dispatch(closeModal());
 	};
@@ -127,8 +130,8 @@ export const CategoryForm = ({ mode, initialData }: Props) => {
 					}}
 				/>
 				<section className="flex gap-4 flex-col">
-					<InputField {...register('name')} label="Name" id="name" error={errors.name?.message} />
-					<InputField {...register('slug')} label="Name" id="name" error={errors.name?.message} />
+					<InputField required {...register('name')} label="Name" id="name" error={errors.name?.message} />
+					<InputField required {...register('slug')} label="Slug" id="slug" error={errors.name?.message} />
 					<TextareaField
 						{...register('description')}
 						label="Description"

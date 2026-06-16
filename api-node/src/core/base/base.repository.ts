@@ -142,7 +142,7 @@ export abstract class BaseRepository<
 		const results = (await this.getBaseQuery()
 			.where(whereClause)
 			.orderBy(desc(this.table.createdAt))
-			.limit(this.MAX_ITEMS)) as T[];
+			.limit(options.pagination?.limit || this.MAX_ITEMS)) as T[];
 
 		return results.map((result) => this.format(result));
 	}

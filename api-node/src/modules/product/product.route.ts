@@ -11,7 +11,6 @@ productRoutes.delete('/:id', productController.delete);
 
 productRoutes.get('/stats', productController.getStats);
 productRoutes.put('/:id/quantity', productController.updateQuantity);
-productRoutes.get('/:id', productController.getById);
 
 export default productRoutes;
 
@@ -20,3 +19,4 @@ export default productRoutes;
 export const publicProductRoutes = Router();
 
 publicProductRoutes.get('/', productController.getCollection);
+publicProductRoutes.get('/:id', productController.getById);

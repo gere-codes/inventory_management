@@ -30,6 +30,8 @@ export const productQuerySchema = commonQuery
 	.extend({
 		categoryId: z.uuid().optional(),
 		sort: z.enum(['createdAt', 'price']).default('createdAt'),
+		minPrice: z.coerce.number().optional().default(0),
+		maxPrice: z.coerce.number().optional().default(0),
 	})
 	.transform((raw) => ({
 		isPaginated: raw.isPaginated,
@@ -41,6 +43,8 @@ export const productQuerySchema = commonQuery
 		filter: {
 			search: raw.search,
 			categoryId: raw.categoryId,
+			minPrice: raw.minPrice,
+			maxPrice: raw.maxPrice,
 		},
 		sort: {
 			field: raw.sort,

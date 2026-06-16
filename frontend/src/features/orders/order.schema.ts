@@ -22,8 +22,8 @@ export const orderSchema = z.object({
 	images: imagesSchema,
 	status: z.enum(['pending', 'cancelled', 'received']),
 	type: z.enum(['new', 'reorder']),
-	createdAt: z.string(),
-	updatedAt: z.string(),
+	createdAt: z.string().optional(),
+	updatedAt: z.string().optional(),
 });
 
 const commonFields = orderSchema.omit({

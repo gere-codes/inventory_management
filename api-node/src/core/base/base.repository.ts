@@ -53,6 +53,13 @@ export abstract class BaseRepository<
 			.$dynamic();
 	}
 
+	protected getBaseCountQuery(whereClause: SQL<unknown> | undefined) {
+		return this.db
+			.select({ count: sql<number>`count(*)` })
+			.from(this.table as AnyPgTable)
+			.where(whereClause);
+	}
+
 	async findById(id: string): Promise<typeof this.table.$inferSelect | null> {
 		const result = await this.db
 			.select()
@@ -155,10 +162,7 @@ export abstract class BaseRepository<
 
 		const [results, countResult] = await Promise.all([
 			this.getBaseQuery().where(whereClause).orderBy(sortClause).limit(limit).offset(offset) as Promise<T[]>,
-			this.db
-				.select({ count: sql<number>`count(*)` })
-				.from(this.table as AnyPgTable)
-				.where(whereClause),
+			this.getBaseCountQuery(whereClause),
 		]);
 
 		const total = Number(countResult[0]?.count ?? 0);

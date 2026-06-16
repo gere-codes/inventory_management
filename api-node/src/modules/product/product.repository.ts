@@ -91,6 +91,14 @@ export class ProductRepository
 		return this.db.select().from(this.table).leftJoin(categories, eq(this.table.categoryId, categories.id));
 	}
 
+	protected getBaseCountQuery(whereClause: SQL<unknown> | undefined) {
+		return this.db
+			.select({ count: sql<number>`count(*)` })
+			.from(this.table as AnyPgTable)
+			.leftJoin(categories, eq(this.table.categoryId, categories.id))
+			.where(whereClause);
+	}
+
 	public async getStats(userId: string) {
 		const result = await this.db
 			.select({

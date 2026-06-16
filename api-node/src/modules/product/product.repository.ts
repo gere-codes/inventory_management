@@ -36,7 +36,11 @@ export class ProductRepository
 			sku: record.products.sku,
 			description: record.products?.description,
 			categoryId: record.products.categoryId,
-			category: record.categories.name || '',
+			category: {
+				id: record.categories.id,
+				name: record.categories.name,
+				slug: record.categories.slug,
+			},
 			images: record.products.images,
 			status: this.getStockStatus(record.products.quantity),
 			createdAt: record.products.createdAt,

@@ -48,21 +48,21 @@ export class ProductRepository
 		};
 	}
 
-	protected buildAdditionalFilters(filter: any): SQL[] {
+	protected buildAdditionalFilters(filter: Partial<TProductQuery['filter']>): SQL[] {
 		const filters: SQL[] = [];
 
 		if (!filter) return filters;
 
-		if (filter?.categoryId) {
-			filters.push(eq(this.table.categoryId, filter.categoryId));
+		if (filter?.category) {
+			filters.push(eq(categories.slug, filter.category));
 		}
 
 		if (filter?.minPrice) {
-			filters.push(gte(this.table.price, filter.minPrice));
+			filters.push(gte(this.table.price, String(filter.minPrice)));
 		}
 
 		if (filter?.maxPrice) {
-			filters.push(lte(this.table.price, filter.maxPrice));
+			filters.push(lte(this.table.price, String(filter.maxPrice)));
 		}
 
 		return filters;

@@ -53,7 +53,7 @@ export class ProductRepository
 
 		if (!filter) return filters;
 
-		if (filter?.category) {
+		if (filter?.category && filter.category !== 'all') {
 			filters.push(eq(categories.slug, filter.category));
 		}
 

@@ -21,8 +21,6 @@ export const useProductFilter = () => {
 		handleSearchChange,
 		pagination,
 		resetFilters,
-
-		setParam,
 		status,
 		data,
 	} = useCollectionFilter({
@@ -42,7 +40,6 @@ export const useProductFilter = () => {
 		handleSearchChange,
 		pagination,
 		resetFilters,
-		setParam,
 		status,
 		data,
 	};

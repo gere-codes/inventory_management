@@ -13,6 +13,7 @@ import { orderFormSchema, orderQuerySchema, type TOrder, type TOrderForm } from 
 import { EOrderStatus, EOrderType } from '../order.enums';
 import { productThunk } from '@products';
 import { useSearchParams } from 'react-router';
+import { useOrderData } from '../order.hook';
 
 interface Props {
 	mode: EModalMode.CREATE | EModalMode.EDIT;
@@ -20,18 +21,12 @@ interface Props {
 }
 
 export const OrderForm = ({ mode, orderData }: Props) => {
+	const { fetchData } = useOrderData();
+
 	const { categories, isLoading } = useCategories();
-	const [term, setTerm] = useState<string>('');
 
 	const [previewUrl, setPreviewUrl] = useState<string[] | null>(null);
 	const isReadOnlyField = orderData?.type === EOrderType.REORDER;
-	const [searchParams, setSearchParams] = useSearchParams();
-
-	const { totalItems, totalPages } = useAppSelector(selectOrderPagination);
-	const page = Number(searchParams.get('page')) || 1;
-	const limit = Number(searchParams.get('limit')) || 10;
-	const search = searchParams.get('search') || term;
-	const categoryId = searchParams.get('categoryId') || undefined;
 
 	const dispatch = useAppDispatch();
 
@@ -99,17 +94,7 @@ export const OrderForm = ({ mode, orderData }: Props) => {
 				await dispatch(orderThunk.update({ id: data.id, body: formData }));
 			} else {
 				await dispatch(orderThunk.create(formData));
-
-				const result = orderQuerySchema.safeParse({
-					search,
-					limit,
-					page,
-				});
-				if (!result.success) {
-					console.error(result.error);
-					return;
-				}
-				await dispatch(orderThunk.getCollection(result.data));
+				await fetchData();
 			}
 			dispatch(closeModal());
 		} catch (error) {

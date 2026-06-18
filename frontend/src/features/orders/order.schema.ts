@@ -60,9 +60,8 @@ export type TOrderForm = z.infer<typeof orderFormSchema>;
 export const orderQuerySchema = commonQuery
 	.extend({
 		search: z.string().optional(),
-		categoryId: z.uuid().optional(),
-		sort: z.enum(['createdAt', 'price', 'name']).default('createdAt'),
-		order: z.enum(['asc', 'desc']).default('desc'),
+		category: z.string().optional(),
+		sortBy: z.enum(['featured', 'priceAsc', 'priceDesc', 'nameAsc', 'nameDesc']).default('featured'),
 	})
 	.transform(withOffset);
 

@@ -104,9 +104,6 @@ export const OrderForm = ({ mode, orderData }: Props) => {
 					search,
 					limit,
 					page,
-					categoryId,
-					sort: 'createdAt',
-					order: 'desc',
 				});
 				if (!result.success) {
 					console.error(result.error);

@@ -1,4 +1,4 @@
-import { commonQuery } from '@src/core/schema/general.schema.js';
+import { commonQuery, withOffset } from '@src/core/schema/general.schema.js';
 import { sanitized } from '@src/core/validation/sanitized.js';
 import z, { optional } from 'zod';
 
@@ -10,7 +10,11 @@ export const orderSchema = z.object({
 	quantity: z.coerce.number().int().nonnegative(),
 	description: sanitized(z.string().max(1000)).nullable().optional(),
 	categoryId: z.uuid().optional(),
-	category: z.string().optional(),
+	category: z.object({
+		id: z.uuid(),
+		name: z.string(),
+		slug: z.string(),
+	}),
 	sku: sanitized(z.string().min(3).max(36)),
 	images: z.array(z.string()).optional().nullable(),
 	status: z.enum(['pending', 'cancelled', 'received']),
@@ -36,25 +40,9 @@ export type TUpdateOrder = z.infer<typeof updateOrderSchema>;
 export const orderQuerySchema = commonQuery
 	.extend({
 		search: z.string().optional(),
-		categoryId: z.uuid().optional(),
-		sort: z.enum(['createdAt', 'price', 'name']).default('createdAt'),
-		order: z.enum(['asc', 'desc']).default('desc'),
+		category: z.string().optional(),
+		sortBy: z.enum(['featured', 'priceAsc', 'priceDesc', 'nameAsc', 'nameDesc']).default('featured'),
 	})
-	.transform((raw) => ({
-		isPaginated: raw.isPaginated,
-		pagination: {
-			page: raw.page,
-			limit: raw.limit,
-			offset: (raw.page - 1) * raw.limit,
-		},
-		filter: {
-			search: raw.search,
-			categoryId: raw.categoryId,
-		},
-		sort: {
-			field: raw.sort,
-			order: raw.order,
-		},
-	}));
+	.transform(withOffset);
 
 export type TOrderQuery = z.infer<typeof orderQuerySchema>;

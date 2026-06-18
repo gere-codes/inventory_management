@@ -5,8 +5,7 @@ import { selectProductStats } from '@products';
 import { Button } from '@ui';
 
 export const CategoriesPage = () => {
-	const { filters, searchTerm, handleSearchChange, pagination, data, handleLimitChange, handlePageChange } =
-		useCategoryFilter();
+	const { filters, searchTerm, handleSearchChange, pagination, data, setLimit, setPage } = useCategoryFilter();
 
 	const { handleDelete, handleEdit, handleAdd } = useCategoryHandlers();
 
@@ -43,8 +42,8 @@ export const CategoriesPage = () => {
 						totalPages={pagination?.totalPages}
 						itemsPerPage={filters.limit}
 						totalItems={pagination.totalItems}
-						onPageChange={handlePageChange}
-						onPerPageChange={handleLimitChange}
+						onPageChange={setPage}
+						onPerPageChange={setLimit}
 					/>
 				</section>
 

@@ -14,6 +14,7 @@ export const SupplierItem = memo(({ supplier, onEdit, onDelete }: Props) => {
 	return (
 		<tr key={supplier.id} className="hover:bg-gray-50  border-b border-gray-200">
 			<TableItemData item={supplier.name} />
+			<TableItemData item={supplier?.address || ''} />
 			<TableItemData item={supplier.description || ''} />
 
 			<td className="px-4 py-4  w-1/4 text-ellipsis overflow-hidden">
@@ -28,7 +29,7 @@ export const SupplierItem = memo(({ supplier, onEdit, onDelete }: Props) => {
 
 const TableItemData = ({ item, image }: { item: string | number; image?: string }) => {
 	return (
-		<td className="px-4 py-4  w-1/7 text-ellipsis  overflow-hidden">
+		<td className="px-4 py-4  w-1/4 text-ellipsis  overflow-hidden">
 			<div className="flex gap-1 items-center">
 				{image && (
 					<img

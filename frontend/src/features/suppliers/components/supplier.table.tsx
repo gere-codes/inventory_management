@@ -8,7 +8,7 @@ interface Props {
 	onEdit: (supplier: TSupplier) => void;
 }
 export const SupplierTable = memo(({ suppliers, onDelete, onEdit }: Props) => {
-	const tableHeaders = ['name', 'description', 'actions'];
+	const tableHeaders = ['name', 'address', 'description', 'actions'];
 
 	return (
 		<section className="bg-white rounded-lg border border-gray-200 overflow-hidden relative mt-4">

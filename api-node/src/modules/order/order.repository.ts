@@ -14,25 +14,26 @@ export class OrderRespository
 	}
 
 	format(record: any): TOrder {
+		const { orders, categories } = record;
 		return {
-			id: record.id,
-			name: record.name,
-			categoryId: record.categoryId,
-			price: record.price,
-			productId: record.productId,
+			id: orders.id,
+			name: orders.name,
+			categoryId: orders.categoryId,
+			price: orders.price,
+			productId: orders.productId,
 			category: {
-				id: record.categories.id,
-				name: record.categories.name,
-				slug: record.categories.slug,
+				id: categories.id,
+				name: categories.name,
+				slug: categories.slug,
 			},
-			description: record.description,
-			quantity: record.quantity,
-			sku: record.sku,
-			status: record.status,
-			type: record.type,
-			images: record?.images,
-			createdAt: record?.createdAt,
-			updatedAt: record?.updatedAt,
+			description: orders.description,
+			quantity: orders.quantity,
+			sku: orders.sku,
+			status: orders.status,
+			type: orders.type,
+			images: orders?.images,
+			createdAt: orders?.createdAt,
+			updatedAt: orders?.updatedAt,
 		};
 	}
 

@@ -21,7 +21,28 @@ export const useQueryParams = <TQuery extends TBaseQuery = TBaseQuery>({ schema 
 		}
 	}, [searchParams, schema]);
 
-	return { filters, searchParams, setSearchParams };
+	// Updates the params
+	const updateParams = <TQuery extends TBaseQuery = TBaseQuery>(params: Partial<TQuery>) => {
+		setSearchParams((prev) => {
+			const newParams = new URLSearchParams(prev);
+
+			Object.entries(params).forEach(([key, value]) => {
+				if (value === undefined || value === null || value === '') {
+					newParams.delete(key);
+				} else {
+					newParams.set(key, String(value));
+				}
+			});
+			return newParams;
+		});
+	};
+
+	// Rests the URL params
+	const resetFilters = () => {
+		setSearchParams(new URLSearchParams());
+	};
+
+	return { filters, searchParams, setSearchParams, resetFilters, updateParams };
 };
 
 export const useFetchData = <TEntity, TQuery extends TBaseQuery = TBaseQuery>({
@@ -68,54 +89,26 @@ export const useFetchData = <TEntity, TQuery extends TBaseQuery = TBaseQuery>({
 };
 
 export const usePaginationParams = <TQuery extends TBaseQuery = TBaseQuery>({
-	setSearchParams,
+	schema,
 }: {
-	setSearchParams: SetURLSearchParams;
+	schema: z.ZodSchema<TQuery>;
 }) => {
-	// Dynamic setter
-	const setParam = <K extends Extract<keyof TQuery, string>>(key: K, value: TQuery[K]) => {
-		setSearchParams((prev) => {
-			const newParams = new URLSearchParams(prev);
-
-			if (value === undefined || value === null || value === '') {
-				newParams.delete(key);
-			} else {
-				newParams.set(key, String(value));
-			}
-
-			return newParams;
-		});
-	};
+	const { updateParams } = useQueryParams({ schema });
 
 	// Sets a limit to the number of items per page
+	// And resets the page to 1
 	const setLimit = (limit: number) => {
-		setSearchParams((prev) => {
-			const newParams = new URLSearchParams(prev);
-			newParams.set('limit', String(limit));
-			newParams.set('page', String(FIRST_PAGE));
-			return newParams;
-		});
+		updateParams({ limit, page: 1 });
 	};
 
 	// Sets the current page as paginating
 	const setPage = (page: number) => {
-		setSearchParams((prev) => {
-			const newParams = new URLSearchParams(prev);
-			newParams.set('page', String(page));
-			return newParams;
-		});
-	};
-
-	// Rests the URL params
-	const resetFilters = () => {
-		setSearchParams(new URLSearchParams());
+		updateParams({ page });
 	};
 
 	return {
-		setParam,
 		setPage,
 		setLimit,
-		resetFilters,
 	};
 };
 
@@ -211,15 +204,16 @@ export const useCollectionFilter = <TEntity, TQuery extends TBaseQuery = TBaseQu
 	selectPagination,
 }: IUseCollectionFilter<TEntity, TQuery>) => {
 	// Params
-	const { filters, searchParams, setSearchParams } = useQueryParams<TQuery>({ schema });
+	const {
+		filters,
+		searchParams,
+		setSearchParams,
+		updateParams,
+		resetFilters: clearUrlFilters,
+	} = useQueryParams<TQuery>({ schema });
 
 	// Pagination
-	const {
-		setParam,
-		setPage,
-		setLimit,
-		resetFilters: clearUrlFilters,
-	} = usePaginationParams<TQuery>({ setSearchParams });
+	const { setPage, setLimit } = usePaginationParams<TQuery>({ schema });
 
 	// Fetch Data
 	const { fetchData, data, pagination, status } = useFetchData({
@@ -248,7 +242,7 @@ export const useCollectionFilter = <TEntity, TQuery extends TBaseQuery = TBaseQu
 		handleSearchChange,
 
 		// filters and pagination
-		setParam,
+		updateParams,
 		setPage,
 		setLimit,
 		filters,

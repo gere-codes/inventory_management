@@ -1,4 +1,4 @@
-import { commonQuery } from '@src/core/schema/general.schema.js';
+import { commonQuery, withOffset } from '@src/core/schema/general.schema.js';
 import { sanitized, sanitizedPhone } from '@src/core/validation/sanitized.js';
 import z from 'zod';
 
@@ -24,23 +24,8 @@ export type TSupplierUpdate = z.infer<typeof supplierUpdateSchema>;
 export const supplierQuerySchema = commonQuery
 	.extend({
 		search: z.string().optional(),
-		sort: z.enum(['createdAt', 'name']).default('createdAt'),
-		order: z.enum(['asc', 'desc']).default('desc'),
+		sortBy: z.enum(['featured', 'nameAsc', 'nameDesc']).default('featured'),
 	})
-	.transform((raw) => ({
-		isPaginated: raw.isPaginated,
-		pagination: {
-			page: raw.page,
-			limit: raw.limit,
-			offset: (raw.page - 1) * raw.limit,
-		},
-		filter: {
-			search: raw.search,
-		},
-		sort: {
-			field: raw.sort,
-			order: raw.order,
-		},
-	}));
+	.transform(withOffset);
 
 export type TSupplierQuery = z.infer<typeof supplierQuerySchema>;

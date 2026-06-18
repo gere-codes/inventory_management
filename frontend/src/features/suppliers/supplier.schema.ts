@@ -49,7 +49,7 @@ export type TSupplierForm = z.infer<typeof supplierFormSchema>;
 export const suppplierQuerySchema = commonQuery
 	.extend({
 		search: z.string().optional(),
-		sort: z.enum(['createdAt', 'name']).default('createdAt'),
+		sortBy: z.enum(['featured', 'nameAsc', 'nameDesc']).default('featured'),
 	})
 	.transform(withOffset);
 

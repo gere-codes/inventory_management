@@ -4,7 +4,7 @@ import { useSupplierFilter, useSupplierHanlders } from '@/features/suppliers/sup
 import { SupplierTable } from '@suppliers';
 
 export const SuppliersPage = () => {
-	const { filters, searchTerm, handleSearchChange, pagination, status, data, handleLimitChange, handlePageChange } =
+	const { filters, searchTerm, handleSearchChange, pagination, status, data, setLimit, setPage } =
 		useSupplierFilter();
 
 	const { handleEdit, handleAdd, handleDelete } = useSupplierHanlders();
@@ -44,8 +44,8 @@ export const SuppliersPage = () => {
 				totalPages={pagination?.totalPages}
 				itemsPerPage={filters.limit}
 				totalItems={pagination.totalItems}
-				onPageChange={handlePageChange}
-				onPerPageChange={handleLimitChange}
+				onPageChange={setPage}
+				onPerPageChange={setLimit}
 			/>
 		</section>
 	);

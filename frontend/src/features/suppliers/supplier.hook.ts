@@ -28,7 +28,6 @@ export const useSupplierFilter = () => {
 		handleSearchChange,
 		pagination,
 		resetFilters,
-		setParam,
 		status,
 		data,
 	} = useCollectionFilter({
@@ -48,7 +47,6 @@ export const useSupplierFilter = () => {
 		handleSearchChange,
 		pagination,
 		resetFilters,
-		setParam,
 		status,
 		data,
 	};

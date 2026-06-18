@@ -1,11 +1,11 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useAppDispatch, useAppSelector } from '@hooks';
+import { useAppDispatch } from '@hooks';
 import { closeModal, EModalMode } from '@common';
 import { supplierFormSchema, type TSupplier, type TSupplierForm } from '../supplier.schema';
 import { Button, InputField, TextareaField } from '@ui';
 import { supplierThunk } from '../supplier.thunk';
-import { selectSuppliersPagination } from '../supplier.selectors';
+import { useSupplierData } from '../supplier.hook';
 
 interface Props {
 	mode: EModalMode.CREATE | EModalMode.EDIT;
@@ -27,11 +27,10 @@ export const SupplierForm = ({ mode, initialData }: Props) => {
 		},
 	});
 
-	const { page, limit, totalItems, totalPages } = useAppSelector(selectSuppliersPagination);
+	const { fetchData } = useSupplierData();
 
 	const dispatch = useAppDispatch();
 
-	console.log(errors);
 	const onSubmit = async (data: TSupplierForm) => {
 		const body = {
 			name: data?.name,
@@ -46,6 +45,7 @@ export const SupplierForm = ({ mode, initialData }: Props) => {
 			await dispatch(supplierThunk.update({ id: data.id, body }));
 		} else {
 			await dispatch(supplierThunk.create(body));
+			await fetchData();
 		}
 		dispatch(closeModal());
 	};

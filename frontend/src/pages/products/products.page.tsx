@@ -10,7 +10,6 @@ import { Button } from '@ui';
 
 export const ProductsPage = () => {
 	const { filters, searchTerm, handleSearchChange, pagination, status, data, setPage, setLimit } = useProductFilter();
-
 	const { handleDelete, handleEdit, handleReorder, handleAddProduct } = useProductHandlers();
 
 	const productStats = useAppSelector(selectProductStats);

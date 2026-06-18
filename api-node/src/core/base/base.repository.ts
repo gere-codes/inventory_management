@@ -4,6 +4,7 @@ import type { AnyPgTable, PgColumn, PgSelectDynamic, PgTable } from 'drizzle-orm
 import { AppError } from '@utils';
 import type { ICollectionResult } from '../types/general.js';
 import type { TBaseQuery, TContext } from '../schema/general.schema.js';
+import { sortOptions } from '../enums/query.enum.js';
 
 export interface IBaseRepository<T, TCreate, TUpdate, TQuery extends TBaseQuery = TBaseQuery> {
 	getAll(userId: string): Promise<T[]>;
@@ -113,8 +114,6 @@ export abstract class BaseRepository<
 	}
 
 	protected buildFilters(context: TContext, options: TQuery): SQL<unknown> | undefined {
-		const { filter } = options;
-
 		const filters: SQL[] = [];
 
 		// context
@@ -123,11 +122,11 @@ export abstract class BaseRepository<
 		}
 
 		// filter
-		if (filter?.search) {
-			filters.push(ilike(this.table.name, `${filter.search}%`));
+		if (options?.search) {
+			filters.push(ilike(this.table.name, `${options.search}%`));
 		}
 
-		const additionaFilters = this.buildAdditionalFilters(filter);
+		const additionaFilters = this.buildAdditionalFilters(options);
 
 		if (additionaFilters.length > 0) {
 			filters.push(...additionaFilters);
@@ -136,10 +135,7 @@ export abstract class BaseRepository<
 	}
 
 	// sort
-	protected buildSortClause(sort: TQuery['sort']): SQL<unknown> {
-		if (sort && sort.order === 'asc') {
-			return asc(this.table.createdAt);
-		}
+	protected buildSortClause(sortBy: TQuery['sortBy']): SQL<unknown> {
 		return desc(this.table.createdAt);
 	}
 
@@ -149,16 +145,16 @@ export abstract class BaseRepository<
 		const results = (await this.getBaseQuery()
 			.where(whereClause)
 			.orderBy(desc(this.table.createdAt))
-			.limit(options.pagination?.limit || this.MAX_ITEMS)) as T[];
+			.limit(options?.limit || this.MAX_ITEMS)) as T[];
 
 		return results.map((result) => this.format(result));
 	}
 
 	async findManyAndCount(context: TContext, options: TQuery): Promise<ICollectionResult<T>> {
-		const { page, limit, offset } = options.pagination;
+		const { page, limit, offset } = options;
 
 		const whereClause = this.buildFilters(context, options);
-		const sortClause = this.buildSortClause(options?.sort);
+		const sortClause = this.buildSortClause(options?.sortBy);
 
 		const [results, countResult] = await Promise.all([
 			this.getBaseQuery().where(whereClause).orderBy(sortClause).limit(limit).offset(offset) as Promise<T[]>,

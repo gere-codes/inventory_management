@@ -6,6 +6,7 @@ import { and, asc, desc, eq, gte, ilike, lte, or, SQL, sql } from 'drizzle-orm';
 import { EProductStatus } from './product.enum.js';
 import type { AnyPgTable } from 'drizzle-orm/pg-core';
 import { AppError } from '@src/core/utils/app-error.util.js';
+import { sortOptions } from '@src/core/enums/query.enum.js';
 
 export interface IProductRepository extends IBaseRepository<TProduct, TProductCreate, TProductUpdate> {
 	getStats(userId: string): any;
@@ -48,7 +49,7 @@ export class ProductRepository
 		};
 	}
 
-	protected buildAdditionalFilters(filter: Partial<TProductQuery['filter']>): SQL[] {
+	protected buildAdditionalFilters(filter: Partial<TProductQuery>): SQL[] {
 		const filters: SQL[] = [];
 
 		if (!filter) return filters;
@@ -68,16 +69,16 @@ export class ProductRepository
 		return filters;
 	}
 
-	override buildSortClause(sort: TProductQuery['sort']) {
-		if (sort.field) {
-			if (sort.order === 'asc') {
-				const result = asc(this.table[sort.field]);
-				return result;
-			} else {
-				return desc(this.table[sort.field]);
-			}
-		} else {
-			return desc(this.table.createdAt);
+	override buildSortClause(sort: TProductQuery['sortBy']): SQL<unknown> {
+		switch (sort) {
+			case sortOptions.feature:
+				return desc(this.table.createdAt);
+			case sortOptions.priceAsc:
+				return asc(this.table.price);
+			case sortOptions.priceDesc:
+				return desc(this.table.price);
+			default:
+				return desc(this.table.createdAt);
 		}
 	}
 

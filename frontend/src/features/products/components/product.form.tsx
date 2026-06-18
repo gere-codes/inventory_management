@@ -9,7 +9,6 @@ import { CategorySelect, useCategories } from '@categories';
 import { productThunk } from '../product.thunk';
 import { BASE_URL } from '@api';
 import { TiDelete } from 'react-icons/ti';
-import { useParams, useSearchParams } from 'react-router';
 import { useProductData } from '../product.hook';
 
 interface Props {
@@ -41,9 +40,11 @@ export const ProductForm = ({ mode, initialData }: Props) => {
 	});
 
 	const onSubmit = async (data: TProductFormValues) => {
+		const { mode, ...payload } = productFormSchema.parse(data);
+
 		const formData = new FormData();
 
-		Object.entries(data).forEach(([key, value]) => {
+		Object.entries(payload).forEach(([key, value]) => {
 			if (value === null || value === undefined) return;
 
 			if (Array.isArray(value)) {

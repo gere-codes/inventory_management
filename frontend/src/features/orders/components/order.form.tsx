@@ -52,13 +52,9 @@ export const OrderForm = ({ mode, orderData }: Props) => {
 			return;
 		}
 
-		const result = orderFormSchema.safeParse(data);
-		if (!result.success) {
-			console.error('Form validation errors:', result.error);
-			return;
-		}
+		const result = orderFormSchema.parse(data);
+		const { mode, ...payload } = result;
 
-		const { mode, ...payload } = result.data;
 		const formData = new FormData();
 
 		Object.entries(payload).forEach(([key, value]) => {

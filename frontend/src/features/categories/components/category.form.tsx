@@ -40,13 +40,8 @@ export const CategoryForm = ({ mode, initialData }: Props) => {
 	const imageFile = watch('image');
 
 	const onSubmit = async (data: TCategoryForm) => {
-		const result = categoryFormSchema.safeParse(data);
-
-		if (!result.success) {
-			return;
-		}
-
-		const { mode, ...payload } = result.data;
+		const result = categoryFormSchema.parse(data);
+		const { mode, ...payload } = result;
 
 		const formData = new FormData();
 

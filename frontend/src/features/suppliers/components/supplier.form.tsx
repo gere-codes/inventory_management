@@ -32,19 +32,13 @@ export const SupplierForm = ({ mode, initialData }: Props) => {
 	const dispatch = useAppDispatch();
 
 	const onSubmit = async (data: TSupplierForm) => {
-		const body = {
-			name: data?.name,
-			phone: data?.phone,
-			address: data?.address,
-			description: data?.description,
-			createdAt: data?.createdAt,
-			updatedAt: data?.updatedAt,
-		};
+		const result = supplierFormSchema.parse(data);
+		const { mode, ...payload } = result;
 
 		if (data.mode === EModalMode.EDIT) {
-			await dispatch(supplierThunk.update({ id: data.id, body }));
+			await dispatch(supplierThunk.update({ id: data.id, body: payload }));
 		} else {
-			await dispatch(supplierThunk.create(body));
+			await dispatch(supplierThunk.create(payload));
 			await fetchData();
 		}
 		dispatch(closeModal());

@@ -3,17 +3,8 @@ import { Pagination, SearchBar } from '@common';
 import { OrderTable, useOrderFilter, useOrderHanlders } from '@orders';
 
 export const OrdersPage = () => {
-	const {
-		filters,
-		fetchData,
-		searchTerm,
-		handleSearchChange,
-		pagination,
-		status,
-		data,
-		handleLimitChange,
-		handlePageChange,
-	} = useOrderFilter();
+	const { filters, fetchData, searchTerm, handleSearchChange, pagination, status, data, setLimit, setPage } =
+		useOrderFilter();
 
 	const { handleEdit, handleAdd } = useOrderHanlders({
 		fetchData,
@@ -52,8 +43,8 @@ export const OrdersPage = () => {
 				totalPages={pagination?.totalPages}
 				itemsPerPage={filters.limit}
 				totalItems={pagination.totalItems}
-				onPageChange={handlePageChange}
-				onPerPageChange={handleLimitChange}
+				onPageChange={setPage}
+				onPerPageChange={setLimit}
 			/>
 		</section>
 	);

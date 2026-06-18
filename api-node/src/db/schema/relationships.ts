@@ -31,6 +31,10 @@ export const orderRelations = relations(orders, ({ one }) => ({
 		fields: [orders.productId],
 		references: [products.id],
 	}),
+	category: one(categories, {
+		fields: [orders.categoryId],
+		references: [categories.id],
+	}),
 }));
 
 export const categoryRelations = relations(categories, ({ one, many }) => ({
@@ -39,6 +43,7 @@ export const categoryRelations = relations(categories, ({ one, many }) => ({
 		references: [users.id],
 	}),
 	products: many(products),
+	orders: many(orders),
 }));
 
 export const supplierRelations = relations(suppliers, ({ one, many }) => ({

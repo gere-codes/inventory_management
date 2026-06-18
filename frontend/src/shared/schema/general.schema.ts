@@ -5,7 +5,7 @@ export const commonQuery = z.object({
 	page: z.coerce.number().int().positive().default(1),
 	limit: z.coerce.number().int().positive().max(50).default(10),
 	search: z.string().optional(),
-	sort: 'createdAt',
+	sortBy: 'featured',
 });
 
 export const withOffset = <T extends { page: number; limit: number }>(data: T) => ({

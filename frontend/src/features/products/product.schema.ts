@@ -76,7 +76,7 @@ export type TProductStats = z.infer<typeof productStatsSchema>;
 export const productQuerySchema = commonQuery
 	.extend({
 		category: z.string().optional(),
-		sort: z.enum(['featured', 'priceAsc', 'priceDesc']).default('featured'),
+		sortBy: z.enum(['featured', 'priceAsc', 'priceDesc']).default('featured'),
 		minPrice: z.coerce.number().optional().default(0),
 		maxPrice: z.coerce.number().optional().default(0),
 	})

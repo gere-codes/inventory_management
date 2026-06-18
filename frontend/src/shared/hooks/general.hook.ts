@@ -6,8 +6,6 @@ import { debounce } from '../utils';
 import { useAppDispatch, useAppSelector } from './redux.hook';
 import type { AsyncThunk } from '@reduxjs/toolkit';
 
-const FIRST_PAGE = 1;
-
 export const useQueryParams = <TQuery extends TBaseQuery = TBaseQuery>({ schema }: { schema: z.ZodSchema<TQuery> }) => {
 	const [searchParams, setSearchParams] = useSearchParams();
 
@@ -37,12 +35,15 @@ export const useQueryParams = <TQuery extends TBaseQuery = TBaseQuery>({ schema 
 		});
 	};
 
+	// Update with debounce
+	const updateParamsDebounce = useDebouncedCallback(updateParams, 300);
+
 	// Rests the URL params
 	const resetFilters = () => {
 		setSearchParams(new URLSearchParams());
 	};
 
-	return { filters, searchParams, setSearchParams, resetFilters, updateParams };
+	return { filters, searchParams, setSearchParams, resetFilters, updateParams, updateParamsDebounce };
 };
 
 export const useFetchData = <TEntity, TQuery extends TBaseQuery = TBaseQuery>({
@@ -112,48 +113,40 @@ export const usePaginationParams = <TQuery extends TBaseQuery = TBaseQuery>({
 	};
 };
 
-export const useDebouncedCallback = <T extends (...args: any[]) => any>(callback: T, delay: number) => {
-	const callbackRef = useRef(callback);
+export const useDebouncedCallback = <TArgs extends unknown[]>(
+	callback: (...args: TArgs) => void,
+	delay: number = 300,
+) => {
+	const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+	const debouncedCallback = useCallback(
+		(...args: TArgs) => {
+			if (timeoutRef.current) {
+				clearTimeout(timeoutRef.current);
+			}
+			timeoutRef.current = setTimeout(() => {
+				callback(...args);
+			}, delay);
+		},
+		[callback, delay],
+	);
+
 	useEffect(() => {
-		callbackRef.current = callback;
-	}, [callback]);
-
-	const engineRef = useRef<{
-		run: (...args: Parameters<T>) => void;
-		cancel: () => void;
-	} | null>(null);
-
-	useEffect(() => {
-		const inst = debounce((...args: Parameters<T>) => {
-			callbackRef.current(...args);
-		}, delay);
-
-		engineRef.current = {
-			run: inst,
-			cancel: inst.cancel,
-		};
-
 		return () => {
-			inst.cancel();
+			if (timeoutRef.current) {
+				clearTimeout(timeoutRef.current);
+			}
 		};
-	}, [delay]);
-
-	return useCallback((...args: Parameters<T>) => {
-		engineRef.current?.run(...args);
 	}, []);
+
+	return debouncedCallback;
 };
 
 // Search with debounce
-export const useSearch = ({
-	searchParams,
-	setSearchParams,
-	delay = 500,
-}: {
-	searchParams: URLSearchParams;
-	setSearchParams: SetURLSearchParams;
-	delay?: number;
-}) => {
+export const useUrlSearch = <TQuery extends TBaseQuery = TBaseQuery>({ schema }: { schema: z.ZodType<TQuery> }) => {
 	const [searchTerm, setSearchTerm] = useState<string>('');
+
+	const { updateParamsDebounce, searchParams } = useQueryParams({ schema });
 
 	// Persists the searchTerm state
 	const searchParam = searchParams.get('search') || '';
@@ -161,25 +154,10 @@ export const useSearch = ({
 		setSearchTerm(searchParam);
 	}, [searchParam]);
 
-	const debouncedSearchUpdate = useDebouncedCallback((nextTerm: string) => {
-		setSearchParams((prev) => {
-			const newParams = new URLSearchParams(prev);
-
-			if (!nextTerm) {
-				newParams.delete('search');
-			} else {
-				newParams.set('search', nextTerm);
-			}
-
-			newParams.set('page', '1');
-			return newParams;
-		});
-	}, delay);
-
 	// Handle Search change
 	const handleSearchChange = (value: string) => {
 		setSearchTerm(value);
-		debouncedSearchUpdate(value);
+		updateParamsDebounce({ search: value, page: 1 });
 	};
 
 	return {
@@ -234,7 +212,7 @@ export const useCollectionFilter = <TEntity, TQuery extends TBaseQuery = TBaseQu
 	}, [fetchData]);
 
 	// Seach
-	const { handleSearchChange, searchTerm } = useSearch({ searchParams, setSearchParams });
+	const { handleSearchChange, searchTerm } = useUrlSearch({ schema });
 
 	return {
 		// Search

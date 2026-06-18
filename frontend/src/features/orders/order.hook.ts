@@ -1,4 +1,4 @@
-import { useAppDispatch, useCollectionFilter } from '@/shared/hooks';
+import { useAppDispatch, useCollectionFilter, useFetchData } from '@/shared/hooks';
 import { orderQuerySchema, type TOrder } from './order.schema';
 import { selectOrderList, selectOrderPagination, selectOrderListStatus } from './order.selector';
 import { orderThunk } from './order.thunk';
@@ -14,9 +14,6 @@ export const useOrderFilter = () => {
 		handleSearchChange,
 		pagination,
 		resetFilters,
-		handlePageChange,
-		handleLimitChange,
-		setParam,
 		status,
 		data,
 	} = useCollectionFilter({
@@ -33,12 +30,9 @@ export const useOrderFilter = () => {
 		setPage,
 		fetchData,
 		searchTerm,
-		handlePageChange,
-		handleLimitChange,
 		handleSearchChange,
 		pagination,
 		resetFilters,
-		setParam,
 		status,
 		data,
 	};
@@ -60,4 +54,15 @@ export const useOrderHanlders = ({ fetchData }: { fetchData: () => void }) => {
 		handleEdit,
 		handleAdd,
 	};
+};
+
+export const useOrderData = () => {
+	const products = useFetchData({
+		schema: orderQuerySchema,
+		thunkAction: orderThunk.getCollection,
+		selectData: selectOrderList,
+		selectPagination: selectOrderPagination,
+		selectStatus: selectOrderListStatus,
+	});
+	return products;
 };

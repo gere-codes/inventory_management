@@ -1,7 +1,7 @@
 import { sanitized } from '@src/core/validation/sanitized.js';
 import { z } from 'zod';
 import { EProductStatus } from './product.enum.js';
-import { baseQuerySchema, commonQuery } from '@src/core/schema/general.schema.js';
+import { baseQuerySchema, commonQuery, withOffset } from '@src/core/schema/general.schema.js';
 
 export const productSchema = z.object({
 	id: z.uuid(),
@@ -40,27 +40,10 @@ export type TProductUpdate = z.infer<typeof productUpdateSchema>;
 export const productQuerySchema = commonQuery
 	.extend({
 		category: z.string().optional(),
-		sort: z.enum(['createdAt', 'price']).default('createdAt'),
+		sortBy: z.enum(['featured', 'priceAsc', 'priceDesc']).default('featured'),
 		minPrice: z.coerce.number().optional().default(0),
 		maxPrice: z.coerce.number().optional().default(0),
 	})
-	.transform((raw) => ({
-		isPaginated: raw.isPaginated,
-		pagination: {
-			page: raw.page,
-			limit: raw.limit,
-			offset: (raw.page - 1) * raw.limit,
-		},
-		filter: {
-			search: raw.search,
-			category: raw.category,
-			minPrice: raw.minPrice,
-			maxPrice: raw.maxPrice,
-		},
-		sort: {
-			field: raw.sort,
-			order: raw.order,
-		},
-	}));
+	.transform(withOffset);
 
 export type TProductQuery = z.infer<typeof productQuerySchema>;

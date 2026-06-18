@@ -10,50 +10,46 @@ const imageSchema = z.union([
 
 const imagesSchema = z.array(imageSchema).optional().nullable();
 
-export const productCreateSchema = z.object({
+export const productSchema = z.object({
+	id: z.uuid(),
 	name: z.string().min(2).max(100),
 	price: z.number().nonnegative(),
 	description: z.string().max(1000).nullable().optional(),
 	quantity: z.number().int().nonnegative(),
 	categoryId: z.uuid(),
+	category: z.object({
+		id: z.uuid(),
+		name: z.string(),
+		slug: z.string(),
+	}),
 	sku: z.string().min(3).max(36),
 	images: imagesSchema,
-});
-
-export const productSchema = productCreateSchema.extend({
-	id: z.uuid(),
-	category: z.string(),
 	status: z.enum([EProductStatus.IN_STOCK, EProductStatus.LOW_STOCK, EProductStatus.OUT_OF_STOCK]),
 	createdAt: z.string(),
 	updatedAt: z.string(),
 });
-export const productUpdateSchema = productCreateSchema.partial();
+
+const commonFields = productSchema.omit({
+	id: true,
+	category: true,
+	status: true,
+	createdAt: true,
+	updatedAt: true,
+});
+
+export const productCreateSchema = commonFields.extend({});
+export const productUpdateSchema = commonFields.partial();
 
 export const productFormSchema = z.discriminatedUnion('mode', [
 	// CREATE
-	z.object({
+	commonFields.extend({
 		mode: z.literal('CREATE'),
-		name: z.string().min(2),
-		images: imagesSchema,
-		price: z.number().min(0.01),
-		categoryId: z.uuid(),
-		id: z.string().optional(),
-		sku: z.string().min(3, { message: 'Minimum 3 characters are required' }),
-		quantity: z.number().min(0, { message: 'Quantity must be ≥ 0' }),
-		description: z.string().optional().nullable(),
 	}),
 
 	// EDIT
-	z.object({
+	commonFields.extend({
 		mode: z.literal('EDIT'),
-		name: z.string().min(2),
-		images: imagesSchema,
-		price: z.number().min(0.01),
-		categoryId: z.uuid(),
 		id: z.uuid(),
-		sku: z.string().min(3, ' SKU must be minium 3 characters'),
-		quantity: z.number().min(0, 'Quantity'),
-		description: z.string().optional().nullable(),
 	}),
 ]);
 
@@ -79,8 +75,10 @@ export type TProductStats = z.infer<typeof productStatsSchema>;
 
 export const productQuerySchema = commonQuery
 	.extend({
-		categoryId: z.uuid().optional(),
-		sort: z.enum(['createdAt', 'price', 'name']).default('createdAt'),
+		category: z.string().optional(),
+		sort: z.enum(['featured', 'priceAsc', 'priceDesc']).default('featured'),
+		minPrice: z.coerce.number().optional().default(0),
+		maxPrice: z.coerce.number().optional().default(0),
 	})
 	.transform(withOffset);
 

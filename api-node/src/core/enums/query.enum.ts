@@ -1,5 +1,5 @@
 export enum sortOptions {
-	feature = 'featured',
+	featured = 'featured',
 	priceAsc = 'priceAsc',
 	priceDesc = 'priceDesc',
 	nameAsc = 'nameAsc',

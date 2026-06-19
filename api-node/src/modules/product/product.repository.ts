@@ -27,6 +27,11 @@ export class ProductRepository
 	constructor(db: NodePgDatabase<any>) {
 		super(products, db);
 	}
+	private readonly sortMap: Record<string, SQL> = {
+		[sortOptions.featured]: desc(this.table.createdAt),
+		[sortOptions.priceAsc]: asc(this.table.price),
+		[sortOptions.priceDesc]: desc(this.table.price),
+	};
 
 	protected format(record: any): TProduct {
 		return {
@@ -69,17 +74,8 @@ export class ProductRepository
 		return filters;
 	}
 
-	override buildSortClause(sort: TProductQuery['sortBy']): SQL<unknown> {
-		switch (sort) {
-			case sortOptions.feature:
-				return desc(this.table.createdAt);
-			case sortOptions.priceAsc:
-				return asc(this.table.price);
-			case sortOptions.priceDesc:
-				return desc(this.table.price);
-			default:
-				return desc(this.table.createdAt);
-		}
+	override buildSortClause(sort: TProductQuery['sortBy']): SQL {
+		return this.sortMap[sort] ?? desc(this.table.createdAt);
 	}
 
 	private getStockStatus(qty: number): EProductStatus {

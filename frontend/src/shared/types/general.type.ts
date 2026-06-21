@@ -15,7 +15,7 @@ export interface IPagination {
 	totalItems: number;
 }
 export interface ICollectionResult<T> {
-	data: T[];
+	items: T[];
 	pagination?: IPagination;
 }
 

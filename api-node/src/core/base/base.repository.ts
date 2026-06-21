@@ -164,7 +164,7 @@ export abstract class BaseRepository<
 		const normalizedPage = totalPages > 0 && page > totalPages ? totalPages : page;
 
 		return {
-			data: results.map((result) => this.format(result)),
+			items: results.map((result) => this.format(result)),
 			pagination: {
 				page: normalizedPage,
 				limit,

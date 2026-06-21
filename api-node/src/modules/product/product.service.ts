@@ -1,13 +1,5 @@
 import { BaseService, type IBaseService } from '@core/base/base.service.js';
-import {
-	productCreateSchema,
-	productSchema,
-	productUpdateSchema,
-	type TProduct,
-	type TProductCreate,
-	type TProductQuery,
-	type TProductUpdate,
-} from './product.shema.js';
+import type { TProduct, TProductCreate, TProductQuery, TProductUpdate } from './product.shema.js';
 import type { IProductRepository } from './product.repository.js';
 import type { TBaseQuery } from '@src/core/schema/general.schema.js';
 
@@ -28,7 +20,7 @@ export class ProductService
 	implements IProductService
 {
 	constructor(repository: IProductRepository) {
-		super(repository, productSchema, productCreateSchema, productUpdateSchema);
+		super(repository);
 	}
 
 	async getStats(userId: string) {
@@ -44,7 +36,6 @@ export class ProductService
 		productId: string;
 		quantity: number;
 	}): Promise<TProduct> {
-		const response = await this.repository.updateQuantity({ userId, productId, quantity });
-		return this.schema.parse(response);
+		return this.repository.updateQuantity({ userId, productId, quantity });
 	}
 }

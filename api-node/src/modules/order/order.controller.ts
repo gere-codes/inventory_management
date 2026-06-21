@@ -1,5 +1,13 @@
 import { BaseController } from '@src/core/base/base.controller.js';
-import { orderQuerySchema, type TCreateOrder, type TOrder, type TUpdateOrder } from './order.schema.js';
+import {
+	updateOrderSchema,
+	createOrderSchema,
+	orderQuerySchema,
+	orderSchema,
+	type TCreateOrder,
+	type TOrder,
+	type TUpdateOrder,
+} from './order.schema.js';
 import { OrderRespository } from './order.repository.js';
 import { db } from '@src/db/index.js';
 import { OrderService } from './order.service.js';
@@ -10,7 +18,7 @@ class OrderController extends BaseController<TOrder, TCreateOrder, TUpdateOrder>
 		const repo = new OrderRespository(db);
 		const service = new OrderService(repo);
 		const fileService = new LocalFileService();
-		super(service, orderQuerySchema, fileService);
+		super(service, orderSchema, createOrderSchema, updateOrderSchema, orderQuerySchema, fileService);
 	}
 }
 

@@ -148,7 +148,7 @@ export const baseSlice = <
 				.addCase(thunks.getCollection.fulfilled, (state, action: PayloadAction<ICollectionResult<T>>) => {
 					state.list.status = 'succeeded';
 					state.list.error = null;
-					state.list.data = castDraft(action.payload.data);
+					state.list.data = castDraft(action.payload.items);
 					state.pagination = action.payload.pagination as typeof state.pagination;
 				})
 				.addCase(thunks.getCollection.rejected, (state, action) => {

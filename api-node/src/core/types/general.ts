@@ -9,8 +9,8 @@ export interface PaginatedResult<T> {
 }
 
 export interface ICollectionResult<T> {
-	data: T[];
-	pagination: {
+	items: T[];
+	pagination?: {
 		page: number;
 		limit: number;
 		totalItems: number;

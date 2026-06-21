@@ -89,10 +89,10 @@ export abstract class BaseService<
 		const queries = this.queryBuilder(params);
 
 		const response = await publicInstance.get(`/public/${this.resource}`, { params: queries });
-		const { data, pagination } = response.data.data;
+		const { items, pagination } = response.data.payload;
 
 		return {
-			data: z.array(this.schema).parse(data),
+			items: z.array(this.schema).parse(items),
 			pagination: pagination ?? null,
 		};
 	}

@@ -24,6 +24,9 @@ export abstract class BaseController<
 > implements IBaseController<T, TCreate, TUpdate> {
 	constructor(
 		protected service: TService,
+		protected schema: z.ZodSchema<T>,
+		protected createSchema: z.ZodSchema<TCreate>,
+		protected updateSchema: z.ZodSchema<TUpdate>,
 		protected querySchema: z.ZodSchema<TQuery>,
 		protected fileService?: IFileService,
 	) {}
@@ -77,16 +80,18 @@ export abstract class BaseController<
 			payload.images = newImages;
 		}
 
-		const result = await this.service.create(userId, payload);
+		const validateInput = this.createSchema.parse(payload);
+
+		const createdItem = await this.service.create(userId, validateInput);
+		const responseDto = this.schema.parse(createdItem);
 
 		res.status(201).json({
 			success: true,
-			data: result,
+			data: responseDto,
 		});
 	});
 
 	update = catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-		const userId = req.user.id;
 		const id = req.params?.id as string;
 		const { body } = req;
 
@@ -111,18 +116,19 @@ export abstract class BaseController<
 
 		const payload = { ...body, images: finalImages };
 
-		const result = await this.service.update(userId, id, payload);
+		const validateInput = this.updateSchema.parse(payload);
+		const updatedItem = await this.service.update(id, validateInput);
+		const responseDto = this.schema.parse(updatedItem);
 
 		res.status(201).json({
 			success: true,
-			data: result,
+			data: responseDto,
 		});
 	});
 
 	delete = catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-		const userId = req.user.id;
 		const id = req.params?.id as string;
-		const deletedProduct = await this.service.delete(userId, id);
+		const deletedProduct = await this.service.delete(id);
 
 		res.status(200).json({
 			success: true,

@@ -1,16 +1,15 @@
 import type { IBaseRepository } from './base.repository.js';
-import z from 'zod';
-import type { ICollectionResult, IQueryOptions, PaginatedResult, QueryOptions } from '../types/general.js';
-import { baseQuerySchema, type TBaseQuery, type TContext } from '../schema/general.schema.js';
+import type { ICollectionResult } from '../types/general.js';
+import type { TBaseQuery, TContext } from '../schema/general.schema.js';
 import { AppError } from '../utils/app-error.util.js';
 
 export interface IBaseService<T, TCreate, TUpdate, TQuery extends TBaseQuery = TBaseQuery> {
 	getAll(userId: string): Promise<T[]>;
 	getById(id: string): Promise<T>;
 	create(userId: string, data: TCreate): Promise<T>;
-	update(userId: string, id: string, data: TUpdate): Promise<T>;
-	delete(userId: string, id: string): Promise<T>;
-	getCollection(context: TContext, options?: TQuery): Promise<ICollectionResult<T> | T[]>;
+	update(id: string, data: TUpdate): Promise<T>;
+	delete(id: string): Promise<T>;
+	getCollection(context: TContext, options?: TQuery): Promise<ICollectionResult<T>>;
 }
 export abstract class BaseService<
 	T,
@@ -20,77 +19,53 @@ export abstract class BaseService<
 	TQuery extends TBaseQuery = TBaseQuery,
 > implements IBaseService<T, TCreate, TUpdate, TQuery> {
 	protected repository: TRepository;
-	protected schema: z.ZodSchema<T>;
-	protected createSchema: z.ZodSchema<TCreate>;
-	protected updateSchema: z.ZodSchema<TUpdate>;
 
-	constructor(
-		repository: TRepository,
-		schema: z.ZodSchema<T>,
-		createSchema: z.ZodSchema<TCreate>,
-		updateSchema: z.ZodSchema<TUpdate>,
-	) {
+	constructor(repository: TRepository) {
 		this.repository = repository;
-		this.schema = schema;
-		this.createSchema = createSchema;
-		this.updateSchema = updateSchema;
 	}
 
 	async getAll(userId: string): Promise<T[]> {
-		const result = await this.repository.getAll(userId);
-		return z.array(this.schema).parse(result);
+		return await this.repository.getAll(userId);
 	}
 
 	async getById(id: string): Promise<T> {
-		const result = await this.repository.findOne(id);
-		return this.schema.parse(result);
+		return await this.repository.findOne(id);
 	}
 
 	async create(userId: string, data: TCreate): Promise<T> {
-		const parsedData = await this.createSchema.parseAsync(data);
-
-		const fullPayload = { ...parsedData, userId };
+		const fullPayload = { ...data, userId };
 
 		const id = await this.repository.create(fullPayload);
 
-		const item = await this.repository.findOne(id);
-
-		return this.schema.parse(item);
+		return await this.repository.findOne(id);
 	}
 
-	async update(userId: string, id: string, data: TUpdate): Promise<T> {
-		const parsedData = await this.updateSchema.parseAsync(data);
-
+	async update(id: string, data: TUpdate): Promise<T> {
 		const item = await this.repository.findByIdRaw(id);
 
 		if (!item) throw new AppError(404, 'Item not found');
-		await this.repository.update(id, parsedData);
+		await this.repository.update(id, data);
 
-		const updatedItem = await this.repository.findOne(id);
-		return this.schema.parse(updatedItem);
+		return await this.repository.findOne(id);
 	}
 
-	async delete(userId: string, id: string): Promise<T> {
+	async delete(id: string): Promise<T> {
 		const item = await this.repository.findByIdRaw(id);
-		if (item.userId !== userId) throw new AppError(401, 'Unauthorized');
+		if (!item) throw new AppError(404, 'Item not found');
 
 		const deletedItem = await this.repository.findOne(id);
 		await this.repository.delete(id);
 
-		return this.schema.parse(deletedItem);
+		return deletedItem;
 	}
 
 	async getCollection(context: TContext, options: TQuery): Promise<ICollectionResult<T>> {
 		if (Boolean(options.isPaginated) === false) {
-			const response = await this.repository.findAll(context, options);
-			return { data: z.array(this.schema).parse(response) };
+			return {
+				items: await this.repository.findAll(context, options),
+			};
 		}
 
-		const { data, pagination } = await this.repository.findManyAndCount(context, options);
-
-		return {
-			data: z.array(this.schema).parse(data),
-			pagination: { ...pagination },
-		};
+		return await this.repository.findManyAndCount(context, options);
 	}
 }

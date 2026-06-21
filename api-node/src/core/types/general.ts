@@ -1,3 +1,5 @@
+import type { TPagination } from '../schema/general.schema.js';
+
 export interface PaginatedResult<T> {
 	data: T[];
 	pagination: {
@@ -10,12 +12,7 @@ export interface PaginatedResult<T> {
 
 export interface ICollectionResult<T> {
 	items: T[];
-	pagination?: {
-		page: number;
-		limit: number;
-		totalItems: number;
-		totalPages: number;
-	};
+	pagination?: TPagination;
 }
 
 export interface QueryOptions {

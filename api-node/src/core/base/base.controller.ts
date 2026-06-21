@@ -2,7 +2,7 @@ import type { Request, Response, NextFunction } from 'express';
 import type { BaseService, IBaseService } from './base.service.js';
 import { catchAsync } from '@utils/index.js';
 import type { IFileService } from '@services';
-import type { TBaseQuery } from '../schema/general.schema.js';
+import { paginationSchema, type TBaseQuery } from '../schema/general.schema.js';
 import z from 'zod';
 
 export interface IBaseController<T, TCreate, TUpdate> {
@@ -42,11 +42,12 @@ export abstract class BaseController<
 
 	getById = catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 		const { id } = req.params;
-		const result = await this.service.getById(id as string);
+		const item = await this.service.getById(id as string);
+		const responseDto = this.schema.parse(item);
 
 		res.status(200).json({
 			success: true,
-			payload: result,
+			payload: responseDto,
 		});
 	});
 
@@ -128,10 +129,11 @@ export abstract class BaseController<
 	delete = catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 		const id = req.params?.id as string;
 		const deletedProduct = await this.service.delete(id);
+		const responseDto = this.schema.parse(deletedProduct);
 
 		res.status(200).json({
 			success: true,
-			payload: deletedProduct,
+			payload: responseDto,
 		});
 	});
 
@@ -143,11 +145,16 @@ export abstract class BaseController<
 
 		const options = this.querySchema.parse(req.query);
 
-		const response = await this.service.getCollection(context, options);
+		const { items, pagination } = await this.service.getCollection(context, options);
+
+		const responseDto = {
+			items: z.array(this.schema).parse(items),
+			pagination: paginationSchema.parse(pagination),
+		};
 
 		res.status(200).json({
 			success: true,
-			payload: response,
+			payload: responseDto,
 		});
 	});
 }

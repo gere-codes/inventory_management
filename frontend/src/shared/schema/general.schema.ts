@@ -16,3 +16,14 @@ export const withOffset = <T extends { page: number; limit: number }>(data: T) =
 export const baseQuerySchema = commonQuery.transform(withOffset);
 
 export type TBaseQuery = z.infer<typeof baseQuerySchema>;
+
+export const paginationSchema = z
+	.object({
+		page: z.number(),
+		limit: z.number(),
+		totalItems: z.number(),
+		totalPages: z.number(),
+	})
+	.nullish();
+
+export type TPagination = z.infer<typeof paginationSchema>;

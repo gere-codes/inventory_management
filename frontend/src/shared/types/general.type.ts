@@ -1,3 +1,5 @@
+import type { TPagination } from '../schema';
+
 export interface PaginatedResult<T> {
 	data: T[];
 	pagination: {
@@ -16,7 +18,7 @@ export interface IPagination {
 }
 export interface ICollectionResult<T> {
 	items: T[];
-	pagination?: IPagination;
+	pagination?: TPagination;
 }
 
 export interface IParams {

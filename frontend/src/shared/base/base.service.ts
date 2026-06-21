@@ -1,5 +1,5 @@
 import { privateInstance, publicInstance } from '../api/instance.api';
-import type { TBaseQuery } from '../schema';
+import { paginationSchema, type TBaseQuery } from '../schema';
 import type { ICollectionResult, IParams, PaginatedResult } from '../types';
 import z from 'zod';
 
@@ -93,7 +93,7 @@ export abstract class BaseService<
 
 		return {
 			items: z.array(this.schema).parse(items),
-			pagination: pagination ?? null,
+			pagination: paginationSchema.parse(pagination),
 		};
 	}
 }

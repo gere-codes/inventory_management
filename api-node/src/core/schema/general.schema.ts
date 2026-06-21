@@ -22,3 +22,14 @@ export const context = z.object({
 });
 
 export type TContext = z.infer<typeof context>;
+
+export const paginationSchema = z
+	.object({
+		page: z.number(),
+		limit: z.number(),
+		totalItems: z.number(),
+		totalPages: z.number(),
+	})
+	.nullish();
+
+export type TPagination = z.infer<typeof paginationSchema>;

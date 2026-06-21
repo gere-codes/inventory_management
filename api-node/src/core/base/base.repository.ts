@@ -4,7 +4,6 @@ import type { AnyPgTable, PgColumn, PgSelectDynamic, PgTable } from 'drizzle-orm
 import { AppError } from '@utils';
 import type { ICollectionResult } from '../types/general.js';
 import type { TBaseQuery, TContext } from '../schema/general.schema.js';
-import { sortOptions } from '../enums/query.enum.js';
 
 export interface IBaseRepository<T, TCreate, TUpdate, TQuery extends TBaseQuery = TBaseQuery> {
 	getAll(userId: string): Promise<T[]>;
@@ -12,15 +11,10 @@ export interface IBaseRepository<T, TCreate, TUpdate, TQuery extends TBaseQuery 
 	update(id: string, data: TUpdate): Promise<void>;
 	delete(id: string): Promise<void>;
 	findOne(id: string): Promise<T>;
-	findById(id: string): Promise<any | null>;
 	findAll(context: TContext, options: TQuery): Promise<T[]>;
 	findManyAndCount(context: TContext, options: TQuery): Promise<ICollectionResult<T>>;
+	findByIdRaw(id: string): Promise<any | null>;
 }
-
-type AnyUserIdColumn = PgColumn<ColumnBaseConfig<'string', string>>;
-type AnyIdColumn = PgColumn<ColumnBaseConfig<'string', string>>;
-type AnyCreatedAtColumn = PgColumn<ColumnBaseConfig<'date', string>>;
-type AnyNameColumn = PgColumn<ColumnBaseConfig<'string', string>>;
 
 type TableWithOtherProperties = PgTable<any> & {
 	userId: AnyUserIdColumn;
@@ -28,6 +22,10 @@ type TableWithOtherProperties = PgTable<any> & {
 	createdAt: AnyCreatedAtColumn;
 	name: AnyNameColumn;
 };
+type AnyUserIdColumn = PgColumn<ColumnBaseConfig<'string', string>>;
+type AnyIdColumn = PgColumn<ColumnBaseConfig<'string', string>>;
+type AnyCreatedAtColumn = PgColumn<ColumnBaseConfig<'date', string>>;
+type AnyNameColumn = PgColumn<ColumnBaseConfig<'string', string>>;
 
 export abstract class BaseRepository<
 	T,
@@ -61,9 +59,9 @@ export abstract class BaseRepository<
 			.where(whereClause);
 	}
 
-	async findById(id: string): Promise<typeof this.table.$inferSelect | null> {
+	async findByIdRaw(id: string): Promise<typeof this.table.$inferSelect | null> {
 		const result = await this.db
-			.select()
+			.select({ id: this.table.id })
 			.from(this.table as AnyPgTable)
 			.where(eq(this.table.id, id))
 			.limit(1);

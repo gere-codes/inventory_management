@@ -61,21 +61,17 @@ export abstract class BaseService<
 	async update(userId: string, id: string, data: TUpdate): Promise<T> {
 		const parsedData = await this.updateSchema.parseAsync(data);
 
-		const item = await this.repository.findById(id);
+		const item = await this.repository.findByIdRaw(id);
 
-		if (!item) throw new Error('Item not found');
-
-		if (item.userId !== userId) throw new AppError(401, 'Unauthorized');
-
+		if (!item) throw new AppError(404, 'Item not found');
 		await this.repository.update(id, parsedData);
 
 		const updatedItem = await this.repository.findOne(id);
-
 		return this.schema.parse(updatedItem);
 	}
 
 	async delete(userId: string, id: string): Promise<T> {
-		const item = await this.repository.findById(id);
+		const item = await this.repository.findByIdRaw(id);
 		if (item.userId !== userId) throw new AppError(401, 'Unauthorized');
 
 		const deletedItem = await this.repository.findOne(id);

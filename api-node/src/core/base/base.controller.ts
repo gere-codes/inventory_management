@@ -11,7 +11,6 @@ export interface IBaseController<T, TCreate, TUpdate> {
 	create(req: Request, res: Response, next: NextFunction): void;
 	update(req: Request, res: Response, next: NextFunction): void;
 	delete(req: Request, res: Response, next: NextFunction): void;
-
 	getCollection(req: Request, res: Response, next: NextFunction): void;
 }
 
@@ -37,7 +36,7 @@ export abstract class BaseController<
 
 		res.status(200).json({
 			success: true,
-			data: result,
+			payload: result,
 		});
 	});
 
@@ -47,7 +46,7 @@ export abstract class BaseController<
 
 		res.status(200).json({
 			success: true,
-			data: result,
+			payload: result,
 		});
 	});
 
@@ -87,7 +86,7 @@ export abstract class BaseController<
 
 		res.status(201).json({
 			success: true,
-			data: responseDto,
+			payload: responseDto,
 		});
 	});
 
@@ -122,7 +121,7 @@ export abstract class BaseController<
 
 		res.status(201).json({
 			success: true,
-			data: responseDto,
+			payload: responseDto,
 		});
 	});
 
@@ -132,7 +131,7 @@ export abstract class BaseController<
 
 		res.status(200).json({
 			success: true,
-			data: deletedProduct,
+			payload: deletedProduct,
 		});
 	});
 
@@ -148,7 +147,7 @@ export abstract class BaseController<
 
 		res.status(200).json({
 			success: true,
-			data: response,
+			payload: response,
 		});
 	});
 }

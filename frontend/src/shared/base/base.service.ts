@@ -57,32 +57,32 @@ export abstract class BaseService<
 			}
 		});
 
-		return query;
+		return this.paramSchema?.parse(params) || {};
 	}
 
 	async getAll(): Promise<T[]> {
-		const result = await privateInstance.get<{ success: boolean; data: T[] }>(`/${this.resource}`);
-		return z.array(this.schema).parse(result.data.data);
+		const result = await privateInstance.get<{ success: boolean; payload: T[] }>(`/${this.resource}`);
+		return z.array(this.schema).parse(result.data.payload);
 	}
 
 	async getById(id: string): Promise<T> {
-		const result = await privateInstance.get<{ success: boolean; data: T }>(`/${this.resource}/${id}`);
-		return this.schema.parse(result.data.data);
+		const result = await privateInstance.get<{ success: boolean; payload: T }>(`/${this.resource}/${id}`);
+		return this.schema.parse(result.data.payload);
 	}
 
 	async create(body: TCreateBody): Promise<T> {
-		const result = await privateInstance.post<{ success: boolean; data: T }>(`/${this.resource}`, body);
-		return this.schema.parse(result.data.data);
+		const result = await privateInstance.post<{ success: boolean; payload: T }>(`/${this.resource}`, body);
+		return this.schema.parse(result.data.payload);
 	}
 
 	async update(id: string, body: TUpdateBody): Promise<T> {
-		const result = await privateInstance.put<{ success: boolean; data: T }>(`/${this.resource}/${id}`, body);
-		return this.schema.parse(result.data.data);
+		const result = await privateInstance.put<{ success: boolean; payload: T }>(`/${this.resource}/${id}`, body);
+		return this.schema.parse(result.data.payload);
 	}
 
 	async delete(id: string): Promise<T> {
-		const result = await privateInstance.delete<{ success: boolean; data: T }>(`/${this.resource}/${id}`);
-		return this.schema.parse(result.data.data);
+		const result = await privateInstance.delete<{ success: boolean; payload: T }>(`/${this.resource}/${id}`);
+		return this.schema.parse(result.data.payload);
 	}
 
 	async getCollection(params: TQuery): Promise<ICollectionResult<T>> {

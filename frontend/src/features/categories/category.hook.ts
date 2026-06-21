@@ -63,11 +63,11 @@ export const useCategoryFilter = () => {
 export const useCategoryHandlers = () => {
 	const dispatch = useAppDispatch();
 
-	const handleEdit = async (order: TCategory) => {
-		dispatch(openModal({ data: order, type: EModalType.CATEGORY, mode: EModalMode.EDIT }));
+	const handleEdit = async (category: TCategory) => {
+		dispatch(openModal({ data: category, type: EModalType.CATEGORY, mode: EModalMode.EDIT }));
 	};
-	const handleDelete = async (order: TCategory) => {
-		dispatch(openModal({ data: order, type: EModalType.CATEGORY, mode: EModalMode.DELETE }));
+	const handleDelete = async (category: TCategory) => {
+		dispatch(openModal({ data: category, type: EModalType.CATEGORY, mode: EModalMode.DELETE }));
 	};
 	const handleAdd = async () => {
 		dispatch(openModal({ data: null, type: EModalType.CATEGORY, mode: EModalMode.CREATE }));

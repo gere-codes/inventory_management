@@ -1,3 +1,5 @@
+import { logger } from './logger.util.js';
+
 export class AppError extends Error {
 	constructor(
 		public message: string,
@@ -10,6 +12,7 @@ export class AppError extends Error {
 	}
 }
 
+// HTTP Errors
 export class BadRequestError extends AppError {
 	constructor(message = 'Bad Request') {
 		super(message, 400);
@@ -35,3 +38,33 @@ export class ConflictError extends AppError {
 		super(message, 409);
 	}
 }
+
+// Error handlers
+export const repositoryError = (error: any, message: string, fallback: string, context: any) => {
+	logger.error({
+		message,
+		...context,
+		error: error.message,
+		stack: error.stack,
+	});
+
+	if (error instanceof AppError) {
+		throw error;
+	}
+
+	throw new AppError(fallback, 500);
+};
+
+export const serviceError = (error: any, message: string, fallback: string, context: any) => {
+	if (!(error instanceof AppError)) {
+		logger.error({
+			message,
+			...context,
+			error: error.message,
+			stack: error.stack,
+		});
+	}
+
+	if (error instanceof AppError) throw error;
+	throw new AppError(fallback, 500);
+};

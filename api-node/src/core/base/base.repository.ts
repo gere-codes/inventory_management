@@ -4,7 +4,6 @@ import type { AnyPgTable, PgColumn, PgSelectDynamic, PgTable } from 'drizzle-orm
 import { AppError, BadRequestError, NotFoundError, repositoryError } from '@utils';
 import type { ICollectionResult } from '../types/general.js';
 import type { TBaseQuery, TContext } from '../schema/general.schema.js';
-import { logger } from '../utils/logger.util.js';
 
 type AnyUserIdColumn = PgColumn<ColumnBaseConfig<'string', string>>;
 type AnyIdColumn = PgColumn<ColumnBaseConfig<'string', string>>;
@@ -64,6 +63,33 @@ export abstract class BaseRepository<
 			.select({ count: sql<number>`count(*)` })
 			.from(this.table as AnyPgTable)
 			.where(whereClause);
+	}
+
+	protected buildAdditionalFilters(filter: any): SQL[] {
+		return [];
+	}
+
+	protected buildFilters(context: TContext, options: TQuery): SQL<unknown> | undefined {
+		const filters: SQL[] = [];
+
+		if (context?.userId) {
+			filters.push(eq(this.table.userId, sql`${context?.userId}`));
+		}
+
+		if (options?.search) {
+			filters.push(ilike(this.table.name, `${options.search}%`));
+		}
+
+		const additionaFilters = this.buildAdditionalFilters(options);
+
+		if (additionaFilters.length > 0) {
+			filters.push(...additionaFilters);
+		}
+		return filters.length > 0 ? and(...filters) : undefined;
+	}
+
+	protected buildSortClause(sortBy: TQuery['sortBy']): SQL<unknown> {
+		return desc(this.table.createdAt);
 	}
 
 	async findByIdRaw(id: string): Promise<typeof this.table.$inferSelect | null> {
@@ -134,36 +160,6 @@ export abstract class BaseRepository<
 		} catch (error) {
 			return repositoryError(error, 'DB delete failed', 'Database error during delete', { id });
 		}
-	}
-
-	protected buildAdditionalFilters(filter: any): SQL[] {
-		return [];
-	}
-
-	protected buildFilters(context: TContext, options: TQuery): SQL<unknown> | undefined {
-		const filters: SQL[] = [];
-
-		// context
-		if (context?.userId) {
-			filters.push(eq(this.table.userId, sql`${context?.userId}`));
-		}
-
-		// filter
-		if (options?.search) {
-			filters.push(ilike(this.table.name, `${options.search}%`));
-		}
-
-		const additionaFilters = this.buildAdditionalFilters(options);
-
-		if (additionaFilters.length > 0) {
-			filters.push(...additionaFilters);
-		}
-		return filters.length > 0 ? and(...filters) : undefined;
-	}
-
-	// sort
-	protected buildSortClause(sortBy: TQuery['sortBy']): SQL<unknown> {
-		return desc(this.table.createdAt);
 	}
 
 	async findAll(context: TContext, options: TQuery): Promise<T[]> {

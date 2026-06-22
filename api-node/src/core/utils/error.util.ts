@@ -40,9 +40,9 @@ export class ConflictError extends AppError {
 }
 
 // Error handlers
-export const repositoryError = (error: any, message: string, fallback: string, context: any) => {
+export const repositoryError = (error: any, message: string, fallback: string, context: any): never => {
 	logger.error({
-		message,
+		message: 'Repository Layer: ' + message,
 		...context,
 		error: error.message,
 		stack: error.stack,
@@ -55,7 +55,7 @@ export const repositoryError = (error: any, message: string, fallback: string, c
 	throw new AppError(fallback, 500);
 };
 
-export const serviceError = (error: any, message: string, fallback: string, context: any) => {
+export const serviceError = (error: any, message: string, fallback: string, context: any): never => {
 	if (!(error instanceof AppError)) {
 		logger.error({
 			message,

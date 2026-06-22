@@ -1,9 +1,10 @@
 import { and, asc, desc, eq, ilike, SQL, sql, type ColumnBaseConfig } from 'drizzle-orm';
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import type { AnyPgTable, PgColumn, PgSelectDynamic, PgTable } from 'drizzle-orm/pg-core';
-import { AppError } from '@utils';
+import { AppError, BadRequestError, NotFoundError, repositoryError } from '@utils';
 import type { ICollectionResult } from '../types/general.js';
 import type { TBaseQuery, TContext } from '../schema/general.schema.js';
+import { logger } from '../utils/logger.util.js';
 
 type AnyUserIdColumn = PgColumn<ColumnBaseConfig<'string', string>>;
 type AnyIdColumn = PgColumn<ColumnBaseConfig<'string', string>>;
@@ -76,41 +77,63 @@ export abstract class BaseRepository<
 	}
 
 	async findOne(id: string): Promise<T> {
-		const result = await this.getBaseQuery().where(eq(this.table.id, id)).limit(1);
+		try {
+			const result = await this.getBaseQuery().where(eq(this.table.id, id)).limit(1);
 
-		if (!result || result.length === 0) throw new AppError(404, 'Item not found');
+			if (!result || result.length === 0) throw new NotFoundError('Item not found');
 
-		return this.format(result[0]);
+			return this.format(result[0]);
+		} catch (error: any) {
+			return repositoryError(error, 'DB findOne failed', 'Database error during findOne', {
+				id,
+			});
+		}
 	}
 
 	async getAll(userId: string): Promise<T[]> {
-		const results = await this.db
-			.select()
-			.from(this.table as AnyPgTable)
-			.where(eq(this.table.userId, userId));
+		try {
+			const results = await this.db
+				.select()
+				.from(this.table as AnyPgTable)
+				.where(eq(this.table.userId, userId));
 
-		return results.map((result) => this.format(result));
+			return results.map((result) => this.format(result));
+		} catch (error) {
+			return repositoryError(error, 'DB getAll failed', 'Database error during getAll', { userId });
+		}
 	}
 
 	async create(data: TCreate): Promise<string> {
-		const [record] = await this.db.insert(this.table).values(data).returning({ id: this.table.id });
+		try {
+			const [record] = await this.db.insert(this.table).values(data).returning({ id: this.table.id });
 
-		if (!record) throw new AppError(400, 'Item was not created');
+			if (!record) throw new BadRequestError('Item was not created');
 
-		return record.id as string;
+			return record.id as string;
+		} catch (error) {
+			return repositoryError(error, 'DB create failed', 'Database error during create', { data });
+		}
 	}
 
 	async update(id: string, data: TUpdate): Promise<void> {
-		await this.db
-			.update(this.table as AnyPgTable)
-			.set(data as any)
-			.where(eq(this.table.id, id));
-		return;
+		try {
+			await this.db
+				.update(this.table as AnyPgTable)
+				.set(data as any)
+				.where(eq(this.table.id, id));
+			return;
+		} catch (error) {
+			return repositoryError(error, 'DB update failed', 'Database error during update', { id, data });
+		}
 	}
 
 	async delete(id: string): Promise<void> {
-		await this.db.delete(this.table as AnyPgTable).where(eq(this.table.id, id));
-		return;
+		try {
+			await this.db.delete(this.table as AnyPgTable).where(eq(this.table.id, id));
+			return;
+		} catch (error) {
+			return repositoryError(error, 'DB delete failed', 'Database error during delete', { id });
+		}
 	}
 
 	protected buildAdditionalFilters(filter: any): SQL[] {
@@ -144,39 +167,53 @@ export abstract class BaseRepository<
 	}
 
 	async findAll(context: TContext, options: TQuery): Promise<T[]> {
-		const whereClause = this.buildFilters(context, options);
+		try {
+			const whereClause = this.buildFilters(context, options);
 
-		const results = (await this.getBaseQuery()
-			.where(whereClause)
-			.orderBy(desc(this.table.createdAt))
-			.limit(options?.limit || this.MAX_ITEMS)) as T[];
+			const results = (await this.getBaseQuery()
+				.where(whereClause)
+				.orderBy(desc(this.table.createdAt))
+				.limit(options?.limit || this.MAX_ITEMS)) as T[];
 
-		return results.map((result) => this.format(result));
+			return results.map((result) => this.format(result));
+		} catch (error) {
+			return repositoryError(error, 'DB findAll failed', 'Database error during findAll', {
+				...context,
+				...options,
+			});
+		}
 	}
 
 	async findManyAndCount(context: TContext, options: TQuery): Promise<ICollectionResult<T>> {
 		const { page, limit, offset } = options;
 
-		const whereClause = this.buildFilters(context, options);
-		const sortClause = this.buildSortClause(options?.sortBy);
+		try {
+			const whereClause = this.buildFilters(context, options);
+			const sortClause = this.buildSortClause(options?.sortBy);
 
-		const [results, countResult] = await Promise.all([
-			this.getBaseQuery().where(whereClause).orderBy(sortClause).limit(limit).offset(offset) as Promise<T[]>,
-			this.getBaseCountQuery(whereClause),
-		]);
+			const [results, countResult] = await Promise.all([
+				this.getBaseQuery().where(whereClause).orderBy(sortClause).limit(limit).offset(offset) as Promise<T[]>,
+				this.getBaseCountQuery(whereClause),
+			]);
 
-		const total = Number(countResult[0]?.count ?? 0);
-		const totalPages = Math.ceil(total / limit);
-		const normalizedPage = totalPages > 0 && page > totalPages ? totalPages : page;
+			const total = Number(countResult[0]?.count ?? 0);
+			const totalPages = Math.ceil(total / limit);
+			const normalizedPage = totalPages > 0 && page > totalPages ? totalPages : page;
 
-		return {
-			items: results.map((result) => this.format(result)),
-			pagination: {
-				page: normalizedPage,
-				limit,
-				totalItems: total,
-				totalPages,
-			},
-		};
+			return {
+				items: results.map((result) => this.format(result)),
+				pagination: {
+					page: normalizedPage,
+					limit,
+					totalItems: total,
+					totalPages,
+				},
+			};
+		} catch (error) {
+			return repositoryError(error, 'DB findManyAndCount failed', 'Database error during findManyAndCount', {
+				...context,
+				...options,
+			});
+		}
 	}
 }

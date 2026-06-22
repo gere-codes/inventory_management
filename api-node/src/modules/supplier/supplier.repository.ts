@@ -3,7 +3,12 @@ import type { TSupplier, TSupplierCreate, TSupplierUpdate } from './supplier.sch
 import { suppliers } from '@src/db/index.js';
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 
-export interface ISupplierRepository extends IBaseRepository<TSupplier, TSupplierCreate, TSupplierUpdate> {}
+export interface ISupplierRepository extends IBaseRepository<
+	TSupplier,
+	TSupplierCreate,
+	TSupplierUpdate,
+	typeof suppliers
+> {}
 
 export class SupplierRepository
 	extends BaseRepository<TSupplier, TSupplierCreate, TSupplierUpdate, typeof suppliers>

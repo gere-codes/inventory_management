@@ -5,7 +5,24 @@ import { AppError } from '@utils';
 import type { ICollectionResult } from '../types/general.js';
 import type { TBaseQuery, TContext } from '../schema/general.schema.js';
 
-export interface IBaseRepository<T, TCreate, TUpdate, TQuery extends TBaseQuery = TBaseQuery> {
+type AnyUserIdColumn = PgColumn<ColumnBaseConfig<'string', string>>;
+type AnyIdColumn = PgColumn<ColumnBaseConfig<'string', string>>;
+type AnyCreatedAtColumn = PgColumn<ColumnBaseConfig<'date', string>>;
+type AnyNameColumn = PgColumn<ColumnBaseConfig<'string', string>>;
+
+type TableWithOtherProperties = PgTable<any> & {
+	userId: AnyUserIdColumn;
+	id: AnyIdColumn;
+	createdAt: AnyCreatedAtColumn;
+	name: AnyNameColumn;
+};
+export interface IBaseRepository<
+	T,
+	TCreate,
+	TUpdate,
+	TTable extends TableWithOtherProperties,
+	TQuery extends TBaseQuery = TBaseQuery,
+> {
 	getAll(userId: string): Promise<T[]>;
 	create(data: TCreate): Promise<string>;
 	update(id: string, data: TUpdate): Promise<void>;
@@ -16,24 +33,13 @@ export interface IBaseRepository<T, TCreate, TUpdate, TQuery extends TBaseQuery 
 	findByIdRaw(id: string): Promise<any | null>;
 }
 
-type TableWithOtherProperties = PgTable<any> & {
-	userId: AnyUserIdColumn;
-	id: AnyIdColumn;
-	createdAt: AnyCreatedAtColumn;
-	name: AnyNameColumn;
-};
-type AnyUserIdColumn = PgColumn<ColumnBaseConfig<'string', string>>;
-type AnyIdColumn = PgColumn<ColumnBaseConfig<'string', string>>;
-type AnyCreatedAtColumn = PgColumn<ColumnBaseConfig<'date', string>>;
-type AnyNameColumn = PgColumn<ColumnBaseConfig<'string', string>>;
-
 export abstract class BaseRepository<
 	T,
 	TCreate,
 	TUpdate,
 	TTable extends TableWithOtherProperties,
 	TQuery extends TBaseQuery = TBaseQuery,
-> implements IBaseRepository<T, TCreate, TUpdate, TQuery> {
+> implements IBaseRepository<T, TCreate, TUpdate, TTable, TQuery> {
 	protected table: TTable;
 	protected db: NodePgDatabase;
 	protected MAX_ITEMS = 1000;

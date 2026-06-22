@@ -8,7 +8,7 @@ import type { AnyPgTable } from 'drizzle-orm/pg-core';
 import { AppError } from '@src/core/utils/app-error.util.js';
 import { sortOptions } from '@src/core/enums/query.enum.js';
 
-export interface IProductRepository extends IBaseRepository<TProduct, TProductCreate, TProductUpdate> {
+export interface IProductRepository extends IBaseRepository<TProduct, TProductCreate, TProductUpdate, typeof products> {
 	getStats(userId: string): any;
 	updateQuantity({
 		userId,

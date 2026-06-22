@@ -6,6 +6,7 @@ export interface ICategoryRepository extends IBaseRepository<
 	TCategory,
 	TCategoryCreate,
 	TCategoryUpdate,
+	typeof categories,
 	TCategoryQuery
 > {}
 export class CategoryRepository

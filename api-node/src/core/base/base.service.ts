@@ -42,10 +42,7 @@ export abstract class BaseService<
 
 	async update(id: string, data: TUpdate): Promise<T> {
 		const item = await this.repository.findByIdRaw(id);
-
-		if (!item) throw new AppError(404, 'Item not found');
 		await this.repository.update(id, data);
-
 		return await this.repository.findOne(id);
 	}
 

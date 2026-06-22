@@ -20,7 +20,7 @@ export interface IBaseRepository<
 	T,
 	TCreate,
 	TUpdate,
-	TTable extends TableWithOtherProperties,
+	TTable extends TableWithOtherProperties = TableWithOtherProperties,
 	TQuery extends TBaseQuery = TBaseQuery,
 > {
 	getAll(userId: string): Promise<T[]>;

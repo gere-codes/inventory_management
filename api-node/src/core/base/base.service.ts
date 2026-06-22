@@ -1,7 +1,7 @@
 import type { IBaseRepository } from './base.repository.js';
 import type { ICollectionResult } from '../types/general.js';
 import type { TBaseQuery, TContext } from '../schema/general.schema.js';
-import { AppError } from '../utils/app-error.util.js';
+import { serviceError } from '../utils/error.util.js';
 
 export interface IBaseService<T, TCreate, TUpdate, TQuery extends TBaseQuery = TBaseQuery> {
 	getAll(userId: string): Promise<T[]>;
@@ -25,44 +25,70 @@ export abstract class BaseService<
 	}
 
 	async getAll(userId: string): Promise<T[]> {
-		return await this.repository.getAll(userId);
+		try {
+			return await this.repository.getAll(userId);
+		} catch (error) {
+			return serviceError(error, 'Service Layer: getAll failed', 'Failed to retrive items', { userId });
+		}
 	}
 
 	async getById(id: string): Promise<T> {
-		return await this.repository.findOne(id);
+		try {
+			return await this.repository.findOne(id);
+		} catch (error: any) {
+			return serviceError(error, 'Service Layer: getById failed', 'Failed to retrive item', { id });
+		}
 	}
 
 	async create(userId: string, data: TCreate): Promise<T> {
-		const fullPayload = { ...data, userId };
+		try {
+			const fullPayload = { ...data, userId };
 
-		const id = await this.repository.create(fullPayload);
+			const id = await this.repository.create(fullPayload);
 
-		return await this.repository.findOne(id);
+			return await this.repository.findOne(id);
+		} catch (error) {
+			return serviceError(error, 'Service Layer: create failed', 'Failed to create item', { userId, data });
+		}
 	}
 
 	async update(id: string, data: TUpdate): Promise<T> {
-		const item = await this.repository.findByIdRaw(id);
-		await this.repository.update(id, data);
-		return await this.repository.findOne(id);
+		try {
+			const item = await this.repository.findByIdRaw(id);
+			await this.repository.update(id, data);
+			return await this.repository.findOne(id);
+		} catch (error) {
+			return serviceError(error, 'Service Layer: update failed', 'Failed to update item', { id, data });
+		}
 	}
 
 	async delete(id: string): Promise<T> {
-		const item = await this.repository.findByIdRaw(id);
-		if (!item) throw new AppError(404, 'Item not found');
+		try {
+			const item = await this.repository.findByIdRaw(id);
 
-		const deletedItem = await this.repository.findOne(id);
-		await this.repository.delete(id);
+			const deletedItem = await this.repository.findOne(id);
+			await this.repository.delete(id);
 
-		return deletedItem;
+			return deletedItem;
+		} catch (error) {
+			return serviceError(error, 'Service Layer: delete failed', 'Failed to delete item', { id });
+		}
 	}
 
 	async getCollection(context: TContext, options: TQuery): Promise<ICollectionResult<T>> {
-		if (Boolean(options.isPaginated) === false) {
-			return {
-				items: await this.repository.findAll(context, options),
-			};
-		}
+		try {
+			if (Boolean(options.isPaginated) === false) {
+				return {
+					items: await this.repository.findAll(context, options),
+				};
+			}
 
-		return await this.repository.findManyAndCount(context, options);
+			return await this.repository.findManyAndCount(context, options);
+		} catch (error) {
+			return serviceError(error, 'Service Layer: getCollection failed', 'Failed to retrieve items', {
+				context,
+				options,
+			});
+		}
 	}
 }

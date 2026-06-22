@@ -1,4 +1,4 @@
-import { AppError } from '@src/core/utils/app-error.util.js';
+import { AppError, NotFoundError } from '@src/core/utils/error.util.js';
 import { unlinkSync, unlink } from 'fs';
 import { join } from 'path';
 
@@ -19,7 +19,7 @@ export class LocalFileService implements IFileService {
 			const imagePath = join(process.cwd(), 'uploads', filename);
 			await unlinkSync(imagePath);
 		} catch (error) {
-			throw new AppError(404, 'File not found');
+			throw new NotFoundError('File Not found');
 		}
 	}
 }

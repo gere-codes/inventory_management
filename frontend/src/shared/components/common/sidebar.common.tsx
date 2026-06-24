@@ -23,19 +23,17 @@ export const SideBar = () => {
 		setPathName();
 	}, [location.pathname]);
 	return (
-		<aside className="flex flex-col gap-2 py-2 min-w-[270px] bg-gray-50/20 rounded shadow">
+		<aside className="flex flex-col gap-2 py-2 min-w-[270px] bg-gray-50/20 rounded shadow-sm">
 			{/* Logo */}
 			<section className="pl-6 h-16 flex items-center">
-				<Link to={'/'} className="text-black h-fit w-fit ">
+				<Link to={'/'} className="text-black h-fit w-fit">
 					<SiGoogletagmanager size={35} />
 				</Link>
 			</section>
 
 			{/* Navs */}
-
 			<nav className="flex-1  flex flex-col justify-between **:">
-				{/* Navs */}
-				<ul className="flex flex-col gap-1  w-full ">
+				<ul className="flex flex-col gap-1 w-full ">
 					<NavLink lable="Products" pathName="/" currentPath={currentPath} Icon={RiAlignItemRightFill} />
 					<NavLink lable="Orders" pathName="/orders" currentPath={currentPath} Icon={FaShoppingBag} />
 					<NavLink
@@ -46,15 +44,16 @@ export const SideBar = () => {
 					/>
 					<NavLink lable="Categories" pathName="/categories" currentPath={currentPath} Icon={MdCategory} />
 				</ul>
-
-				<button
-					onClick={() => dispatch(authThunk.logout())}
-					className=" w-full rounded pl-6 mb-12 cursor-pointer flex gap-2 items-center text-gray-400"
-				>
-					<IoIosLogOut size={35} />
-					<span className="text-gray-400">Logout</span>
-				</button>
 			</nav>
+
+			{/* Logout */}
+			<button
+				onClick={() => dispatch(authThunk.logout())}
+				className=" w-full rounded pl-6 mb-16 cursor-pointer flex gap-2 items-center text-gray-600"
+			>
+				<IoIosLogOut size={35} />
+				<span className="text-gray-600">Logout</span>
+			</button>
 		</aside>
 	);
 };

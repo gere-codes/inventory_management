@@ -5,8 +5,8 @@ import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { and, asc, desc, eq, gte, ilike, lte, or, SQL, sql } from 'drizzle-orm';
 import { EProductStatus } from './product.enum.js';
 import type { AnyPgTable } from 'drizzle-orm/pg-core';
-import { AppError } from '@src/core/utils/app-error.util.js';
 import { sortOptions } from '@src/core/enums/query.enum.js';
+import { BadRequestError } from '@src/core/utils/error.util.js';
 
 export interface IProductRepository extends IBaseRepository<TProduct, TProductCreate, TProductUpdate, typeof products> {
 	getStats(userId: string): any;
@@ -144,7 +144,7 @@ export class ProductRepository
 			.where(and(eq(this.table.userId, userId), eq(this.table.id, productId)))
 			.returning({ id: this.table.id });
 
-		if (!record) throw new AppError(400, 'Item was not updated');
+		if (!record) throw new BadRequestError('Item was not updated');
 
 		const [product] = await this.db
 			.select()

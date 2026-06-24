@@ -32,7 +32,7 @@ export const SideBar = () => {
 			</section>
 
 			{/* Navs */}
-			<nav className="flex-1  flex flex-col justify-between **:">
+			<nav className="flex-1  flex flex-col justify-between">
 				<ul className="flex flex-col gap-1 w-full ">
 					<NavLink lable="Products" pathName="/" currentPath={currentPath} Icon={RiAlignItemRightFill} />
 					<NavLink lable="Orders" pathName="/orders" currentPath={currentPath} Icon={FaShoppingBag} />

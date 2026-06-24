@@ -50,6 +50,7 @@
 			"@config/*": ["config/*"],
 			"@core/*": ["core/*"],
 			"@db/*": ["db/*"],
+
 			"@modules/*": ["modules/*"],
 			"@routes/*": ["routes/*"],
 

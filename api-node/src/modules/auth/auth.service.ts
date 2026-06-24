@@ -1,7 +1,7 @@
 import type { TUser, TUserResponse } from '@src/db/schema/user.js';
 import { loginSchema, registerSchema, type TLoginInput, type TRegisterInput } from './auth.schema.js';
 import { authRepository } from './auth.repository.js';
-import { AppError } from '@src/core/utils/app-error.util.js';
+import { AppError, ConflictError, NotAuthorizedError } from '@src/core/utils/error.util.js';
 import jwt from 'jsonwebtoken';
 import { env } from '@src/config/env.js';
 import bcrypt from 'bcrypt';
@@ -17,7 +17,7 @@ class AuthService {
 
 		// check if the user exists
 		const existingUser = await this.repo.findByEmail(validatedUser.email);
-		if (existingUser) throw new AppError(409, 'User already exists');
+		if (existingUser) throw new ConflictError('User already exists');
 
 		// Hash the password
 		const hashedPassword = await bcrypt.hash(validatedUser.password, 12);
@@ -56,7 +56,7 @@ class AuthService {
 		const validUser = await bcrypt.compare(validatedUser.password, hashedPassword);
 
 		// return error if user is not valid
-		if (!validUser || !existingUser) throw new AppError(401, 'Invalid email or password');
+		if (!validUser || !existingUser) throw new NotAuthorizedError();
 
 		const user: TUserResponse = {
 			id: existingUser.id,
@@ -73,7 +73,7 @@ class AuthService {
 	}
 
 	async refresh(userId: string) {
-		if (!userId) throw new AppError(401, 'Unauthorized');
+		if (!userId) throw new NotAuthorizedError();
 		const accessToken = this.generateAccessToken(userId);
 		const refreshToken = this.generateRefreshToken(userId);
 		return { accessToken, refreshToken };

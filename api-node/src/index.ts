@@ -4,6 +4,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
+import path from 'path';
 
 import { env } from '@config/env.js';
 import { db, closeConnection } from '@db/index.js';
@@ -14,7 +15,6 @@ import { globalErrorHandler } from '@middlewares/index.js';
 import { apiLimiter, corsOptions } from '@config/index.js';
 
 const app = express();
-const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors(corsOptions));
@@ -43,22 +43,29 @@ app.use(
 
 app.use('/api', apiRoutes);
 
+const __dirname = path.resolve();
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.get('/*spat', (req, res) => {
+	res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 // global error handler
 app.use(globalErrorHandler);
 
 async function startServer() {
 	try {
 		// connect to db
-		console.log('⏳ Connecting to database...');
+		console.log('Connecting to database...');
 		await db.execute(sql`SELECT 1`);
-		console.log('✅ Database connected');
+		console.log('Database connected');
 
 		// start the app
 		app.listen(env.PORT, () => {
-			console.log(`🚀 Server ready at http://localhost:${env.PORT}`);
+			console.log(`Server ready at http://localhost:${env.PORT}`);
 		});
 	} catch (error) {
-		console.error('❌ Failed to start server:', error);
+		console.error('Failed to start server:', error);
 		process.exit(1);
 	}
 }

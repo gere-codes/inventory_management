@@ -34,7 +34,6 @@ export const useCategoryFilter = () => {
 		handleSearchChange,
 		pagination,
 		resetFilters,
-		setParam,
 		status,
 		data,
 	} = useCollectionFilter({
@@ -54,7 +53,6 @@ export const useCategoryFilter = () => {
 		handleSearchChange,
 		pagination,
 		resetFilters,
-		setParam,
 		status,
 		data,
 	};

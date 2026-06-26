@@ -13,7 +13,7 @@ const imagesSchema = z.array(imageSchema).optional().nullable();
 export const productSchema = z.object({
 	id: z.uuid(),
 	name: z.string().min(2).max(100),
-	price: z.coerce.number().nonnegative(),
+	price: z.number().nonnegative(),
 	description: z.string().max(1000).nullable().optional(),
 	quantity: z.number().int().nonnegative(),
 	categoryId: z.uuid(),

@@ -13,7 +13,7 @@ export const orderSchema = z.object({
 	id: z.uuid(),
 	productId: z.uuid().optional().nullable(),
 	name: z.string().min(1),
-	price: z.coerce.number().min(0.01),
+	price: z.number().min(0.01),
 	quantity: z.number().min(0),
 	description: z.string().max(1000).nullable().optional(),
 	categoryId: z.uuid(),

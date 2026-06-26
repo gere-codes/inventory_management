@@ -1,25 +1,20 @@
-name: Deploy to Railway
 
+name: Deploy to Railway
 on:
   push:
     branches:
       - staging
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
-      # Step 1: Check out your repository code so the workflow can see it
       - name: Checkout Code
         uses: actions/checkout@v4
-
-      # Step 2: Install the Railway CLI inside the GitHub Actions runner
       - name: Install Railway CLI
         run: npm i -g @railway/cli
-
-      # Step 3: Deploy to Railway using your account token
       - name: Deploy to Railway
         run: railway up --detach
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_PROJECT_ID: 264a1c32-8c3b-4390-81c9-cf71f2bb81fc
+          RAILWAY_SERVICE_ID: cf217038-af33-428c-8211-a28c166c0e7e

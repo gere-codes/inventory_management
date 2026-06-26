@@ -25,65 +25,64 @@
 		"noUncheckedSideEffectImports": true,
 
 		/* Alias paths */
-		"baseUrl": "./src",
 		"paths": {
 			// Root
-			"@/*": ["./*"],
+			"@/*": ["./src/*"],
 
 			// Pages
-			"@pages": ["pages/index"],
-			"@pages/*": ["pages/*"],
+			"@pages": ["./src/pages/index"],
+			"@pages/*": ["./src/pages/*"],
 
 			// Shared
-			"@base": ["shared/base/index"],
-			"@base/*": ["shared/base/*"],
+			"@base": ["./src/shared/base/index"],
+			"@base/*": ["./src/shared/base/*"],
 
-			"@api": ["shared/api/index"],
-			"@api/*": ["shared/api/*"],
+			"@api": ["./src/shared/api/index"],
+			"@api/*": ["./src/shared/api/*"],
 
-			"@ui": ["shared/components/ui/index"],
-			"@ui/*": ["shared/components/ui/*"],
+			"@ui": ["./src/shared/components/ui/index"],
+			"@ui/*": ["./src/shared/components/ui/*"],
 
-			"@common": ["shared/components/common/index"],
-			"@common/*": ["shared/components/common/*"],
+			"@common": ["./src/shared/components/common/index"],
+			"@common/*": ["./src/shared/components/common/*"],
 
-			"@hooks": ["shared/hooks/index"],
-			"@hooks/*": ["shared/hooks/*"],
+			"@hooks": ["./src/shared/hooks/index"],
+			"@hooks/*": ["./src/shared/hooks/*"],
 
-			"@utils": ["shared/utils/index"],
-			"@utils/*": ["shared/utils/*"],
+			"@utils": ["./src/shared/utils/index"],
+			"@utils/*": ["./src/shared/utils/*"],
 
-			"@constants": ["shared/constants/index"],
-			"@constants/*": ["shared/constants/*"],
+			"@constants": ["./src/shared/constants/index"],
+			"@constants/*": ["./src/shared/constants/*"],
 
-			"@routes": ["shared/routes/index"],
-			"@routes/*": ["shared/routes/*"],
+			"@routes": ["./src/shared/routes/index"],
+			"@routes/*": ["./src/shared/routes/*"],
 
-			"@enums": ["shared/enums/index"],
-			"@enums/*": ["shared/enums/*"],
+			"@enums": ["./src/shared/enums/index"],
+			"@enums/*": ["./src/shared/enums/*"],
 
-			"@sharedTypes": ["shared/types/index"],
-			"@sharedTypes/*": ["shared/types/*"],
+			"@sharedTypes": ["./src/shared/types/index"],
+			"@sharedTypes/*": ["./src/shared/types/*"],
 
 			// Features
-			"@auth": ["features/auth/index"],
-			"@auth/*": ["features/auth/*"],
+			"@auth": ["./src/features/auth/index"],
+			"@auth/*": ["./src/features/auth/*"],
 
-			"@products": ["features/products/index"],
-			"@products/*": ["features/products/*"],
+			"@products": ["./src/features/products/index"],
+			"@products/*": ["./src/features/products/*"],
 
-			"@categories": ["features/categories/index"],
-			"@categories/*": ["features/categories/*"],
+			"@categories": ["./src/features/categories/index"],
+			"@categories/*": ["./src/features/categories/*"],
 
-			"@suppliers": ["features/suppliers/index"],
-			"@suppliers/*": ["features/suppliers/*"],
+			"@suppliers": ["./src/features/suppliers/index"],
+			"@suppliers/*": ["./src/features/suppliers/*"],
 
-			"@orders": ["features/orders/index"],
-			"@orders/*": ["features/orders/*"],
+			"@orders": ["./src/features/orders/index"],
+			"@orders/*": ["./src/features/orders/*"],
 
 			// Store
-			"@store": ["store/index"],
-			"@store/*": ["store/*"]
+			"@store": ["./src/store/index"],
+			"@store/*": ["./src/store/*"]
 		}
 	},
 	"include": ["src"]

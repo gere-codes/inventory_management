@@ -43,25 +43,24 @@
 		"skipLibCheck": true,
 
 		// Paths
-		"baseUrl": "./src",
 		"paths": {
-			"@src/*": ["./*"],
+			"@src/*": ["./src/*"],
 
-			"@config/*": ["config/*"],
-			"@core/*": ["core/*"],
-			"@db/*": ["db/*"],
+			"@config/*": ["./src/config/*"],
+			"@core/*": ["./src/core/*"],
+			"@db/*": ["./src/db/*"],
 
-			"@modules/*": ["modules/*"],
-			"@routes/*": ["routes/*"],
+			"@modules/*": ["./src/modules/*"],
+			"@routes/*": ["./src/routes/*"],
 
-			"@utils": ["core/utils/index.js"],
-			"@utils/*": ["core/utils/*"],
+			"@utils": ["./src/core/utils/index.js"],
+			"@utils/*": ["./src/core/utils/*"],
 
-			"@middlewares": ["core/middlewares/index.js"],
-			"@middlewares/*": ["core/middlewares/*"],
+			"@middlewares": ["./src/core/middlewares/index.js"],
+			"@middlewares/*": ["./src/core/middlewares/*"],
 
-			"@services": ["services/index.js"],
-			"@services/*": ["services/utils/*"]
+			"@services": ["./src/services/index.js"],
+			"@services/*": ["./src/services/utils/*"]
 		}
 	},
 	"include": ["src/**/*"]

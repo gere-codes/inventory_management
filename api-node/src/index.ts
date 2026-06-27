@@ -61,7 +61,7 @@ async function startServer() {
 		console.log('Database connected');
 
 		// start the app
-		app.listen(env.PORT, () => {
+		app.listen(Number(env.PORT), () => {
 			console.log(`Server ready at http://localhost:${env.PORT}`);
 		});
 	} catch (error) {

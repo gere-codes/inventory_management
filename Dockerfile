@@ -4,7 +4,7 @@ WORKDIR /app/frontend
 COPY frontend/package*.json ./
 RUN npm install
 COPY frontend/ ./
-ARG VITE_BASE
+ARG VITE_BASE=/api
 ENV VITE_BASE=$VITE_BASE
 RUN npm run build
 

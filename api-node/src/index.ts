@@ -17,9 +17,8 @@ import { apiLimiter, corsOptions } from '@config/index.js';
 const app = express();
 
 // Middleware
-app.use(cors(corsOptions));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.set('trust proxy', 1);
+app.get('/health', (req, res) => res.send('OK'));
 app.use(
 	helmet({
 		xPoweredBy: false,
@@ -27,11 +26,11 @@ app.use(
 		crossOriginResourcePolicy: { policy: 'cross-origin' },
 	}),
 );
+app.use(cors(corsOptions));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-
 app.use(apiLimiter);
-
-app.get('/health', (req, res) => res.send('OK'));
 
 app.use(
 	'/uploads',

@@ -22,12 +22,14 @@ RUN npm run build
 FROM node:20-alpine as production 
 WORKDIR /app
 COPY api-node/package*.json ./
-RUN npm install --omit=dev
+RUN npm install --omit=dev && npm install -g drizzle-kit
 
 ## full permission to read and write at the uploads folder
 RUN mkdir uploads && chmod 777 uploads
 
 COPY --from=build-backend /app/backend/dist ./dist
+COPY backend/drizzle ./drizzle
+COPY backend/drizzle.config.ts ./drizzle.config.ts
 COPY --from=build-frontend /app/frontend/dist ./public
 EXPOSE 5000
-CMD ["node", "dist/index.js"]
+CMD ["npm", "run", "start"]

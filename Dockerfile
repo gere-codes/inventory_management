@@ -2,7 +2,7 @@
 FROM node:20-alpine AS frontend-build
 WORKDIR /app/frontend
 COPY frontend/package*.json ./
-RUN npm ci
+RUN npm install
 COPY frontend/ ./
 ARG VITE_BASE=/api
 ENV VITE_BASE=$VITE_BASE
@@ -14,7 +14,7 @@ FROM node:20-alpine AS backend-build
 WORKDIR /app/backend
 
 COPY api-node/package*.json ./
-RUN npm ci
+RUN npm install
 
 COPY api-node/ ./
 
@@ -31,7 +31,7 @@ ENV NODE_ENV=production
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
 COPY --from=backend-build /app/backend/package.json ./
-RUN npm ci --omit=dev
+RUN npm install --omit=dev
 
 COPY --from=backend-build /app/backend/dist ./dist
 COPY --from=backend-build /app/backend/drizzle ./drizzle

@@ -33,7 +33,7 @@ app.use(cookieParser());
 app.use(apiLimiter);
 
 app.use(
-	'/uploads',
+	'/api/uploads',
 	express.static('uploads', {
 		index: false,
 		fallthrough: true,

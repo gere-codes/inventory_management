@@ -32,6 +32,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(apiLimiter);
 
+app.get('/api/uploads/test', (req, res) => {
+	console.log('Reached test route');
+	res.send('OK');
+});
+
 app.use(
 	'/api/uploads',
 	express.static('uploads', {

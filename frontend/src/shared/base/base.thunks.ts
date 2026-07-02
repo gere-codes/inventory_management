@@ -8,12 +8,14 @@ export abstract class BaseThunks<
 	T,
 	TCreate,
 	TUpdate,
+	TStats,
 	TCreateBody = TCreate,
 	TUpdateBody = TUpdate,
-	TService extends IBaseService<T, TCreate, TUpdate, TCreateBody, TUpdateBody> = IBaseService<
+	TService extends IBaseService<T, TCreate, TUpdate, TStats, TCreateBody, TUpdateBody> = IBaseService<
 		T,
 		TCreate,
 		TUpdate,
+		TStats,
 		TCreateBody,
 		TUpdateBody
 	>,
@@ -25,6 +27,7 @@ export abstract class BaseThunks<
 	public update: AsyncThunk<T, { id: string; body: TUpdateBody }, {}>;
 	public delete: AsyncThunk<T, string, {}>;
 	public getCollection: AsyncThunk<ICollectionResult<T>, TQuery, {}>;
+	public getStats: AsyncThunk<TStats, void, {}>;
 
 	constructor(
 		protected resource: string,
@@ -91,6 +94,13 @@ export abstract class BaseThunks<
 				}
 			},
 		);
+		this.getStats = createAsyncThunk<TStats, void>(`${resource}/stats`, async (_, { rejectWithValue }) => {
+			try {
+				return await service.getStats();
+			} catch (error) {
+				return rejectWithValue(this.handleError(error, `Error occurred while ${resource}s stats`));
+			}
+		});
 	}
 
 	handleError = (error: any, defaultMessage: string) => {

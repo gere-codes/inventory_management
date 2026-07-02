@@ -1,33 +1,16 @@
 import {} from 'react';
-import type { IconType } from 'react-icons';
-import { LuPackageMinus, LuPackageOpen } from 'react-icons/lu';
-import { TbPackages } from 'react-icons/tb';
-
-import { useAppSelector } from '@hooks';
 import { SearchBar, Pagination } from '@common';
-import { ProductTable, useProductHandlers, useProductFilter, useProductStats } from '@products';
+import { ProductTable, useProductHandlers, useProductFilter, useProductStats, ProductsStats } from '@products';
 import { Button } from '@ui';
 
 export const ProductsPage = () => {
 	const { filters, searchTerm, handleSearchChange, pagination, status, data, setPage, setLimit } = useProductFilter();
 	const { handleDelete, handleEdit, handleReorder, handleAddProduct } = useProductHandlers();
 
-	const { data: productsStat } = useProductStats();
-
 	return (
 		<section className="pt-4 flex flex-col h-full">
 			{/* Stats */}
-			<section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 flex-1">
-				<ProductLevel
-					Icon={TbPackages}
-					color="blue"
-					count={productsStat?.totalProducts ?? 0}
-					name="Total Products"
-				/>
-				<ProductLevel Icon={LuPackageMinus} color="yellow" count={productsStat?.lowStock} name="Low in Stock" />
-				<ProductLevel Icon={LuPackageOpen} color="red" count={productsStat?.outOfStock} name="Out of Stock" />
-			</section>
-
+			<ProductsStats />
 			<section className="flex flex-col justify-between">
 				<section className="">
 					{/* Search + Add */}
@@ -66,46 +49,6 @@ export const ProductsPage = () => {
 					onPerPageChange={setLimit}
 				/>
 			</section>
-		</section>
-	);
-};
-type TColor = 'yellow' | 'red' | 'blue';
-const colorMap: Record<TColor, Record<'bg' | 'text' | 'iconBg', string>> = {
-	yellow: {
-		bg: 'bg-yellow-50',
-		text: 'text-yellow-600',
-		iconBg: 'bg-yellow-200',
-	},
-	red: {
-		bg: 'bg-red-50',
-		text: 'text-red-600',
-		iconBg: 'bg-red-200',
-	},
-	blue: {
-		bg: 'bg-blue-50',
-		text: 'text-blue-600',
-		iconBg: 'bg-blue-200',
-	},
-};
-
-interface IProductLevel {
-	name: string;
-	count: number;
-	Icon: IconType;
-	color: TColor;
-}
-
-const ProductLevel = ({ color, count, name, Icon }: IProductLevel) => {
-	const styles = colorMap[color];
-	return (
-		<section className={`${styles.bg} ${styles.text} h-[160px] p-4 rounded-lg shadow-xs flex items-center gap-4`}>
-			<span className={`p-3 ${styles.iconBg} rounded-lg`}>
-				<Icon size={28} />
-			</span>
-			<div>
-				<span className="text-3xl font-semibold">{count}</span>
-				<h2 className="text-sm ">{name}</h2>
-			</div>
 		</section>
 	);
 };

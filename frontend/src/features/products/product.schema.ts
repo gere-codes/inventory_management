@@ -60,15 +60,11 @@ export type TProductUpdate = z.infer<typeof productUpdateSchema>;
 export type TProductFormValues = z.infer<typeof productFormSchema>;
 
 export const productStatsSchema = z.object({
-	categories: z.array(
-		z.object({
-			name: z.string(),
-			count: z.number(),
-		}),
-	),
-	lowStock: z.number(),
-	outOfStock: z.number(),
-	totalProducts: z.number(),
+	stockLevel: z.object({
+		lowStock: z.number(),
+		outOfStock: z.number(),
+		totalProducts: z.number(),
+	}),
 });
 
 export type TProductStats = z.infer<typeof productStatsSchema>;

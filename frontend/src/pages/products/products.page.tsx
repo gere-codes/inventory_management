@@ -5,14 +5,14 @@ import { TbPackages } from 'react-icons/tb';
 
 import { useAppSelector } from '@hooks';
 import { SearchBar, Pagination } from '@common';
-import { ProductTable, selectProductStats, useProductHandlers, useProductFilter } from '@products';
+import { ProductTable, useProductHandlers, useProductFilter, useProductStats } from '@products';
 import { Button } from '@ui';
 
 export const ProductsPage = () => {
 	const { filters, searchTerm, handleSearchChange, pagination, status, data, setPage, setLimit } = useProductFilter();
 	const { handleDelete, handleEdit, handleReorder, handleAddProduct } = useProductHandlers();
 
-	const productStats = useAppSelector(selectProductStats);
+	const { data: productsStat } = useProductStats();
 
 	return (
 		<section className="pt-4 flex flex-col h-full">
@@ -21,11 +21,11 @@ export const ProductsPage = () => {
 				<ProductLevel
 					Icon={TbPackages}
 					color="blue"
-					count={productStats?.totalProducts ?? 0}
+					count={productsStat?.totalProducts ?? 0}
 					name="Total Products"
 				/>
-				<ProductLevel Icon={LuPackageMinus} color="yellow" count={productStats?.lowStock} name="Low in Stock" />
-				<ProductLevel Icon={LuPackageOpen} color="red" count={productStats?.outOfStock} name="Out of Stock" />
+				<ProductLevel Icon={LuPackageMinus} color="yellow" count={productsStat?.lowStock} name="Low in Stock" />
+				<ProductLevel Icon={LuPackageOpen} color="red" count={productsStat?.outOfStock} name="Out of Stock" />
 			</section>
 
 			<section className="flex flex-col justify-between">

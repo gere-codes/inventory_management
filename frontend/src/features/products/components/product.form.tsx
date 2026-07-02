@@ -9,7 +9,7 @@ import { CategorySelect, useCategories } from '@categories';
 import { productThunk } from '../product.thunk';
 import { BASE_URL } from '@api';
 import { TiDelete } from 'react-icons/ti';
-import { useProductData } from '../product.hook';
+import { useProductData, useProductStats } from '../product.hook';
 
 interface Props {
 	mode: EModalMode.CREATE | EModalMode.EDIT;
@@ -20,8 +20,9 @@ export const ProductForm = ({ mode, initialData }: Props) => {
 	const { fetchData } = useProductData();
 	const dispatch = useAppDispatch();
 
-	const { categories, isLoading } = useCategories();
 	const [previewUrl, setPreviewUrl] = useState<string[] | null>(null);
+	const { categories, isLoading } = useCategories();
+	const { fetchProductsStats } = useProductStats();
 
 	const {
 		register,
@@ -59,13 +60,20 @@ export const ProductForm = ({ mode, initialData }: Props) => {
 				formData.append(key, value.toString());
 			}
 		});
-		if (data.mode === EModalMode.EDIT) {
-			await dispatch(productThunk.update({ id: data.id, body: formData }));
-		} else {
-			await dispatch(productThunk.create(formData));
-			await fetchData();
+		try {
+			if (data.mode === EModalMode.EDIT) {
+				await dispatch(productThunk.update({ id: data.id, body: formData }));
+			} else {
+				await dispatch(productThunk.create(formData));
+				await fetchData();
+			}
+
+			dispatch(closeModal());
+		} catch (error) {
+			console.error(error);
+		} finally {
+			fetchProductsStats();
 		}
-		dispatch(closeModal());
 	};
 
 	const imageFile = watch('images');

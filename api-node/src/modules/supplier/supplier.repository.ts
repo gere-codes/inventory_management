@@ -1,5 +1,5 @@
 import { BaseRepository, type IBaseRepository } from '@src/core/base/base.repository.js';
-import type { TSupplier, TSupplierCreate, TSupplierUpdate } from './supplier.schema.js';
+import type { TSupplier, TSupplierCreate, TSupplierStats, TSupplierUpdate } from './supplier.schema.js';
 import { suppliers } from '@src/db/index.js';
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 
@@ -7,11 +7,12 @@ export interface ISupplierRepository extends IBaseRepository<
 	TSupplier,
 	TSupplierCreate,
 	TSupplierUpdate,
+	TSupplierStats,
 	typeof suppliers
 > {}
 
 export class SupplierRepository
-	extends BaseRepository<TSupplier, TSupplierCreate, TSupplierUpdate, typeof suppliers>
+	extends BaseRepository<TSupplier, TSupplierCreate, TSupplierUpdate, TSupplierStats, typeof suppliers>
 	implements ISupplierRepository
 {
 	constructor(db: NodePgDatabase<any>) {

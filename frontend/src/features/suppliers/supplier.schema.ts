@@ -54,3 +54,8 @@ export const suppplierQuerySchema = commonQuery
 	.transform(withOffset);
 
 export type TSupplierQuery = z.infer<typeof suppplierQuerySchema>;
+
+export const supplierStatsSchema = z.object({
+	name: z.string(),
+});
+export type TSupplierStats = z.infer<typeof supplierStatsSchema>;

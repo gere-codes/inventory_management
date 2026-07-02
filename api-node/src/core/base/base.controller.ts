@@ -18,7 +18,8 @@ export abstract class BaseController<
 	T,
 	TCreate,
 	TUpdate,
-	TService extends IBaseService<T, TCreate, TUpdate> = IBaseService<T, TCreate, TUpdate>,
+	TStats,
+	TService extends IBaseService<T, TCreate, TUpdate, TStats> = IBaseService<T, TCreate, TUpdate, TStats>,
 	TQuery extends TBaseQuery = TBaseQuery,
 > implements IBaseController<T, TCreate, TUpdate> {
 	constructor(
@@ -27,6 +28,7 @@ export abstract class BaseController<
 		protected createSchema: z.ZodSchema<TCreate>,
 		protected updateSchema: z.ZodSchema<TUpdate>,
 		protected querySchema: z.ZodSchema<TQuery>,
+		protected statsSchema: z.ZodSchema<TStats>,
 		protected fileService?: IFileService,
 	) {}
 
@@ -151,6 +153,17 @@ export abstract class BaseController<
 			items: z.array(this.schema).parse(items),
 			pagination: paginationSchema.parse(pagination),
 		};
+
+		res.status(200).json({
+			success: true,
+			payload: responseDto,
+		});
+	});
+
+	getStats = catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+		const userId = req.user?.id as string;
+		const reponse = await this.service.getStats(userId);
+		const responseDto = this.schema.parse(reponse);
 
 		res.status(200).json({
 			success: true,

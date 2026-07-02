@@ -7,6 +7,7 @@ export interface IBaseService<
 	T,
 	TCreate,
 	TUpdate,
+	TStats,
 	TCreateBody = TCreate,
 	TUpdateBody = TUpdate,
 	TQuery extends TBaseQuery = TBaseQuery,
@@ -17,26 +18,30 @@ export interface IBaseService<
 	update(id: string, data: TUpdateBody): Promise<T>;
 	delete(id: string): Promise<T>;
 	getCollection(params?: TQuery): Promise<ICollectionResult<T>>;
+	getStats(): Promise<TStats>;
 }
 export abstract class BaseService<
 	T,
 	TCreate,
 	TUpdate,
+	TStats,
 	TCreateBody = TCreate,
 	TUpdateBody = TUpdate,
 	TQuery extends TBaseQuery = TBaseQuery,
-> implements IBaseService<T, TCreate, TUpdate, TCreateBody, TUpdateBody, TQuery> {
+> implements IBaseService<T, TCreate, TUpdate, TStats, TCreateBody, TUpdateBody, TQuery> {
 	protected readonly resource: string;
 	protected schema: z.ZodSchema<T>;
 	protected createSchema: z.ZodSchema<TCreate>;
 	protected updateSchema: z.ZodSchema<TUpdate>;
 	protected paramSchema?: z.ZodSchema<TQuery>;
+	protected statsSchema: z.ZodSchema<TStats>;
 
 	constructor(
 		resource: string,
 		schema: z.ZodSchema<T>,
 		createSchema: z.ZodSchema<TCreate>,
 		updateSchema: z.ZodSchema<TUpdate>,
+		statsSchema: z.ZodSchema<TStats>,
 		paramSchema?: z.ZodSchema<TQuery>,
 	) {
 		this.resource = resource;
@@ -44,6 +49,7 @@ export abstract class BaseService<
 		this.createSchema = createSchema;
 		this.updateSchema = updateSchema;
 		this.paramSchema = paramSchema;
+		this.statsSchema = statsSchema;
 	}
 
 	queryBuilder(params: TQuery): Record<string, any> {
@@ -95,5 +101,10 @@ export abstract class BaseService<
 			items: z.array(this.schema).parse(items),
 			pagination: paginationSchema.parse(pagination),
 		};
+	}
+
+	async getStats(): Promise<any> {
+		const respose = await privateInstance.get(`/${this.resource}`);
+		return this.statsSchema.parse(respose);
 	}
 }

@@ -3,21 +3,23 @@ import type { ICollectionResult } from '../types/general.js';
 import type { TBaseQuery, TContext } from '../schema/general.schema.js';
 import { serviceError } from '../utils/error.util.js';
 
-export interface IBaseService<T, TCreate, TUpdate, TQuery extends TBaseQuery = TBaseQuery> {
+export interface IBaseService<T, TCreate, TUpdate, TStats, TQuery extends TBaseQuery = TBaseQuery> {
 	getAll(userId: string): Promise<T[]>;
 	getById(id: string): Promise<T>;
 	create(userId: string, data: TCreate): Promise<T>;
 	update(id: string, data: TUpdate): Promise<T>;
 	delete(id: string): Promise<T>;
 	getCollection(context: TContext, options?: TQuery): Promise<ICollectionResult<T>>;
+	getStats(userId: string): Promise<TStats>;
 }
 export abstract class BaseService<
 	T,
 	TCreate,
 	TUpdate,
-	TRepository extends IBaseRepository<T, TCreate, TUpdate> = IBaseRepository<T, TCreate, TUpdate>,
+	TStats,
+	TRepository extends IBaseRepository<T, TCreate, TUpdate, TStats> = IBaseRepository<T, TCreate, TUpdate, TStats>,
 	TQuery extends TBaseQuery = TBaseQuery,
-> implements IBaseService<T, TCreate, TUpdate, TQuery> {
+> implements IBaseService<T, TCreate, TUpdate, TStats, TQuery> {
 	protected repository: TRepository;
 
 	constructor(repository: TRepository) {
@@ -89,6 +91,14 @@ export abstract class BaseService<
 				context,
 				options,
 			});
+		}
+	}
+
+	async getStats(userId: string) {
+		try {
+			return await this.repository.getStats(userId);
+		} catch (error) {
+			return serviceError(error, 'Service Layer: getStats failed', 'Failed to retrieve stats', {});
 		}
 	}
 }

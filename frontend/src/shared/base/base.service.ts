@@ -103,8 +103,8 @@ export abstract class BaseService<
 		};
 	}
 
-	async getStats(): Promise<any> {
-		const respose = await privateInstance.get(`/${this.resource}`);
+	async getStats(): Promise<TStats> {
+		const respose = await privateInstance.get(`/${this.resource}/stats`);
 		return this.statsSchema.parse(respose);
 	}
 }

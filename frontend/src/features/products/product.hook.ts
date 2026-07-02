@@ -1,4 +1,4 @@
-import { useAppDispatch, useCollectionFilter, useFetchData } from '@hooks';
+import { useAppDispatch, useAppSelector, useCollectionFilter, useFetchData } from '@hooks';
 import { productThunk } from './product.thunk';
 import { productQuerySchema, type TProduct } from './product.schema';
 import { EModalMode, EModalType, openModal } from '@common';
@@ -10,6 +10,7 @@ import {
 	selectProductsStatus,
 	selectProductStats,
 } from './product.selectors';
+import { useCallback, useEffect } from 'react';
 
 export const useProductFilter = () => {
 	const {
@@ -90,4 +91,25 @@ export const useProductData = () => {
 		selectStatus: selectProductsStatus,
 	});
 	return products;
+};
+
+export const useProductStats = () => {
+	const dispatch = useAppDispatch();
+	const { data, status } = useAppSelector(selectProductStats);
+
+	const fetchProductsStats = useCallback(() => {
+		dispatch(productThunk.getStats());
+	}, [dispatch]);
+
+	useEffect(() => {
+		fetchProductsStats();
+	}, [fetchProductsStats]);
+
+	return {
+		data,
+		isLoading: status === 'loading',
+		isSuccess: status === 'succeeded',
+		isError: status === 'failed',
+		fetchProductsStats,
+	};
 };

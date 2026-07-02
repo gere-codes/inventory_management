@@ -123,7 +123,6 @@ export class ProductRepository
 			outOfStock: result[0]?.outOfStock ?? 0,
 			lowStock: result[0]?.lowStock ?? 0,
 			totalProducts: result[0]?.totalProducts ?? 0,
-			categories: categoriesResult,
 		};
 	}
 

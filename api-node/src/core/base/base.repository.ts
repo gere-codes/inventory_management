@@ -20,6 +20,7 @@ export interface IBaseRepository<
 	T,
 	TCreate,
 	TUpdate,
+	TStats,
 	TTable extends TableWithOtherProperties = TableWithOtherProperties,
 	TQuery extends TBaseQuery = TBaseQuery,
 > {
@@ -31,15 +32,17 @@ export interface IBaseRepository<
 	findAll(context: TContext, options: TQuery): Promise<T[]>;
 	findManyAndCount(context: TContext, options: TQuery): Promise<ICollectionResult<T>>;
 	findByIdRaw(id: string): Promise<any | null>;
+	getStats(userId: string): Promise<TStats>;
 }
 
 export abstract class BaseRepository<
 	T,
 	TCreate,
 	TUpdate,
+	TStats,
 	TTable extends TableWithOtherProperties,
 	TQuery extends TBaseQuery = TBaseQuery,
-> implements IBaseRepository<T, TCreate, TUpdate, TTable, TQuery> {
+> implements IBaseRepository<T, TCreate, TUpdate, TStats, TTable, TQuery> {
 	protected table: TTable;
 	protected db: NodePgDatabase;
 	protected MAX_ITEMS = 1000;
@@ -211,5 +214,9 @@ export abstract class BaseRepository<
 				...options,
 			});
 		}
+	}
+
+	async getStats(userId: string): Promise<TStats> {
+		throw new BadRequestError('Stats not implemeted');
 	}
 }

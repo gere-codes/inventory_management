@@ -56,7 +56,7 @@ class AuthService {
 		const validUser = await bcrypt.compare(validatedUser.password, hashedPassword);
 
 		// return error if user is not valid
-		if (!validUser || !existingUser) throw new NotAuthorizedError();
+		if (!validUser || !existingUser) throw new NotAuthorizedError('Invalid email or password');
 
 		const user: TUserResponse = {
 			id: existingUser.id,

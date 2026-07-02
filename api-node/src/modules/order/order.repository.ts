@@ -1,12 +1,18 @@
 import { BaseRepository, type IBaseRepository } from '@src/core/base/base.repository.js';
-import type { TCreateOrder, TOrder, TUpdateOrder } from './order.schema.js';
+import type { TCreateOrder, TOrder, TOrderStats, TUpdateOrder } from './order.schema.js';
 import { categories, orders } from '@src/db/index.js';
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { eq, gte, lte, sql, type SQL } from 'drizzle-orm';
 import type { AnyPgTable } from 'drizzle-orm/pg-core';
-export interface IOrderRepository extends IBaseRepository<TOrder, TCreateOrder, TUpdateOrder, typeof orders> {}
+export interface IOrderRepository extends IBaseRepository<
+	TOrder,
+	TCreateOrder,
+	TUpdateOrder,
+	TOrderStats,
+	typeof orders
+> {}
 export class OrderRespository
-	extends BaseRepository<TOrder, TCreateOrder, TUpdateOrder, typeof orders>
+	extends BaseRepository<TOrder, TCreateOrder, TUpdateOrder, TOrderStats, typeof orders>
 	implements IOrderRepository
 {
 	constructor(db: NodePgDatabase<any>) {

@@ -66,3 +66,6 @@ export const orderQuerySchema = commonQuery
 	.transform(withOffset);
 
 export type TOrdertQuery = z.infer<typeof orderQuerySchema>;
+
+export const orderStatsSchema = z.object({});
+export type TOrderStats = z.infer<typeof orderStatsSchema>;

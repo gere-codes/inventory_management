@@ -47,3 +47,13 @@ export const productQuerySchema = commonQuery
 	.transform(withOffset);
 
 export type TProductQuery = z.infer<typeof productQuerySchema>;
+
+export const productStatsSchema = z.object({
+	stockLevel: z.object({
+		lowStock: z.number(),
+		outOfStock: z.number(),
+		totalProducts: z.number(),
+	}),
+});
+
+export type TProductStats = z.infer<typeof productStatsSchema>;

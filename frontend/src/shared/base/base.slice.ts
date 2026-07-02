@@ -1,17 +1,14 @@
 import {
 	createSlice,
 	type PayloadAction,
-	type ValidateSliceCaseReducers,
-	type CaseReducer,
 	type SliceCaseReducers,
 	type ActionReducerMapBuilder,
-	type Reducer,
 } from '@reduxjs/toolkit';
 import type { BaseThunks } from './base.thunks';
-import type { ICollectionResult, IPagination, PaginatedResult } from '../types';
+import type { ICollectionResult, IPagination } from '../types';
 import { castDraft } from 'immer';
 
-export type BaseState<T, TExtra = {}> = {
+export type BaseState<T, TStats, TExtra = {}> = {
 	list: {
 		data: T[];
 		status: 'idle' | 'loading' | 'succeeded' | 'failed';
@@ -22,16 +19,22 @@ export type BaseState<T, TExtra = {}> = {
 		status: 'idle' | 'loading' | 'succeeded' | 'failed';
 		error: string | null;
 	};
+	stats: {
+		data: TStats | null;
+		status: 'idle' | 'loading' | 'succeeded' | 'failed';
+		error: string | null;
+	};
 
 	pagination: IPagination;
 } & TExtra;
 
 export const baseSlice = <
 	T extends { id: string },
-	TState extends BaseState<T>,
+	TStats,
+	TState extends BaseState<T, TStats>,
 	TCreate extends object,
 	TUpdate extends object,
-	CustomeReducers extends SliceCaseReducers<BaseState<T>>,
+	CustomeReducers extends SliceCaseReducers<BaseState<T, TStats>>,
 >(
 	name: string,
 	thunks: BaseThunks<T, TCreate, TUpdate, any, any, any>,
@@ -154,6 +157,20 @@ export const baseSlice = <
 				.addCase(thunks.getCollection.rejected, (state, action) => {
 					state.list.status = 'failed';
 					state.list.error = (action.payload as string) || 'An error occurred';
+				})
+				// Get Stats
+				.addCase(thunks.getStats.pending, (state) => {
+					state.stats.status = 'loading';
+					state.stats.error = null;
+				})
+				.addCase(thunks.getStats.fulfilled, (state, action: PayloadAction<TStats>) => {
+					state.stats.status = 'succeeded';
+					state.stats.data = action.payload as typeof state.stats.data;
+					state.stats.error = null;
+				})
+				.addCase(thunks.getStats.rejected, (state, action) => {
+					state.stats.status = 'failed';
+					state.stats.error = (action.payload as string) || 'An error occurred';
 				});
 
 			if (customExtraReducers) {

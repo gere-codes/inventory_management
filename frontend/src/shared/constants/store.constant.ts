@@ -1,12 +1,17 @@
 import type { BaseState } from '../base';
 
-export const createIinitialBaseState = <T>(): BaseState<T> => ({
+export const createIinitialBaseState = <T, TStats>(): BaseState<T, TStats> => ({
 	list: {
 		data: [],
 		status: 'idle',
 		error: null,
 	},
 	item: {
+		data: null,
+		status: 'idle',
+		error: null,
+	},
+	stats: {
 		data: null,
 		status: 'idle',
 		error: null,

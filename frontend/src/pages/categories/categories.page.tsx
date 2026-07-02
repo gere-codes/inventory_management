@@ -9,8 +9,6 @@ export const CategoriesPage = () => {
 
 	const { handleDelete, handleEdit, handleAdd } = useCategoryHandlers();
 
-	const productStats = useAppSelector(selectProductStats);
-
 	return (
 		<section className=" pt-4 h-full">
 			<section className="flex flex-col-reverse lg:flex-row lg:h-full">
@@ -49,7 +47,7 @@ export const CategoriesPage = () => {
 
 				<section className="lg:mt-10">
 					<h2 className="text-center font-bold text-gray-600">Products by Categories</h2>
-					<DynamicPieChart data={productStats.categories} />
+					<DynamicPieChart data={[]} />
 				</section>
 			</section>
 		</section>

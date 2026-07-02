@@ -28,3 +28,15 @@ export const categoryQuerySchema = commonQuery
 	.transform(withOffset);
 
 export type TCategoryQuery = z.infer<typeof categoryQuerySchema>;
+
+export const categoryStatsSchema = z.object({
+	totalCategories: z.number(),
+	productsPerCategory: z.array(
+		z.object({
+			name: z.string(),
+			count: z.number(),
+		}),
+	),
+});
+
+export type TCategoryStats = z.infer<typeof categoryStatsSchema>;

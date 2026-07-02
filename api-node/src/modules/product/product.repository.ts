@@ -1,5 +1,5 @@
 import { BaseRepository, type IBaseRepository } from '@src/core/base/base.repository.js';
-import type { TProduct, TProductCreate, TProductQuery, TProductUpdate } from './product.shema.js';
+import type { TProduct, TProductCreate, TProductQuery, TProductStats, TProductUpdate } from './product.shema.js';
 import { categories, products } from '@src/db/index.js';
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { and, asc, desc, eq, gte, ilike, lte, or, SQL, sql } from 'drizzle-orm';
@@ -8,7 +8,13 @@ import type { AnyPgTable } from 'drizzle-orm/pg-core';
 import { sortOptions } from '@src/core/enums/query.enum.js';
 import { BadRequestError } from '@src/core/utils/error.util.js';
 
-export interface IProductRepository extends IBaseRepository<TProduct, TProductCreate, TProductUpdate, typeof products> {
+export interface IProductRepository extends IBaseRepository<
+	TProduct,
+	TProductCreate,
+	TProductUpdate,
+	TProductStats,
+	typeof products
+> {
 	getStats(userId: string): any;
 	updateQuantity({
 		userId,
@@ -21,7 +27,7 @@ export interface IProductRepository extends IBaseRepository<TProduct, TProductCr
 	}): Promise<TProduct>;
 }
 export class ProductRepository
-	extends BaseRepository<TProduct, TProductCreate, TProductUpdate, typeof products>
+	extends BaseRepository<TProduct, TProductCreate, TProductUpdate, TProductStats, typeof products>
 	implements IProductRepository
 {
 	constructor(db: NodePgDatabase<any>) {

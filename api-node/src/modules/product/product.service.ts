@@ -1,10 +1,16 @@
 import { BaseService, type IBaseService } from '@core/base/base.service.js';
-import type { TProduct, TProductCreate, TProductQuery, TProductUpdate } from './product.shema.js';
+import type { TProduct, TProductCreate, TProductQuery, TProductStats, TProductUpdate } from './product.shema.js';
 import type { IProductRepository } from './product.repository.js';
 import type { TBaseQuery } from '@src/core/schema/general.schema.js';
+import { serviceError } from '@src/core/utils/error.util.js';
 
-export interface IProductService extends IBaseService<TProduct, TProductCreate, TProductUpdate, TBaseQuery> {
-	getStats(userId: string): any;
+export interface IProductService extends IBaseService<
+	TProduct,
+	TProductCreate,
+	TProductUpdate,
+	TProductStats,
+	TBaseQuery
+> {
 	updateQuantity({
 		userId,
 		productId,
@@ -16,7 +22,7 @@ export interface IProductService extends IBaseService<TProduct, TProductCreate, 
 	}): Promise<TProduct>;
 }
 export class ProductService
-	extends BaseService<TProduct, TProductCreate, TProductUpdate, IProductRepository, TProductQuery>
+	extends BaseService<TProduct, TProductCreate, TProductUpdate, TProductStats, IProductRepository, TProductQuery>
 	implements IProductService
 {
 	constructor(repository: IProductRepository) {
@@ -24,7 +30,11 @@ export class ProductService
 	}
 
 	async getStats(userId: string) {
-		return await this.repository.getStats(userId);
+		try {
+			return await this.repository.getStats(userId);
+		} catch (error) {
+			return serviceError(error, 'Service Layer: getStats products failed', 'Failed to retrieve stats', {});
+		}
 	}
 
 	async updateQuantity({

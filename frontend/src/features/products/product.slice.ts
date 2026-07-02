@@ -9,7 +9,7 @@ interface StatsState {
 	status: 'idle' | 'loading' | 'succeeded' | 'failed';
 	error: string | null;
 }
-const initialStatsState: StatsState = {
+const initialStateStats: StatsState = {
 	data: {
 		stockLevel: {
 			lowStock: 0,
@@ -23,23 +23,11 @@ const initialStatsState: StatsState = {
 export const productSlice = baseSlice(
 	'product',
 	productThunk,
-	{ ...createIinitialBaseState<TProduct>(), stats: initialStatsState },
+	{ ...createIinitialBaseState<TProduct, TProductStats>(), stats: initialStateStats },
 	{},
 
 	(builder) => {
-		// stats
 		builder
-			.addCase(productThunk.getStats.pending, (state) => {
-				state.stats.status = 'loading';
-			})
-			.addCase(productThunk.getStats.fulfilled, (state, action) => {
-				state.stats.status = 'succeeded';
-				state.stats.data = action.payload;
-			})
-			.addCase(productThunk.getStats.rejected, (state, action) => {
-				state.stats.status = 'failed';
-				state.stats.error = (action.payload as string) || 'An error occurred';
-			})
 
 			// update poduct quantity
 			.addCase(productThunk.updateQuantity.pending, (state) => {

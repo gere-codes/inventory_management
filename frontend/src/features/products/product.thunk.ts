@@ -1,10 +1,18 @@
 import { BaseThunks } from '@base';
-import type { TProduct, TProductCreate, TProductUpdate } from './product.schema';
+import type { TProduct, TProductCreate, TProductStats, TProductUpdate } from './product.schema';
 import { productService, type IProductService } from './product.service';
 import { createAsyncThunk, type AsyncThunk } from '@reduxjs/toolkit';
 import { isAxiosError } from 'axios';
 
-class ProductThunk extends BaseThunks<TProduct, TProductCreate, TProductUpdate, FormData, FormData, IProductService> {
+class ProductThunk extends BaseThunks<
+	TProduct,
+	TProductCreate,
+	TProductUpdate,
+	TProductStats,
+	FormData,
+	FormData,
+	IProductService
+> {
 	public getStats: AsyncThunk<any, void, {}>;
 	public updateQuantity: AsyncThunk<TProduct, { productId: string; quantity: number }, {}>;
 

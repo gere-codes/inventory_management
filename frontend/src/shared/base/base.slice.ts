@@ -8,7 +8,7 @@ import type { BaseThunks } from './base.thunks';
 import type { ICollectionResult, IPagination } from '../types';
 import { castDraft } from 'immer';
 
-export type BaseState<T, TStats, TExtra = {}> = {
+export type TBaseState<T, TStats, TExtra = {}> = {
 	list: {
 		data: T[];
 		status: 'idle' | 'loading' | 'succeeded' | 'failed';
@@ -31,10 +31,10 @@ export type BaseState<T, TStats, TExtra = {}> = {
 export const baseSlice = <
 	T extends { id: string },
 	TStats,
-	TState extends BaseState<T, TStats>,
+	TState extends TBaseState<T, TStats>,
 	TCreate extends object,
 	TUpdate extends object,
-	CustomeReducers extends SliceCaseReducers<BaseState<T, TStats>>,
+	CustomeReducers extends SliceCaseReducers<TBaseState<T, TStats>>,
 >(
 	name: string,
 	thunks: BaseThunks<T, TCreate, TUpdate, any, any, any>,

@@ -1,6 +1,6 @@
-import { useAppDispatch, useAppSelector, useCollectionFilter, useFetchData } from '@hooks';
+import { useAppDispatch, useAppSelector, useCollectionFilter, useFetchData, useFetchStats } from '@hooks';
 import { productThunk } from './product.thunk';
-import { productQuerySchema, type TProduct } from './product.schema';
+import { productQuerySchema, type TProduct, type TProductStats } from './product.schema';
 import { EModalMode, EModalType, openModal } from '@common';
 import { EOrderStatus, EOrderType, type TOrderForm } from '../orders';
 import { ECRUDMode } from '@enums';
@@ -111,5 +111,20 @@ export const useProductStats = () => {
 		isSuccess: status === 'succeeded',
 		isError: status === 'failed',
 		fetchProductsStats,
+	};
+};
+
+export const useProductsStats = () => {
+	const { data, error, status, fetchStats } = useFetchStats<TProduct, TProductStats>({
+		selectStatsState: selectProductStats,
+		thunkAction: productThunk.getStats,
+	});
+
+	return {
+		data,
+		isLoading: status === 'loading',
+		isSuccess: status === 'succeeded',
+		isError: status === 'failed',
+		fetchStats,
 	};
 };

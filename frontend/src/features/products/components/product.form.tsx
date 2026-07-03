@@ -9,7 +9,7 @@ import { CategorySelect, useCategories } from '@categories';
 import { productThunk } from '../product.thunk';
 import { BASE_URL } from '@api';
 import { TiDelete } from 'react-icons/ti';
-import { useProductData, useProductStats } from '../product.hook';
+import { useProductData, useProductsStats } from '../product.hook';
 
 interface Props {
 	mode: EModalMode.CREATE | EModalMode.EDIT;
@@ -22,7 +22,7 @@ export const ProductForm = ({ mode, initialData }: Props) => {
 
 	const [previewUrl, setPreviewUrl] = useState<string[] | null>(null);
 	const { categories, isLoading } = useCategories();
-	const { fetchProductsStats } = useProductStats();
+	const { fetchStats: fetchProductsStats } = useProductsStats();
 
 	const {
 		register,

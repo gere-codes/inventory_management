@@ -1,6 +1,6 @@
-import type { BaseState } from '../base';
+import type { TBaseState } from '../base';
 
-export const createIinitialBaseState = <T, TStats>(): BaseState<T, TStats> => ({
+export const createIinitialBaseState = <T, TStats>(): TBaseState<T, TStats> => ({
 	list: {
 		data: [],
 		status: 'idle',

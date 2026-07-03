@@ -1,11 +1,11 @@
 import type { IconType } from 'react-icons';
 import { LuPackageMinus, LuPackageOpen } from 'react-icons/lu';
 import { TbPackages } from 'react-icons/tb';
-import { useProductStats } from '../product.hook';
+import { useProductsStats, useProductStats } from '../product.hook';
 import type { TProductStats } from '../product.schema';
 
 export const ProductsStats = () => {
-	const { data, isLoading } = useProductStats();
+	const { data, isLoading } = useProductsStats();
 
 	if (isLoading || !data) {
 		// skeleton

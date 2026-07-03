@@ -1,6 +1,6 @@
 import { baseSlice } from '@base';
 import { productThunk } from './product.thunk';
-import type { TProduct, TProductStats } from './product.schema';
+import type { TProduct, TProductCreate, TProductStats } from './product.schema';
 import { createIinitialBaseState } from '@constants';
 import { castDraft } from 'immer';
 

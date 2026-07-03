@@ -13,19 +13,19 @@ class ProductThunk extends BaseThunks<
 	FormData,
 	IProductService
 > {
-	public getStats: AsyncThunk<any, void, {}>;
+	// public getStats: AsyncThunk<any, void, {}>;
 	public updateQuantity: AsyncThunk<TProduct, { productId: string; quantity: number }, {}>;
 
 	constructor() {
 		super('product', productService);
 
-		this.getStats = createAsyncThunk<any, void>(`product/getStats`, async (_, { rejectWithValue }) => {
-			try {
-				return await this.service.getStats();
-			} catch (error) {
-				return rejectWithValue(this.handleError(error, `Error occurred while fetching products stats`));
-			}
-		});
+		// this.getStats = createAsyncThunk<any, void>(`product/getStats`, async (_, { rejectWithValue }) => {
+		// 	try {
+		// 		return await this.service.getStats();
+		// 	} catch (error) {
+		// 		return rejectWithValue(this.handleError(error, `Error occurred while fetching products stats`));
+		// 	}
+		// });
 		this.updateQuantity = createAsyncThunk<TProduct, { productId: string; quantity: number }>(
 			`product/updaateQuantity`,
 			async ({ productId, quantity }, { rejectWithValue }) => {

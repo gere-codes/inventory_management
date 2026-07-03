@@ -27,7 +27,7 @@ export abstract class BaseThunks<
 	public update: AsyncThunk<T, { id: string; body: TUpdateBody }, {}>;
 	public delete: AsyncThunk<T, string, {}>;
 	public getCollection: AsyncThunk<ICollectionResult<T>, TQuery, {}>;
-	public getStats: AsyncThunk<TStats, void, {}>;
+	public getStats: AsyncThunk<TStats, void, { rejectValue: string }>;
 
 	constructor(
 		protected resource: string,
@@ -94,13 +94,16 @@ export abstract class BaseThunks<
 				}
 			},
 		);
-		this.getStats = createAsyncThunk<TStats, void>(`${resource}/stats`, async (_, { rejectWithValue }) => {
-			try {
-				return await service.getStats();
-			} catch (error) {
-				return rejectWithValue(this.handleError(error, `Error occurred while ${resource}s stats`));
-			}
-		});
+		this.getStats = createAsyncThunk<TStats, void, { rejectValue: string }>(
+			`${resource}/stats`,
+			async (_, { rejectWithValue }) => {
+				try {
+					return await service.getStats();
+				} catch (error) {
+					return rejectWithValue(this.handleError(error, `Error occurred while ${resource}s stats`));
+				}
+			},
+		);
 	}
 
 	handleError = (error: any, defaultMessage: string) => {

@@ -5,6 +5,8 @@ import type { TBaseQuery } from '../schema';
 import { debounce } from '../utils';
 import { useAppDispatch, useAppSelector } from './redux.hook';
 import type { AsyncThunk } from '@reduxjs/toolkit';
+import type { RootState } from '@/store';
+import type { TBaseState } from '../base';
 
 export const useQueryParams = <TQuery extends TBaseQuery = TBaseQuery>({ schema }: { schema: z.ZodSchema<TQuery> }) => {
 	const [searchParams, setSearchParams] = useSearchParams();
@@ -236,4 +238,25 @@ export const useCollectionFilter = <TEntity, TQuery extends TBaseQuery = TBaseQu
 			clearUrlFilters();
 		},
 	};
+};
+
+export const useFetchStats = <T, TStats>({
+	thunkAction,
+	selectStatsState,
+}: {
+	selectStatsState: (state: RootState) => TBaseState<T, TStats>['stats'];
+	thunkAction: AsyncThunk<TStats, void, { rejectValue: string }>;
+}) => {
+	const dispatch = useAppDispatch();
+	const statsState = useAppSelector(selectStatsState);
+
+	const fetchStats = useCallback(() => {
+		dispatch(thunkAction());
+	}, [dispatch, thunkAction]);
+
+	useEffect(() => {
+		fetchStats();
+	}, [fetchStats]);
+
+	return { ...statsState, fetchStats };
 };

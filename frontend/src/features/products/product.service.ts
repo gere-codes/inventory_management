@@ -39,10 +39,7 @@ export class ProductService
 			productQuerySchema,
 		);
 	}
-	async getStats(): Promise<any> {
-		const response = await privateInstance.get('/product/stats');
-		return response.data.data;
-	}
+
 	async updateQuantity({ productId, quantity }: { productId: string; quantity: number }): Promise<TProduct> {
 		const response = await privateInstance.put(`/product/${productId}/quantity`, { quantity });
 		return response.data.data;

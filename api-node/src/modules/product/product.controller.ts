@@ -5,9 +5,11 @@ import {
 	productCreateSchema,
 	productQuerySchema,
 	productSchema,
+	productStatsSchema,
 	productUpdateSchema,
 	type TProduct,
 	type TProductCreate,
+	type TProductStats,
 	type TProductUpdate,
 } from './product.shema.js';
 import { ProductRepository } from './product.repository.js';
@@ -18,23 +20,28 @@ export interface IProductController extends IBaseController<TProduct, TProductCr
 	getStats(req: Request, res: Response, next: NextFunction): void;
 	updateQuantity(req: Request, res: Response, next: NextFunction): void;
 }
-class ProductController extends BaseController<TProduct, TProductCreate, TProductUpdate, IProductService> {
+class ProductController extends BaseController<
+	TProduct,
+	TProductCreate,
+	TProductUpdate,
+	TProductStats,
+	IProductService
+> {
 	constructor() {
 		const productRepository = new ProductRepository(db);
 		const productService = new ProductService(productRepository);
 
 		const fileService = new LocalFileService();
-		super(productService, productSchema, productCreateSchema, productUpdateSchema, productQuerySchema, fileService);
+		super(
+			productService,
+			productSchema,
+			productCreateSchema,
+			productUpdateSchema,
+			productQuerySchema,
+			productStatsSchema,
+			fileService,
+		);
 	}
-
-	getStats = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-		const userId = req.user.id;
-		const result = await this.service.getStats(userId);
-		res.status(200).json({
-			success: true,
-			data: result,
-		});
-	});
 
 	updateQuantity = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 		const userId = req.user.id;

@@ -163,7 +163,7 @@ export abstract class BaseController<
 	getStats = catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 		const userId = req.user?.id as string;
 		const reponse = await this.service.getStats(userId);
-		const responseDto = this.schema.parse(reponse);
+		const responseDto = this.statsSchema.parse(reponse);
 
 		res.status(200).json({
 			success: true,

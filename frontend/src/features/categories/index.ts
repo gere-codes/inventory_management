@@ -6,3 +6,4 @@ export * from './category.schema';
 export * from './category.hook';
 export { CategoryTable } from './components/category.table';
 export { CategorySelect } from './components/category.select';
+export { CategoriesStats } from './components/categories.stats';

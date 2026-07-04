@@ -1,4 +1,4 @@
-import { CategoryTable, useCategoryFilter, useCategoryHandlers, useCategoryStats } from '@categories';
+import { CategoriesStats, CategoryTable, useCategoryFilter, useCategoryHandlers, useCategoryStats } from '@categories';
 import { DynamicPieChart, Pagination, SearchBar } from '@common';
 import { Button } from '@ui';
 
@@ -45,10 +45,8 @@ export const CategoriesPage = () => {
 					/>
 				</section>
 
-				<section>
-					<h2 className="text-center font-bold text-gray-600">Products by Categories</h2>
-					<DynamicPieChart data={categoryStats.data?.productsPerCategory || []} />
-				</section>
+				{/* Category Stats */}
+				<CategoriesStats />
 			</section>
 		</section>
 	);

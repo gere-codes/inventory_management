@@ -4,6 +4,7 @@ import { upload } from '@middlewares';
 
 const categoryRoutes = Router();
 
+categoryRoutes.get('/stats', categoryController.getStats);
 categoryRoutes.get('/', categoryController.getAll);
 categoryRoutes.post('/', upload.single('image'), categoryController.create);
 categoryRoutes.put('/:id', upload.single('image'), categoryController.update);

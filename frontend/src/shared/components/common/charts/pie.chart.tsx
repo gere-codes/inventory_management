@@ -39,7 +39,7 @@ export function DynamicPieChart({ data }: Props) {
 
 	return (
 		<section className="h-[350px] w-[450px]  ">
-			<ResponsiveContainer width={'100%'} height={'100%'}>
+			<ResponsiveContainer width={'100%'} height={'70%'}>
 				<PieChart width={'100%'} height={'100%'}>
 					<Pie
 						data={chartData}

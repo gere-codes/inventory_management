@@ -42,12 +42,12 @@ export const SideBar = () => {
 		>
 			{/* Logo */}
 			<section className="pl-6 h-16 flex items-center relative">
-				<Link to={'/'} className="text-black h-fit w-fit">
+				<Link to={'/'} className=" h-fit w-fit text-primary">
 					<SiGoogletagmanager size={25} />
 				</Link>
 				<button
 					onClick={() => setIsOpen((prev) => !prev)}
-					className={`absolute ${isOpen ? '-right-4' : '-right-6'} -translate-y-1/2 top-1/2 bg-transparent  p-1 rounded  text-gray-500`}
+					className={`absolute ${isOpen ? '-right-4' : '-right-6'} -translate-y-1/2 top-1/2 bg-transparent  p-1 rounded  text-primary`}
 				>
 					{isOpen ? <MdKeyboardArrowLeft size={30} /> : <MdKeyboardArrowRight size={30} />}
 				</button>

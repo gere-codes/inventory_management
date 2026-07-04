@@ -36,17 +36,17 @@ export class CategoryRepository
 		const productsPerCategory = await this.db
 			.select({
 				name: categories.name,
-				count: sql<number>`count(${this.table.id})`.mapWith(Number),
+				count: sql<number>`count(${products.id})`.mapWith(Number),
 			})
-			.from(this.table as AnyPgTable)
-			.leftJoin(products, eq(this.table.id, products.id))
+			.from(this.table)
+			.leftJoin(products, eq(products.categoryId, this.table.id))
 			.where(eq(this.table.userId, userId))
 			.groupBy(categories.name);
 
 		const totalCategories = await this.db
 			.select({ count: sql<number>`count(*)`.mapWith(Number) })
-			.from(categories)
-			.where(eq(categories.userId, userId));
+			.from(this.table)
+			.where(eq(this.table.userId, userId));
 
 		const count = totalCategories[0]?.count;
 		return {

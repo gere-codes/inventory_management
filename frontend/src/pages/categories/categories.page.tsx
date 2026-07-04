@@ -1,13 +1,13 @@
-import { CategoryTable, useCategoryFilter, useCategoryHandlers } from '@categories';
-import { useAppSelector } from '@hooks';
+import { CategoryTable, useCategoryFilter, useCategoryHandlers, useCategoryStats } from '@categories';
 import { DynamicPieChart, Pagination, SearchBar } from '@common';
-import { selectProductStats } from '@products';
 import { Button } from '@ui';
 
 export const CategoriesPage = () => {
 	const { filters, searchTerm, handleSearchChange, pagination, data, setLimit, setPage } = useCategoryFilter();
 
 	const { handleDelete, handleEdit, handleAdd } = useCategoryHandlers();
+
+	const categoryStats = useCategoryStats();
 
 	return (
 		<section className=" pt-4 h-full">
@@ -45,9 +45,9 @@ export const CategoriesPage = () => {
 					/>
 				</section>
 
-				<section className="lg:mt-10">
+				<section>
 					<h2 className="text-center font-bold text-gray-600">Products by Categories</h2>
-					<DynamicPieChart data={[]} />
+					<DynamicPieChart data={categoryStats.data?.productsPerCategory || []} />
 				</section>
 			</section>
 		</section>

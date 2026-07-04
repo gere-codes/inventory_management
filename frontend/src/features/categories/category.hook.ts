@@ -1,6 +1,11 @@
 import { useEffect } from 'react';
-import { useAppDispatch, useAppSelector, useCollectionFilter, useFetchData } from '@hooks';
-import { selectCategories, selectCategoryPagination, selectCategoryStatus } from './category.selectors';
+import { useAppDispatch, useAppSelector, useCollectionFilter, useFetchData, useFetchStats } from '@hooks';
+import {
+	selectCategories,
+	selectCategoryPagination,
+	selectCategoryStats,
+	selectCategoryStatus,
+} from './category.selectors';
 import { categoryThunk } from './category.thunk';
 import { categoryQuerySchema, type TCategory } from './category.schema';
 import { EModalMode, EModalType, openModal } from '@/shared/components/common';
@@ -87,4 +92,19 @@ export const useCategoryData = () => {
 		selectStatus: selectCategoryStatus,
 	});
 	return categories;
+};
+
+export const useCategoryStats = () => {
+	const { data, status, fetchStats } = useFetchStats({
+		selectStatsState: selectCategoryStats,
+		thunkAction: categoryThunk.getStats,
+	});
+
+	return {
+		data,
+		isLoading: status === 'loading',
+		isSuccess: status === 'succeeded',
+		isError: status === 'failed',
+		fetchStats,
+	};
 };

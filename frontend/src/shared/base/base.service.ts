@@ -104,7 +104,7 @@ export abstract class BaseService<
 	}
 
 	async getStats(): Promise<TStats> {
-		const respose = await privateInstance.get(`/${this.resource}/stats`);
-		return this.statsSchema.parse(respose);
+		const response = await privateInstance.get(`/${this.resource}/stats`);
+		return this.statsSchema.parse(response.data.payload);
 	}
 }

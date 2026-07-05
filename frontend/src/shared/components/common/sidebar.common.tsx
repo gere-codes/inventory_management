@@ -2,14 +2,7 @@ import { useEffect, useState } from 'react';
 import type { IconType } from 'react-icons';
 import { FaShoppingBag } from 'react-icons/fa';
 import { IoIosLogOut } from 'react-icons/io';
-import {
-	MdCategory,
-	MdHomeRepairService,
-	MdKeyboardArrowLeft,
-	MdKeyboardArrowRight,
-	MdKeyboardDoubleArrowLeft,
-	MdKeyboardDoubleArrowRight,
-} from 'react-icons/md';
+import { MdCategory, MdHomeRepairService, MdKeyboardArrowLeft, MdKeyboardArrowRight } from 'react-icons/md';
 import { RiAlignItemRightFill } from 'react-icons/ri';
 import { SiGoogletagmanager } from 'react-icons/si';
 import { Link, useLocation } from 'react-router';

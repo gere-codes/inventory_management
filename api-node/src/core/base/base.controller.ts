@@ -97,6 +97,16 @@ export abstract class BaseController<
 		const id = req.params?.id as string;
 		const { body } = req;
 
+		let payload = { ...body };
+
+		// handling a single image
+		if (req.file && this.fileService) {
+			let image: string = '';
+			image = await this.fileService.upload(req.file);
+			payload.image = image;
+		}
+
+		// handling multiple images
 		let existingImages: string[] = [];
 
 		// normalize existing images to array
@@ -116,7 +126,7 @@ export abstract class BaseController<
 
 		const finalImages = [...existingImages, ...newImages];
 
-		const payload = { ...body, images: finalImages };
+		payload.images = finalImages;
 
 		const validateInput = this.updateSchema.parse(payload);
 		const updatedItem = await this.service.update(id, validateInput);

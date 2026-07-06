@@ -20,7 +20,7 @@ export const ProductForm = ({ mode, initialData }: Props) => {
 	const { fetchData } = useProductData();
 	const dispatch = useAppDispatch();
 
-	const [previewUrl, setPreviewUrl] = useState<string[] | null>(null);
+	const [previewUrl, setPreviewUrl] = useState<string[]>([]);
 	const { categories, isLoading } = useCategories();
 	const { fetchStats: fetchProductsStats } = useProductsStats();
 
@@ -112,30 +112,36 @@ export const ProductForm = ({ mode, initialData }: Props) => {
 							<div className="flex flex-wrap gap-2">
 								{/* Render existing image previews */}
 								{imageFile &&
-									imageFile.map((image, index) => (
-										<div className="border border-gray-200 rounded h-24 w-24 relative" key={index}>
-											<button
-												type="button"
-												onClick={() => {
-													// Filter out the deleted image by its index
-													const updatedImages = imageFile.filter((_, i) => i !== index);
-													setValue('images', updatedImages);
-												}}
-												className="absolute -top-2 -right-2 text-gray-600 hover:text-gray-800 z-10 bg-white rounded-full"
+									imageFile.map((image, index) => {
+										// Determine the correct image source safely
+										const isNewFile = image instanceof File;
+										const imageSrc = isNewFile ? previewUrl[index] : `${BASE_URL}${image}`;
+										return (
+											<div
+												className="border border-gray-200 rounded h-24 w-24 relative"
+												key={index}
 											>
-												<TiDelete size={25} />
-											</button>
-											<img
-												src={
-													image instanceof File
-														? URL.createObjectURL(image)
-														: `${BASE_URL}${image}`
-												}
-												alt={`Preview ${index + 1}`}
-												className="object-cover h-full w-full rounded"
-											/>
-										</div>
-									))}
+												<button
+													type="button"
+													onClick={() => {
+														// Filter out the deleted image by its index
+														const updatedImages = imageFile.filter((_, i) => i !== index);
+														setValue('images', updatedImages);
+													}}
+													className="absolute -top-2 -right-2 text-gray-600 hover:text-gray-800 z-10 bg-white rounded-full"
+												>
+													<TiDelete size={25} />
+												</button>
+												{imageSrc && (
+													<img
+														src={imageSrc}
+														alt={`Preview ${index + 1}`}
+														className="object-cover h-full w-full rounded"
+													/>
+												)}
+											</div>
+										);
+									})}
 
 								{/* Render upload slot ONLY if total images are less than 4 */}
 								{(!imageFile || imageFile.length < 4) && (
@@ -147,7 +153,7 @@ export const ProductForm = ({ mode, initialData }: Props) => {
 											name="image"
 											className="h-full w-full opacity-0 absolute cursor-pointer z-10"
 											accept="image/jpeg, image/png"
-											multiple={false}
+											multiple={true}
 											onChange={(e) => {
 												const file = e.target.files && e.target.files[0];
 												if (file) {

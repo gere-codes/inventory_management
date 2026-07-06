@@ -33,17 +33,17 @@ const StockLevelList = ({ stockLevel }: TProductStats) => {
 type TColor = 'yellow' | 'red' | 'blue';
 const colorMap: Record<TColor, Record<'bg' | 'text' | 'iconBg', string>> = {
 	yellow: {
-		bg: 'bg-yellow-50',
+		bg: 'bg-yellow-100',
 		text: 'text-yellow-600',
 		iconBg: 'bg-yellow-200',
 	},
 	red: {
-		bg: 'bg-red-50',
+		bg: 'bg-red-100',
 		text: 'text-red-600',
 		iconBg: 'bg-red-200',
 	},
 	blue: {
-		bg: 'bg-blue-50',
+		bg: 'bg-blue-100',
 		text: 'text-blue-600',
 		iconBg: 'bg-blue-200',
 	},

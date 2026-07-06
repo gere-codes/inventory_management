@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm, useWatch, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { closeModal, EModalMode } from '@common';
@@ -76,26 +76,25 @@ export const ProductForm = ({ mode, initialData }: Props) => {
 		}
 	};
 
+	// Handling images
 	const imageFile = watch('images');
 
-	// revoke url when component unmounts
-	useEffect(() => {
-		if (!imageFile || !Array.isArray(imageFile) || imageFile.length === 0) {
-			setPreviewUrl([]); // Clear previews if no files exist
-			return;
-		}
-
-		const objectUrls = imageFile
-			.filter((image) => image instanceof File)
-			.map((image) => URL.createObjectURL(image));
-
-		setPreviewUrl(objectUrls);
-
-		return () => {
-			// revoke object urls when component unmounts
-			objectUrls.forEach((url) => URL.revokeObjectURL(url));
-		};
+	const previewUrls = useMemo(() => {
+		return (
+			imageFile?.map((image) => (image instanceof File ? URL.createObjectURL(image) : `${BASE_URL}${image}`)) ??
+			[]
+		);
 	}, [imageFile]);
+
+	useEffect(() => {
+		return () => {
+			previewUrls.forEach((url, index) => {
+				if (imageFile?.[index] instanceof File) {
+					URL.revokeObjectURL(url);
+				}
+			});
+		};
+	}, [imageFile, previewUrls]);
 
 	return (
 		<form onSubmit={handleSubmit(onSubmit)} className="bg-white p-6" data-testid="product-form">
@@ -110,12 +109,9 @@ export const ProductForm = ({ mode, initialData }: Props) => {
 					render={({ field: { onChange, value, ...field } }) => {
 						return (
 							<div className="flex flex-wrap gap-2">
-								{/* Render existing image previews */}
-								{imageFile &&
-									imageFile.map((image, index) => {
-										// Determine the correct image source safely
-										const isNewFile = image instanceof File;
-										const imageSrc = isNewFile ? previewUrl[index] : `${BASE_URL}${image}`;
+								{/* Render images */}
+								{previewUrls &&
+									previewUrls.map((image, index) => {
 										return (
 											<div
 												className="border border-gray-200 rounded h-24 w-24 relative"
@@ -124,21 +120,18 @@ export const ProductForm = ({ mode, initialData }: Props) => {
 												<button
 													type="button"
 													onClick={() => {
-														// Filter out the deleted image by its index
-														const updatedImages = imageFile.filter((_, i) => i !== index);
+														const updatedImages = imageFile?.filter((_, i) => i !== index);
 														setValue('images', updatedImages);
 													}}
 													className="absolute -top-2 -right-2 text-gray-600 hover:text-gray-800 z-10 bg-white rounded-full"
 												>
 													<TiDelete size={25} />
 												</button>
-												{imageSrc && (
-													<img
-														src={imageSrc}
-														alt={`Preview ${index + 1}`}
-														className="object-cover h-full w-full rounded"
-													/>
-												)}
+												<img
+													src={image}
+													alt={`Preview ${index + 1}`}
+													className="object-cover h-full w-full rounded"
+												/>
 											</div>
 										);
 									})}

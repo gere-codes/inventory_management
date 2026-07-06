@@ -24,6 +24,13 @@ app.use(
 		xPoweredBy: false,
 		frameguard: { action: 'deny' },
 		crossOriginResourcePolicy: { policy: 'cross-origin' },
+
+		contentSecurityPolicy: {
+			useDefaults: true,
+			directives: {
+				imgSrc: ["'self'", 'data:', 'blob:'],
+			},
+		},
 	}),
 );
 app.use(cors(corsOptions));

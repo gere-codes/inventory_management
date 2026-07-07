@@ -38,7 +38,7 @@ COPY --from=backend-build /app/backend/drizzle ./drizzle
 COPY --from=backend-build /app/backend/drizzle.config.ts ./drizzle.config.ts
 COPY --from=frontend-build /app/frontend/dist ./public
 
-RUN mkdir -p uploads && chown -R appuser:appgroup /app
+# RUN mkdir -p uploads && chown -R appuser:appgroup /app
 
 USER appuser
 

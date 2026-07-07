@@ -29,9 +29,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-RUN mkdir -p ./logs 
-RUN mkdir -p /app/logs /app/uploads \
-    && chown -R appuser:appgroup /app/logs /app/uploads
+RUN mkdir -p /app/logs /app/uploads
 
 COPY --from=backend-build /app/backend/package.json ./
 RUN npm install --omit=dev

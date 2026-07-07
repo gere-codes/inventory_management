@@ -29,6 +29,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+RUN mkdir -p ./logs 
 
 COPY --from=backend-build /app/backend/package.json ./
 RUN npm install --omit=dev
@@ -38,7 +39,6 @@ COPY --from=backend-build /app/backend/drizzle ./drizzle
 COPY --from=backend-build /app/backend/drizzle.config.ts ./drizzle.config.ts
 COPY --from=frontend-build /app/frontend/dist ./public
 
-# RUN mkdir -p uploads && chown -R appuser:appgroup /app
 
 USER appuser
 

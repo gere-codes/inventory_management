@@ -15,7 +15,7 @@ export interface IBaseController<T, TCreate, TUpdate> {
 }
 
 export abstract class BaseController<
-	T,
+	T extends { image?: string; images?: string[] },
 	TCreate,
 	TUpdate,
 	TStats,
@@ -99,34 +99,48 @@ export abstract class BaseController<
 
 		let payload = { ...body };
 
-		// handling a single image
-		if (req.file && this.fileService) {
-			let image: string = '';
-			image = await this.fileService.upload(req.file);
-			payload.image = image;
-		}
+		const item = await this.service.getById(id);
 
-		// handling multiple images
-		let existingImages: string[] = [];
-
-		// normalize existing images to array
-		if (body?.images) {
-			if (Array.isArray(body.images)) {
-				existingImages = body.images;
-			} else if (typeof body.images === 'string') {
-				existingImages = [body.images];
+		if (this.fileService) {
+			// remove the image if it has been deleted
+			if (!body?.image && item?.image) {
+				await this.fileService.delete(item.image);
 			}
+
+			// update a single image
+			if (req.file) {
+				// delete the old image if it exists
+				if (item?.image) {
+					await this.fileService.delete(item.image);
+				}
+
+				// update the image
+				let updateImage = await this.fileService.upload(req.file);
+				payload.image = updateImage;
+			}
+
+			// normalize existing images to array
+			let existingImages: string[] = body?.images ? body.images : [];
+
+			// handle new images upload if any
+			let newImages: string[] = [];
+			if (req.files && Array.isArray(req.files) && req.files.length > 0) {
+				newImages = await Promise.all(req.files.map((file) => this.fileService!.upload(file)));
+			}
+
+			const finalImages = [...existingImages, ...newImages];
+
+			// Delete images that are no longer in the payload
+			if (item?.images && item?.images.length > 0) {
+				for (const oldImage of item.images) {
+					if (!finalImages.includes(oldImage)) {
+						await this.fileService.delete(oldImage);
+					}
+				}
+			}
+
+			payload.images = finalImages;
 		}
-
-		// handle new images upload if any
-		let newImages: string[] = [];
-		if (req.files && Array.isArray(req.files) && req.files.length > 0 && this.fileService) {
-			newImages = await Promise.all(req.files.map((file) => this.fileService!.upload(file)));
-		}
-
-		const finalImages = [...existingImages, ...newImages];
-
-		payload.images = finalImages;
 
 		const validateInput = this.updateSchema.parse(payload);
 		const updatedItem = await this.service.update(id, validateInput);

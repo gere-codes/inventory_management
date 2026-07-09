@@ -16,7 +16,7 @@ export class LocalFileService implements IFileService {
 		if (!filename) return;
 
 		try {
-			const imagePath = join(process.cwd(), 'uploads', filename);
+			const imagePath = join(process.cwd(), 'uploads', filename.replace('/uploads/', ''));
 			await unlinkSync(imagePath);
 		} catch (error) {
 			throw new NotFoundError('File not found');

@@ -157,6 +157,18 @@ export abstract class BaseController<
 		const deletedProduct = await this.service.delete(id);
 		const responseDto = this.schema.parse(deletedProduct);
 
+		// remove image
+		if (deletedProduct?.image) {
+			await this.fileService?.delete(deletedProduct.image);
+		}
+
+		// delete array of images
+		if (deletedProduct?.images && deletedProduct.images.length > 0) {
+			for (const image of deletedProduct.images) {
+				await this.fileService?.delete(image);
+			}
+		}
+
 		res.status(200).json({
 			success: true,
 			payload: responseDto,

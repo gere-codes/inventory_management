@@ -96,13 +96,19 @@ export abstract class BaseRepository<
 	}
 
 	async findByIdRaw(id: string): Promise<typeof this.table.$inferSelect | null> {
-		const result = await this.db
-			.select({ id: this.table.id })
-			.from(this.table as AnyPgTable)
-			.where(eq(this.table.id, id))
-			.limit(1);
+		try {
+			const result = await this.db
+				.select({ id: this.table.id })
+				.from(this.table as AnyPgTable)
+				.where(eq(this.table.id, id))
+				.limit(1);
 
-		return result[0] || null;
+			return result[0] || null;
+		} catch (error) {
+			return repositoryError(error, 'DB findByIdRaw failed', 'Database error during findByIdRaw', {
+				id,
+			});
+		}
 	}
 
 	async findOne(id: string): Promise<T> {

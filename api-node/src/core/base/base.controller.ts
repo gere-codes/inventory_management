@@ -120,7 +120,7 @@ export abstract class BaseController<
 			}
 
 			// normalize existing images to array
-			let existingImages: string[] = body?.images ? body.images : [];
+			let existingImages: string[] = typeof body?.images === 'string' ? [body?.images] : body?.images;
 
 			// handle new images upload if any
 			let newImages: string[] = [];

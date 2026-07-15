@@ -97,7 +97,7 @@ export const ProductForm = ({ mode, initialData }: Props) => {
 	}, [imageFile, previewUrls]);
 
 	return (
-		<form onSubmit={handleSubmit(onSubmit)} className="bg-white p-6" data-testid="product-form">
+		<form onSubmit={handleSubmit(onSubmit)} className="bg-white p-6 max-w-[500px]" data-testid="product-form">
 			<h2 className="capitalize font-bold text-xl text-center mb-1">
 				{mode === EModalMode.EDIT ? 'update product' : 'add product'}
 			</h2>
@@ -108,13 +108,13 @@ export const ProductForm = ({ mode, initialData }: Props) => {
 					control={control}
 					render={({ field: { onChange, value, ...field } }) => {
 						return (
-							<div className="flex flex-wrap gap-2">
+							<div className="flex flex-wrap gap-4 w-full col-span-2 mt-2">
 								{/* Render images */}
 								{previewUrls &&
 									previewUrls.map((image, index) => {
 										return (
 											<div
-												className="border border-gray-200 rounded h-24 w-24 relative"
+												className="rounded w-20 h-30 relative grid place-items-center border border-gray-100"
 												key={index}
 											>
 												<button
@@ -130,7 +130,7 @@ export const ProductForm = ({ mode, initialData }: Props) => {
 												<img
 													src={image}
 													alt={`Preview ${index + 1}`}
-													className="object-cover h-full w-full rounded"
+													className="object-cover h-30 max-w-full rounded"
 												/>
 											</div>
 										);
@@ -138,7 +138,7 @@ export const ProductForm = ({ mode, initialData }: Props) => {
 
 								{/* Render upload slot ONLY if total images are less than 4 */}
 								{(!imageFile || imageFile.length < 4) && (
-									<div className="border border-gray-200 border-dashed rounded h-24 w-24 relative flex items-center justify-center hover:bg-gray-50 transition-colors">
+									<div className="border border-gray-200 border-dashed rounded  w-20 h-30 relative flex items-center justify-center hover:bg-gray-50 transition-colors">
 										<input
 											{...field}
 											type="file"

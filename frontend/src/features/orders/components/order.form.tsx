@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { selectOrderPagination } from '../order.selector';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -25,7 +25,6 @@ export const OrderForm = ({ mode, orderData }: Props) => {
 
 	const { categories, isLoading } = useCategories();
 
-	const [previewUrl, setPreviewUrl] = useState<string[] | null>(null);
 	const isReadOnlyField = orderData?.type === EOrderType.REORDER;
 
 	const dispatch = useAppDispatch();
@@ -101,22 +100,22 @@ export const OrderForm = ({ mode, orderData }: Props) => {
 	const imageFile = watch('images');
 
 	// revoke url when component unmounts
-	useEffect(() => {
-		if (!(imageFile instanceof File)) {
-			setPreviewUrl(null);
-			return;
-		}
-
-		const objectUrls = imageFile
-			.filter((image) => image instanceof File)
-			.map((image) => URL.createObjectURL(image));
-
-		setPreviewUrl(objectUrls);
-
-		return () => {
-			objectUrls.forEach((url) => URL.revokeObjectURL(url));
-		};
+	const previewUrls = useMemo(() => {
+		return (
+			imageFile?.map((image) => (image instanceof File ? URL.createObjectURL(image) : `${BASE_URL}${image}`)) ??
+			[]
+		);
 	}, [imageFile]);
+
+	useEffect(() => {
+		return () => {
+			previewUrls.forEach((url, index) => {
+				if (imageFile?.[index] instanceof File) {
+					URL.revokeObjectURL(url);
+				}
+			});
+		};
+	}, [imageFile, previewUrls]);
 
 	return (
 		<form onSubmit={handleSubmit(onSubmit)} className="bg-white p-6" data-testid="order-form">
@@ -130,56 +129,60 @@ export const OrderForm = ({ mode, orderData }: Props) => {
 					control={control}
 					render={({ field: { onChange, value, ...field } }) => {
 						return (
-							<div className="flex flex-wrap gap-2">
-								{/* Render existing image previews */}
-								{imageFile &&
-									imageFile.map((image, index) => (
-										<div className="border border-gray-200 rounded h-24 w-24 relative" key={index}>
-											<button
-												type="button"
-												disabled={isReadOnlyField}
-												onClick={() => {
-													// Filter out the deleted image by its index
-													const updatedImages = imageFile.filter((_, i) => i !== index);
-													setValue('images', updatedImages);
-												}}
-												className="absolute -top-2 -right-2 text-gray-600 hover:text-gray-800 z-10 bg-white rounded-full"
+							<div className="flex flex-wrap gap-4 w-full col-span-2 mt-2">
+								{/* Render images */}
+								{previewUrls &&
+									previewUrls.map((image, index) => {
+										return (
+											<div
+												className="rounded w-20 h-30 relative grid place-items-center border border-gray-100"
+												key={index + mode}
 											>
-												<TiDelete size={25} />
-											</button>
-											<img
-												src={
-													image instanceof File
-														? URL.createObjectURL(image)
-														: `${BASE_URL}${image}`
-												}
-												alt={`Preview ${index + 1}`}
-												className="object-cover h-full w-full rounded"
-											/>
-										</div>
-									))}
+												<button
+													type="button"
+													onClick={() => {
+														const updatedImages = imageFile?.filter((_, i) => i !== index);
+														setValue('images', updatedImages);
+													}}
+													className="absolute -top-2 -right-2 text-gray-600 hover:text-gray-800 z-10 bg-white rounded-full"
+												>
+													<TiDelete size={25} />
+												</button>
+												<img
+													src={image}
+													alt={`Preview ${index + 1}`}
+													className="object-cover h-30 max-w-full rounded"
+												/>
+											</div>
+										);
+									})}
 
 								{/* Render upload slot ONLY if total images are less than 4 */}
 								{(!imageFile || imageFile.length < 4) && (
-									<div className="border border-gray-200 border-dashed rounded h-24 w-24 relative flex items-center justify-center hover:bg-gray-50 transition-colors">
+									<div className="border border-gray-200 border-dashed rounded  w-20 h-30 relative flex items-center justify-center hover:bg-gray-50 transition-colors">
 										<input
 											{...field}
 											type="file"
-											id="image"
-											name="image"
+											id="images"
+											name="images"
 											className="h-full w-full opacity-0 absolute cursor-pointer z-10"
 											accept="image/jpeg, image/png"
-											multiple={false}
+											multiple={true}
 											onChange={(e) => {
-												const file = e.target.files && e.target.files[0];
-												if (file) {
+												const files = e.target.files;
+												if (files) {
 													const currentImages = imageFile || [];
-													setValue('images', [...currentImages, file]);
+													const imagesToAdd = Array.from(files).slice(
+														0,
+														4 - currentImages.length,
+													);
+
+													setValue('images', [...currentImages, ...imagesToAdd]);
 												}
 											}}
 										/>
 										<label
-											htmlFor="image"
+											htmlFor="images"
 											className="h-full w-full flex flex-col items-center justify-center cursor-pointer text-center p-1"
 										>
 											<span className="text-gray-400 text-lg font-light">+</span>
@@ -273,8 +276,8 @@ export const OrderForm = ({ mode, orderData }: Props) => {
 						{...register('status')}
 						className="w-full px-3 py-2 border border-gray-300 rounded-md h-[42px]"
 					>
-						{orderStatus?.map((status) => (
-							<option className="capitalize" value={status}>
+						{orderStatus?.map((status, index) => (
+							<option key={index + status} className="capitalize" value={status}>
 								{status}
 							</option>
 						))}

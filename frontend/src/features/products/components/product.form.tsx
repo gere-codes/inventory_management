@@ -20,7 +20,6 @@ export const ProductForm = ({ mode, initialData }: Props) => {
 	const { fetchData } = useProductData();
 	const dispatch = useAppDispatch();
 
-	const [previewUrl, setPreviewUrl] = useState<string[]>([]);
 	const { categories, isLoading } = useCategories();
 	const { fetchStats: fetchProductsStats } = useProductsStats();
 
@@ -142,21 +141,26 @@ export const ProductForm = ({ mode, initialData }: Props) => {
 										<input
 											{...field}
 											type="file"
-											id="image"
-											name="image"
+											id="images"
+											name="images"
 											className="h-full w-full opacity-0 absolute cursor-pointer z-10"
 											accept="image/jpeg, image/png"
 											multiple={true}
 											onChange={(e) => {
-												const file = e.target.files && e.target.files[0];
-												if (file) {
+												const files = e.target.files;
+												if (files) {
 													const currentImages = imageFile || [];
-													setValue('images', [...currentImages, file]);
+													const imagesToAdd = Array.from(files).slice(
+														0,
+														4 - currentImages.length,
+													);
+
+													setValue('images', [...currentImages, ...imagesToAdd]);
 												}
 											}}
 										/>
 										<label
-											htmlFor="image"
+											htmlFor="images"
 											className="h-full w-full flex flex-col items-center justify-center cursor-pointer text-center p-1"
 										>
 											<span className="text-gray-400 text-lg font-light">+</span>

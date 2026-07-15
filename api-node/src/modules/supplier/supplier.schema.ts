@@ -11,6 +11,7 @@ export const supplierCreateSchema = z.object({
 
 export const supplierSchema = supplierCreateSchema.extend({
 	id: z.uuid(),
+	image: sanitized(z.string()).optional().nullable(),
 	createdAt: z.coerce.date().transform((v) => v.toISOString()),
 	updatedAt: z.coerce.date().transform((v) => v.toISOString()),
 });

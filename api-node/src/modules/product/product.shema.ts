@@ -4,20 +4,28 @@ import { EProductStatus } from './product.enum.js';
 import { baseQuerySchema, commonQuery, withOffset } from '@src/core/schema/general.schema.js';
 
 export const productSchema = z.object({
-	id: z.uuid(),
-	name: sanitized(z.string().min(2).max(100)),
-	price: z.coerce.number().positive(),
-	description: sanitized(z.string().max(1000)).nullable().optional(),
-	quantity: z.coerce.number().int().nonnegative(),
+	id: z.uuid('product id must be a valid UUID'),
+	name: sanitized(
+		z.string().min(2, 'Name must be at least 2 characters long').max(100, 'Name cannot exceed 100 characters'),
+	),
+	price: z.coerce.number('Price must be a non-negative number').positive(),
+	description: sanitized(z.string().max(1000, 'Description cannot exceed 1000 characters')).nullable().optional(),
+	quantity: z.coerce.number('Quantity must to be a valid number').int().nonnegative(),
 	category: z.object({
-		id: z.uuid(),
-		name: sanitized(z.string()),
-		slug: sanitized(z.string()),
+		id: z.uuid('categoryId must be a valid UUID'),
+		name: sanitized(z.string('Category name must be a valid string')),
+		slug: sanitized(z.string('Category slug must be a valid string')),
 	}),
-	status: z.enum([EProductStatus.IN_STOCK, EProductStatus.LOW_STOCK, EProductStatus.OUT_OF_STOCK]),
-	categoryId: z.uuid(),
-	sku: sanitized(z.string().min(3).max(36)),
-	images: z.array(z.string()).optional().nullable(),
+	status: z.enum(
+		[EProductStatus.IN_STOCK, EProductStatus.LOW_STOCK, EProductStatus.OUT_OF_STOCK],
+		'Product status must be valid status',
+	),
+	categoryId: z.uuid('categoryId must be a valid UUID'),
+	sku: sanitized(z.string().min(3, 'SKU must be at least 3 characters ').max(36, 'SKU cannot exceed 36 characters')),
+	images: z
+		.array(sanitized(z.string('Must be a valid string')))
+		.optional()
+		.nullable(),
 	createdAt: z.coerce.date().transform((v) => v.toISOString()),
 	updatedAt: z.coerce.date().transform((v) => v.toISOString()),
 });

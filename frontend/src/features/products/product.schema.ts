@@ -11,22 +11,25 @@ const imageSchema = z.union([
 const imagesSchema = z.array(imageSchema).optional().nullable();
 
 export const productSchema = z.object({
-	id: z.uuid(),
-	name: z.string().min(2).max(100),
-	price: z.number().nonnegative(),
-	description: z.string().max(1000).nullable().optional(),
-	quantity: z.number().int().nonnegative(),
-	categoryId: z.uuid(),
+	id: z.uuid('product id must be a valid UUID'),
+	name: z.string().min(2, 'Name must be at least 2 characters long').max(100, 'Name cannot exceed 100 characters'),
+	price: z.number('Price must be a non-negative number').nonnegative('Price must be a non-negative number'),
+	description: z.string().max(1000, 'Description cannot exceed 1000 characters').nullable().optional(),
+	quantity: z.number('Quantity must to be a valid number').int().nonnegative(),
+	categoryId: z.uuid('categoryId must be a valid UUID'),
 	category: z.object({
-		id: z.uuid(),
-		name: z.string(),
-		slug: z.string(),
+		id: z.uuid('categoryId must be a valid UUID'),
+		name: z.string('Category name must be a valid string'),
+		slug: z.string('Category slug must be a valid string'),
 	}),
-	sku: z.string().min(3).max(36),
+	sku: z.string().min(3, 'SKU must be at least 3 characters ').max(36, 'SKU cannot exceed 36 characters'),
 	images: imagesSchema,
-	status: z.enum([EProductStatus.IN_STOCK, EProductStatus.LOW_STOCK, EProductStatus.OUT_OF_STOCK]),
-	createdAt: z.string(),
-	updatedAt: z.string(),
+	status: z.enum(
+		[EProductStatus.IN_STOCK, EProductStatus.LOW_STOCK, EProductStatus.OUT_OF_STOCK],
+		'Product status must be valid status',
+	),
+	createdAt: z.string('Created at must be a valid date string'),
+	updatedAt: z.string('Updated at must be a valid date string'),
 });
 
 const commonFields = productSchema.omit({

@@ -15,7 +15,7 @@ export interface IBaseController<T, TCreate, TUpdate> {
 }
 
 export abstract class BaseController<
-	T extends { image?: string; images?: string[] },
+	T extends { image?: string | undefined | null; images?: string[] | null | undefined },
 	TCreate,
 	TUpdate,
 	TStats,

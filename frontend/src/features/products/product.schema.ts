@@ -1,12 +1,7 @@
 import { z } from 'zod';
 import { EProductStatus } from './product.enum.js';
 import { baseQuerySchema, commonQuery, withOffset } from '@/shared/schema/general.schema.js';
-const imageSchema = z.union([
-	z.instanceof(File).refine((f) => f.size <= 5 * 1024 * 1024, 'Max 5MB'),
-	z.string(),
-	z.null(),
-	z.undefined(),
-]);
+const imageSchema = z.union([z.instanceof(File).refine((f) => f.size <= 5 * 1024 * 1024, 'Max 5MB'), z.string()]);
 
 const imagesSchema = z.array(imageSchema).optional().nullable();
 

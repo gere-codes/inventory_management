@@ -49,14 +49,10 @@ export const ProductForm = ({ mode, initialData }: Props) => {
 
 			if (Array.isArray(value)) {
 				value.forEach((item) => {
-					if (item instanceof File) {
-						formData.append(key, item);
-					} else if (typeof item === 'string') {
-						formData.append(key, item);
-					}
+					formData.append(`${key}[]`, item);
 				});
 			} else {
-				formData.append(key, value.toString());
+				formData.append(key, String(value));
 			}
 		});
 		try {

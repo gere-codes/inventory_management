@@ -102,16 +102,18 @@ export abstract class BaseController<
 		const item = await this.service.getById(id);
 
 		if (this.fileService) {
-			// remove the image if it has been deleted
-			if (!body?.image && item?.image) {
+			// Remove deleted image from the database
+			if (!payload?.image && item?.image) {
 				await this.fileService.delete(item.image);
+				item.image = null;
 			}
 
-			// update a single image
+			// Update a single image
 			if (req.file) {
 				// delete the old image if it exists
 				if (item?.image) {
 					await this.fileService.delete(item.image);
+					item.image = null;
 				}
 
 				// update the image
@@ -119,34 +121,32 @@ export abstract class BaseController<
 				payload.image = updateImage;
 			}
 
-			// normalize existing images to array
-			let existingImages: string[] = typeof body?.images === 'string' ? [body?.images] : body?.images;
-
-			// handle new images upload if any
-			let newImages: string[] = [];
-			if (req.files && Array.isArray(req.files) && req.files.length > 0) {
-				newImages = await Promise.all(req.files.map((file) => this.fileService!.upload(file)));
+			// Updating multiple images
+			if (!Array.isArray(item.images)) {
+				item.images = [];
 			}
+			// Remove deleted images from the database
+			payload.images = Array.isArray(payload?.images) ? payload.images : [];
+			item.images = Array.isArray(item.images) ? item.images : [];
 
-			const finalImages = [...existingImages, ...newImages];
-
-			// Delete images that are no longer in the payload
-			if (item?.images && item?.images.length > 0) {
-				for (const oldImage of item.images) {
-					if (!finalImages.includes(oldImage)) {
-						await this.fileService.delete(oldImage);
-					}
+			for (const oldImage of item.images) {
+				if (!payload?.images.includes(oldImage)) {
+					await this.fileService.delete(oldImage);
 				}
 			}
 
-			payload.images = finalImages;
+			// handle new images upload if any
+			if (req.files?.length && Array.isArray(req.files)) {
+				const newImages = await Promise.all(req.files.map((file) => this.fileService!.upload(file)));
+				payload.images.push(...newImages);
+			}
 		}
 
 		const validateInput = this.updateSchema.parse(payload);
 		const updatedItem = await this.service.update(id, validateInput);
 		const responseDto = this.schema.parse(updatedItem);
 
-		res.status(201).json({
+		res.status(200).json({
 			success: true,
 			payload: responseDto,
 		});

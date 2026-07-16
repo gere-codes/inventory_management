@@ -1,11 +1,6 @@
 import { commonQuery, withOffset } from '@/shared/schema';
 import z, { uuid } from 'zod';
-const imageSchema = z.union([
-	z.instanceof(File).refine((f) => f.size <= 5 * 1024 * 1024, 'Max 5MB'),
-	z.string(),
-	z.null(),
-	z.undefined(),
-]);
+const imageSchema = z.union([z.instanceof(File).refine((f) => f.size <= 5 * 1024 * 1024, 'Max 5MB'), z.string()]);
 
 const imagesSchema = z.array(imageSchema).optional().nullable();
 

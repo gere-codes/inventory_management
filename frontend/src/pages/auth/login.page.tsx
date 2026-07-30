@@ -18,6 +18,10 @@ export const LoginPage = () => {
 	} = useForm<TLoginFormData>({
 		resolver: zodResolver(loginSchema),
 		mode: 'all',
+		defaultValues: {
+			email: 'user@mail.com',
+			password: 'password',
+		},
 	});
 
 	const dispatch = useAppDispatch();

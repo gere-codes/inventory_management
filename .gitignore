@@ -32,3 +32,43 @@ uploads
 README.md
 
 
+#----dotnet----
+/.env
+
+# Ignore user-specific settings and temp files.
+*.suo
+*.user
+*.vspscc
+
+# Visual Studio and MSBuild files
+*.csproj.user
+*.vbproj.user
+*.sln.docstates
+*.userprefs
+*.sln.cache
+
+# Build results
+bin/
+obj/
+
+# NuGet packages
+packages/
+*.nupkg
+
+# Log files
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+*.out
+
+# macOS-specific files
+Thumbs.db
+
+# Rider specific files
+.idea/
+.vscode/
+
+# Swagger UI generated files
+swagger/

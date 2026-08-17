@@ -22,12 +22,12 @@ export const verifyRefreshToken = catchAsync(async (req: Request, res: Response,
 	}
 
 	// check if the user exists
-	const user = await authRepository.findById(decoded.sub);
+	const user = await authRepository.findByIdRaw(decoded.sub);
 	if (!user) {
 		throw new NotAuthorizedError('User no longer exists');
 	}
 
-	req.user = { id: user.id };
+	req.user = { id: user.id, role: user.role };
 
 	next();
 });
@@ -60,7 +60,8 @@ export const protect = catchAsync(async (req: Request, res: Response, next: Next
 
 	const userId = decoded.sub;
 
-	req.user = { id: userId };
+	req.user = { id: userId, role: decoded.role };
+	console.log(req.user, 'user req');
 
 	next();
 });

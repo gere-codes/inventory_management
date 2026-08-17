@@ -3,7 +3,6 @@ import type { Request, Response } from 'express';
 import { catchAsync } from '@src/core/utils/index.js';
 import { authService } from './auth.service.js';
 import { EAuth } from './auth.enum.js';
-import { env } from '@src/config/env.js';
 
 class AuthController {
 	private repo = authService;
@@ -29,14 +28,13 @@ class AuthController {
 	});
 
 	public refresh = catchAsync(async (req: Request, res: Response) => {
-		const { accessToken, refreshToken } = await this.repo.refresh(req.user.id);
+		const { accessToken, refreshToken } = await this.repo.refresh(req.user.id, req.user.role);
 
 		res.cookie(EAuth.REFRESH_TOKEN, refreshToken, this.cookieOptions);
 		return res.status(200).json({ accessToken });
 	});
 
 	public logout = catchAsync(async (req: Request, res: Response) => {
-		console.log('logout requested');
 		res.clearCookie(EAuth.REFRESH_TOKEN, {
 			...this.cookieOptions,
 			maxAge: 0,

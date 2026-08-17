@@ -14,7 +14,7 @@ export const registerSchema = z
 	});
 
 export const loginSchema = z.object({
-	email: sanitized(z.email()).transform((e) => e.toLowerCase().trim()),
+	email: sanitized(z.email('not valid email')).transform((e) => e.toLowerCase().trim()),
 	password: passwordRules,
 });
 

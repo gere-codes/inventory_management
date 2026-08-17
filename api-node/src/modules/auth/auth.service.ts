@@ -1,10 +1,10 @@
 import { loginSchema, registerSchema, type TLoginInput, type TRegisterInput } from './auth.schema.js';
 import { authRepository } from './auth.repository.js';
-import { AppError, ConflictError, NotAuthorizedError } from '@src/core/utils/error.util.js';
+import { AppError, ConflictError, NotAuthorizedError, NotFoundError } from '@src/core/utils/error.util.js';
 import jwt from 'jsonwebtoken';
 import { env } from '@src/config/env.js';
 import bcrypt from 'bcrypt';
-import type { TUserResponse } from '../user/user.schema.js';
+import { userResponseSchema, type TUserResponse } from '../user/user.schema.js';
 
 class AuthService {
 	private readonly repo = authRepository;
@@ -16,23 +16,29 @@ class AuthService {
 		const validatedUser = registerSchema.parse(userData);
 
 		// check if the user exists
-		const existingUser = await this.repo.findByEmail(validatedUser.email);
+		const existingUser = await this.repo.findByEmailRaw(validatedUser.email);
 		if (existingUser) throw new ConflictError('User already exists');
 
 		// Hash the password
 		const hashedPassword = await bcrypt.hash(validatedUser.password, 12);
 
 		// register user
-		const user = await this.repo.create({
+		const userEmail = await this.repo.create({
 			name: validatedUser.name,
 			email: validatedUser.email,
 			password: hashedPassword,
 		});
 
+		// get user data;
+		const user = await this.repo.findByEmailRaw(userEmail);
+		if (!user) throw new NotFoundError('User not found');
+
+		const userResponse = userResponseSchema.parse(user);
+
 		return {
-			user,
-			accessToken: this.generateAccessToken(user.id),
-			refreshToken: this.generateRefreshToken(user.id),
+			user: userResponse,
+			accessToken: this.generateAccessToken(user.id, user.role),
+			refreshToken: this.generateRefreshToken(user.id, user.role),
 		};
 	}
 
@@ -47,7 +53,7 @@ class AuthService {
 		const validatedUser = loginSchema.parse(userData);
 
 		// Check if the user exists
-		const existingUser = await this.repo.findByEmail(validatedUser.email);
+		const existingUser = await this.repo.findByEmailRaw(validatedUser.email);
 		const hashedPassword = existingUser ? existingUser.password : DUMMY_HASH;
 
 		// Compare the hashed password
@@ -56,33 +62,36 @@ class AuthService {
 		// return error if user is not valid
 		if (!validUser || !existingUser) throw new NotAuthorizedError('Invalid email or password');
 
-		const user: TUserResponse = {
-			id: existingUser.id,
-			name: existingUser.name,
-			email: existingUser.email,
-			updatedAt: existingUser.updatedAt,
-		};
+		const user = userResponseSchema.parse(existingUser);
 
 		return {
 			user,
-			accessToken: this.generateAccessToken(existingUser.id),
-			refreshToken: this.generateRefreshToken(existingUser.id),
+			accessToken: this.generateAccessToken(existingUser.id, existingUser.role),
+			refreshToken: this.generateRefreshToken(existingUser.id, existingUser.role),
 		};
 	}
 
-	async refresh(userId: string) {
+	async refresh(userId: string, userRole: string) {
 		if (!userId) throw new NotAuthorizedError();
-		const accessToken = this.generateAccessToken(userId);
-		const refreshToken = this.generateRefreshToken(userId);
+		const accessToken = this.generateAccessToken(userId, userRole);
+		const refreshToken = this.generateRefreshToken(userId, userRole);
 		return { accessToken, refreshToken };
 	}
 
-	private generateAccessToken(userId: string): string {
-		return jwt.sign({ sub: userId }, env.ACCESS_TOKEN_KEY, { expiresIn: '15m' });
+	private generateAccessToken(userId: string, userRole: string): string {
+		const payload = {
+			sub: userId,
+			role: userRole,
+		};
+		return jwt.sign(payload, env.ACCESS_TOKEN_KEY, { expiresIn: '15m' });
 	}
 
-	private generateRefreshToken(userId: string): string {
-		return jwt.sign({ sub: userId }, env.REFRESH_TOKEN_KEY, { expiresIn: '7d' });
+	private generateRefreshToken(userId: string, userRole: string): string {
+		const payload = {
+			sub: userId,
+			role: userRole,
+		};
+		return jwt.sign(payload, env.REFRESH_TOKEN_KEY, { expiresIn: '7d' });
 	}
 }
 

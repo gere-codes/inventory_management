@@ -13,16 +13,22 @@ class AuthRepository {
 		};
 	}
 
-	public async create(userData: TUserCreate): Promise<TUserResponse> {
-		const [user] = await db.insert(users).values(userData).returning();
+	public async create(userData: TUserCreate): Promise<string> {
+		const [user] = await db.insert(users).values(userData).returning({ email: users.email });
 
 		if (!user) throw new ConflictError('Registration failed: User already exists.');
 
-		return userResponseSchema.parse(this.format(user));
+		return user.email;
 	}
 
-	async findByEmail(email: string): Promise<TUser | null> {
+	async findByEmailRaw(email: string): Promise<TUser | null> {
 		const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+		return user || null;
+	}
+
+	async findByIdRaw(id: string): Promise<TUser | null> {
+		const [user] = await db.select().from(users).where(eq(users.id, id)).limit(1);
+		if (!user) return null;
 		return user || null;
 	}
 

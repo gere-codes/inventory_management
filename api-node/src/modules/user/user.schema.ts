@@ -7,6 +7,7 @@ export const userSchema = object({
 	email: sanitized(z.email('Please enter a valid email address').max(50, 'Email is too long')).transform((email) =>
 		email.trim().toLowerCase(),
 	),
+	role: sanitized(z.string().min(2, 'Role is not valid').max(10, 'Not valid role')),
 	password: sanitized(z.string().min(8, 'password requires at least 8 characters')),
 	createdAt: z.coerce.date().optional(),
 	updatedAt: z.coerce.date().optional(),
@@ -14,8 +15,8 @@ export const userSchema = object({
 
 export type TUser = z.infer<typeof userSchema>;
 
-export const userCreateSchema = userSchema.omit({ id: true, createdAt: true, updatedAt: true });
+export const userCreateSchema = userSchema.omit({ id: true, role: true, createdAt: true, updatedAt: true });
 export type TUserCreate = z.infer<typeof userCreateSchema>;
 
-export const userResponseSchema = userSchema.omit({ password: true });
+export const userResponseSchema = userSchema.omit({ password: true, role: true });
 export type TUserResponse = z.infer<typeof userResponseSchema>;

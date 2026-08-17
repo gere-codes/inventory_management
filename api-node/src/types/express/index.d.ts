@@ -5,6 +5,7 @@ export declare global {
 		interface Request {
 			user: {
 				readonly id: string;
+				readonly role: string;
 			};
 		}
 	}

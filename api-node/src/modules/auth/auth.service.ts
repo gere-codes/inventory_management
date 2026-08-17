@@ -1,10 +1,10 @@
-import type { TUser, TUserResponse } from '@src/db/schema/user.js';
 import { loginSchema, registerSchema, type TLoginInput, type TRegisterInput } from './auth.schema.js';
 import { authRepository } from './auth.repository.js';
 import { AppError, ConflictError, NotAuthorizedError } from '@src/core/utils/error.util.js';
 import jwt from 'jsonwebtoken';
 import { env } from '@src/config/env.js';
 import bcrypt from 'bcrypt';
+import type { TUserResponse } from '../user/user.schema.js';
 
 class AuthService {
 	private readonly repo = authRepository;
@@ -27,8 +27,6 @@ class AuthService {
 			name: validatedUser.name,
 			email: validatedUser.email,
 			password: hashedPassword,
-			createdAt: new Date(),
-			updatedAt: new Date(),
 		});
 
 		return {

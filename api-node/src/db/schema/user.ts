@@ -13,7 +13,3 @@ export const users = pgTable('users', {
 		.notNull()
 		.$onUpdate(() => new Date()),
 });
-
-export type TUser = typeof users.$inferSelect;
-export type TUserResponse = Omit<TUser, 'password' | 'createdAt'>;
-export type TUserCreate = typeof users.$inferInsert;

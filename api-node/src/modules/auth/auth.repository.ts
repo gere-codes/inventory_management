@@ -1,7 +1,6 @@
 import { AppError, ConflictError } from '@src/core/utils/index.js';
 import { users, db } from '@src/db/index.js';
-import type { TUser, TUserCreate, TUserResponse } from '@src/db/schema/user.js';
-import { userSchema } from '@src/modules/user/index.js';
+import { userResponseSchema, type TUser, type TUserCreate, type TUserResponse } from '@src/modules/user/index.js';
 import { eq } from 'drizzle-orm';
 
 class AuthRepository {
@@ -19,7 +18,7 @@ class AuthRepository {
 
 		if (!user) throw new ConflictError('Registration failed: User already exists.');
 
-		return userSchema.parse(this.format(user));
+		return userResponseSchema.parse(this.format(user));
 	}
 
 	async findByEmail(email: string): Promise<TUser | null> {
@@ -31,7 +30,7 @@ class AuthRepository {
 		const [user] = await db.select().from(users).where(eq(users.id, id)).limit(1);
 		if (!user) return null;
 
-		return userSchema.parse(this.format(user));
+		return userResponseSchema.parse(this.format(user));
 	}
 }
 

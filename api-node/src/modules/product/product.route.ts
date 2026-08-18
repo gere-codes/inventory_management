@@ -4,7 +4,7 @@ import { upload } from '@middlewares';
 
 const productRoutes = Router();
 
-// productRoutes.get('/', productController.getAll);
+productRoutes.get('/collection', productController.getCollection);
 productRoutes.post('/', upload.array('images[]', 4), productController.create);
 productRoutes.put('/:id', upload.array('images[]', 4), productController.update);
 productRoutes.delete('/:id', productController.delete);

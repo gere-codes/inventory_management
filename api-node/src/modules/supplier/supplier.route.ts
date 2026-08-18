@@ -3,7 +3,7 @@ import { supplierController } from './supplier.controller.js';
 
 const supplierRoutes = Router();
 
-supplierRoutes.get('/', supplierController.getAll);
+supplierRoutes.get('/collection', supplierController.getCollection);
 supplierRoutes.post('/', supplierController.create);
 supplierRoutes.put('/:id', supplierController.update);
 supplierRoutes.delete('/:id', supplierController.delete);
@@ -14,5 +14,3 @@ export default supplierRoutes;
 
 // public route
 export const publicSupplieryRoutes = Router();
-
-publicSupplieryRoutes.get('/', supplierController.getCollection);

@@ -4,7 +4,7 @@ import { upload } from '@middlewares';
 
 const orderRoutes = Router();
 
-orderRoutes.get('/', orderController.getAll);
+orderRoutes.get('/collection', orderController.getCollection);
 orderRoutes.post('/', upload.array('images[]', 4), orderController.create);
 orderRoutes.put('/:id', upload.array('images[]', 4), orderController.update);
 
@@ -15,4 +15,3 @@ export default orderRoutes;
 // Public route
 
 export const publicOrderRoutes = Router();
-publicOrderRoutes.get('/', orderController.getCollection);

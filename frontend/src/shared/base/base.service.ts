@@ -94,7 +94,7 @@ export abstract class BaseService<
 	async getCollection(params: TQuery): Promise<ICollectionResult<T>> {
 		const queries = this.queryBuilder(params);
 
-		const response = await publicInstance.get(`/public/${this.resource}`, { params: queries });
+		const response = await privateInstance.get(`/${this.resource}/collection`, { params: queries });
 		const { items, pagination } = response.data.payload;
 
 		return {

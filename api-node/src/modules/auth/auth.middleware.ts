@@ -61,7 +61,6 @@ export const protect = catchAsync(async (req: Request, res: Response, next: Next
 	const userId = decoded.sub;
 
 	req.user = { id: userId, role: decoded.role };
-	console.log(req.user, 'user req');
 
 	next();
 });

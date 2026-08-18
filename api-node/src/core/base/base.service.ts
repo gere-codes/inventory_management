@@ -56,7 +56,8 @@ export abstract class BaseService<
 
 	async update(id: string, data: TUpdate, context: TContext): Promise<T> {
 		try {
-			const item = await this.repository.findByIdRaw(id);
+			await this.repository.findOne(id); // Check if the item exists
+
 			await this.repository.update(id, data, context);
 			return await this.repository.findOne(id);
 		} catch (error) {

@@ -21,6 +21,8 @@ export class OrderRespository
 
 	format(record: any): TOrder {
 		const { orders, categories } = record;
+		console.log(record);
+
 		return {
 			id: orders.id,
 			name: orders.name,

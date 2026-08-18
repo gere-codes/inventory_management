@@ -27,7 +27,7 @@ export interface IBaseRepository<
 > {
 	getAll(userId: string): Promise<T[]>;
 	create(data: TCreate): Promise<string>;
-	update(id: string, data: TUpdate): Promise<void>;
+	update(id: string, data: TUpdate, context: TContext): Promise<void>;
 	delete(id: string): Promise<void>;
 	findOne(id: string): Promise<T>;
 	findAll(context: TContext, options: TQuery): Promise<T[]>;
@@ -151,12 +151,17 @@ export abstract class BaseRepository<
 		}
 	}
 
-	async update(id: string, data: TUpdate): Promise<void> {
+	async update(id: string, data: TUpdate, context: TContext): Promise<void> {
 		try {
+			const whereClause =
+				context.scope === EScope.Own
+					? and(eq(this.table.id, id), eq(this.table.userId, context.userId))
+					: eq(this.table.id, id);
+
 			await this.db
 				.update(this.table as AnyPgTable)
 				.set(data as any)
-				.where(eq(this.table.id, id));
+				.where(whereClause);
 			return;
 		} catch (error) {
 			return repositoryError(error, 'DB update failed', 'Database error during update', { id, data });

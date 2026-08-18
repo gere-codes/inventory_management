@@ -7,7 +7,7 @@ export interface IBaseService<T, TCreate, TUpdate, TStats, TQuery extends TBaseQ
 	getAll(userId: string): Promise<T[]>;
 	getById(id: string): Promise<T>;
 	create(userId: string, data: TCreate): Promise<T>;
-	update(id: string, data: TUpdate): Promise<T>;
+	update(id: string, data: TUpdate, context: TContext): Promise<T>;
 	delete(id: string): Promise<T>;
 	getCollection(context: TContext, options?: TQuery): Promise<ICollectionResult<T>>;
 	getStats(userId: string): Promise<TStats>;
@@ -54,10 +54,10 @@ export abstract class BaseService<
 		}
 	}
 
-	async update(id: string, data: TUpdate): Promise<T> {
+	async update(id: string, data: TUpdate, context: TContext): Promise<T> {
 		try {
 			const item = await this.repository.findByIdRaw(id);
-			await this.repository.update(id, data);
+			await this.repository.update(id, data, context);
 			return await this.repository.findOne(id);
 		} catch (error) {
 			return serviceError(error, 'Service Layer: update failed', 'Failed to update item', { id, data });

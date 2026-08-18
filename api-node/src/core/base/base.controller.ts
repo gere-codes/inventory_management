@@ -2,7 +2,7 @@ import type { Request, Response, NextFunction } from 'express';
 import type { BaseService, IBaseService } from './base.service.js';
 import { catchAsync } from '@utils/index.js';
 import type { IFileService } from '@services';
-import { paginationSchema, type TBaseQuery } from '../schema/general.schema.js';
+import { paginationSchema, type TBaseQuery, type TContext } from '../schema/general.schema.js';
 import z from 'zod';
 import { getScope } from '../utils/auth.util.js';
 
@@ -95,6 +95,13 @@ export abstract class BaseController<
 	});
 
 	update = catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+		const userId = req.user.id;
+		const scope = getScope(req.user.role);
+		const context: TContext = {
+			userId,
+			scope,
+		};
+
 		const id = req.params?.id as string;
 		const { body } = req;
 
@@ -144,7 +151,7 @@ export abstract class BaseController<
 		}
 
 		const validateInput = this.updateSchema.parse(payload);
-		const updatedItem = await this.service.update(id, validateInput);
+		const updatedItem = await this.service.update(id, validateInput, context);
 		const responseDto = this.schema.parse(updatedItem);
 
 		res.status(200).json({

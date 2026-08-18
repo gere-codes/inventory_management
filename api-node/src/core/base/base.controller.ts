@@ -4,6 +4,7 @@ import { catchAsync } from '@utils/index.js';
 import type { IFileService } from '@services';
 import { paginationSchema, type TBaseQuery } from '../schema/general.schema.js';
 import z from 'zod';
+import { getScope } from '../utils/auth.util.js';
 
 export interface IBaseController<T, TCreate, TUpdate> {
 	getAll(req: Request, res: Response, next: NextFunction): void;
@@ -177,8 +178,10 @@ export abstract class BaseController<
 
 	getCollection = catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 		const userId = req.user?.id;
+		const scope = getScope(req.user?.role);
 		const context = {
 			userId,
+			scope,
 		};
 
 		const options = this.querySchema.parse(req.query);

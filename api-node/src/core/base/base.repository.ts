@@ -4,6 +4,7 @@ import type { AnyPgTable, PgColumn, PgSelectDynamic, PgTable } from 'drizzle-orm
 import { AppError, BadRequestError, NotFoundError, repositoryError } from '@utils';
 import type { ICollectionResult } from '../types/general.js';
 import type { TBaseQuery, TContext } from '../schema/general.schema.js';
+import { EScope } from '../types/auth.type.js';
 
 type AnyUserIdColumn = PgColumn<ColumnBaseConfig<'string', string>>;
 type AnyIdColumn = PgColumn<ColumnBaseConfig<'string', string>>;
@@ -75,7 +76,7 @@ export abstract class BaseRepository<
 	protected buildFilters(context: TContext, options: TQuery): SQL<unknown> | undefined {
 		const filters: SQL[] = [];
 
-		if (context?.userId) {
+		if (context?.userId && context.scope === EScope.Own) {
 			filters.push(eq(this.table.userId, sql`${context?.userId}`));
 		}
 

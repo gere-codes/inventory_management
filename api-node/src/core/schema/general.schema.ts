@@ -19,6 +19,7 @@ export type TBaseQuery = z.infer<typeof baseQuerySchema>;
 
 export const context = z.object({
 	userId: z.uuid().optional(),
+	scope: z.string().optional(),
 });
 
 export type TContext = z.infer<typeof context>;

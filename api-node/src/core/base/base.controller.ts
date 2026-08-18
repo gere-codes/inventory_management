@@ -162,7 +162,13 @@ export abstract class BaseController<
 
 	delete = catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 		const id = req.params?.id as string;
-		const deletedProduct = await this.service.delete(id);
+
+		const userId = req.user.id;
+		const userRole = req.user.role;
+		const scope = getScope(userRole);
+		const context = { userId, scope };
+
+		const deletedProduct = await this.service.delete(id, context);
 		const responseDto = this.schema.parse(deletedProduct);
 
 		// remove image

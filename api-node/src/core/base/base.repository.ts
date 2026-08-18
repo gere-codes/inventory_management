@@ -28,7 +28,7 @@ export interface IBaseRepository<
 	getAll(userId: string): Promise<T[]>;
 	create(data: TCreate): Promise<string>;
 	update(id: string, data: TUpdate, context: TContext): Promise<void>;
-	delete(id: string): Promise<void>;
+	delete(id: string, context: TContext): Promise<void>;
 	findOne(id: string): Promise<T>;
 	findAll(context: TContext, options: TQuery): Promise<T[]>;
 	findManyAndCount(context: TContext, options: TQuery): Promise<ICollectionResult<T>>;
@@ -168,9 +168,14 @@ export abstract class BaseRepository<
 		}
 	}
 
-	async delete(id: string): Promise<void> {
+	async delete(id: string, context: TContext): Promise<void> {
 		try {
-			await this.db.delete(this.table as AnyPgTable).where(eq(this.table.id, id));
+			const whereClause =
+				context.scope === EScope.Own
+					? and(eq(this.table.id, id), eq(this.table.userId, context.userId))
+					: eq(this.table.id, id);
+
+			await this.db.delete(this.table as AnyPgTable).where(whereClause);
 			return;
 		} catch (error) {
 			return repositoryError(error, 'DB delete failed', 'Database error during delete', { id });

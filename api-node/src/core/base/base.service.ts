@@ -8,7 +8,7 @@ export interface IBaseService<T, TCreate, TUpdate, TStats, TQuery extends TBaseQ
 	getById(id: string): Promise<T>;
 	create(userId: string, data: TCreate): Promise<T>;
 	update(id: string, data: TUpdate, context: TContext): Promise<T>;
-	delete(id: string): Promise<T>;
+	delete(id: string, context: TContext): Promise<T>;
 	getCollection(context: TContext, options?: TQuery): Promise<ICollectionResult<T>>;
 	getStats(userId: string): Promise<TStats>;
 }
@@ -64,12 +64,10 @@ export abstract class BaseService<
 		}
 	}
 
-	async delete(id: string): Promise<T> {
+	async delete(id: string, context: TContext): Promise<T> {
 		try {
-			const item = await this.repository.findByIdRaw(id);
-
 			const deletedItem = await this.repository.findOne(id);
-			await this.repository.delete(id);
+			await this.repository.delete(id, context);
 
 			return deletedItem;
 		} catch (error) {

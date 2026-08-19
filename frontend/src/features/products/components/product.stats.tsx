@@ -3,6 +3,7 @@ import { LuPackageMinus, LuPackageOpen } from 'react-icons/lu';
 import { TbPackages } from 'react-icons/tb';
 import { useProductsStats, useProductStats } from '../product.hook';
 import type { TProductStats } from '../product.schema';
+import { memo } from 'react';
 
 export const ProductsStats = () => {
 	const { data, isLoading } = useProductsStats();
@@ -18,7 +19,7 @@ export const ProductsStats = () => {
 
 const StockLevelList = ({ stockLevel }: TProductStats) => {
 	return (
-		<section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 flex-1">
+		<ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 flex-1">
 			<StockLevelItem
 				Icon={TbPackages}
 				color="blue"
@@ -27,7 +28,7 @@ const StockLevelList = ({ stockLevel }: TProductStats) => {
 			/>
 			<StockLevelItem Icon={LuPackageMinus} color="yellow" count={stockLevel?.lowStock} name="Low in Stock" />
 			<StockLevelItem Icon={LuPackageOpen} color="red" count={stockLevel?.outOfStock} name="Out of Stock" />
-		</section>
+		</ul>
 	);
 };
 type TColor = 'yellow' | 'red' | 'blue';
@@ -58,7 +59,7 @@ interface IProductLevel {
 const StockLevelItem = ({ color, count, name, Icon }: IProductLevel) => {
 	const styles = colorMap[color];
 	return (
-		<section className={`${styles.bg} ${styles.text} h-[160px] p-4 rounded-lg shadow-xs flex items-center gap-4`}>
+		<li className={`${styles.bg} ${styles.text} h-[160px] p-4 rounded-lg shadow-xs flex items-center gap-4`}>
 			<span className={`p-3 ${styles.iconBg} rounded-lg`}>
 				<Icon size={28} />
 			</span>
@@ -66,6 +67,6 @@ const StockLevelItem = ({ color, count, name, Icon }: IProductLevel) => {
 				<span className="text-3xl font-semibold">{count}</span>
 				<h2 className="text-sm ">{name}</h2>
 			</div>
-		</section>
+		</li>
 	);
 };

@@ -1,9 +1,12 @@
-public interface IAuthRepository<UserCreateDto>
+using Microsoft.EntityFrameworkCore;
+
+public interface IAuthRepository
 {
-    Task CreateAsync(UserCreateDto userData);
+    Task CreateAsync(User user);
+    Task<User?> FindByEmailAsync(string email);
 }
 
-internal class AuthRepository<TUserCreate> : IAuthRepository<TUserCreate>
+internal class AuthRepository : IAuthRepository
 {
     private readonly AppDbContext _context;
 
@@ -12,9 +15,20 @@ internal class AuthRepository<TUserCreate> : IAuthRepository<TUserCreate>
         _context = context;
     }
 
-    public async Task CreateAsync(TUserCreate userData)
+
+
+    public async Task CreateAsync(User user)
     {
-        await _context.AddAsync(userData);
+        user.CreatedAt = DateTime.UtcNow;
+        user.UpdatedAt = DateTime.UtcNow;
+
+        await _context.Users.AddAsync(user);
         await _context.SaveChangesAsync();
+    }
+    
+
+    public async Task<User?> FindByEmailAsync(string email)
+    {
+        return await _context.Users.FirstOrDefaultAsync<User>((u)=> u.Email == email);
     }
 }

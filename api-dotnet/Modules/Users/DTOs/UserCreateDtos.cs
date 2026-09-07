@@ -7,9 +7,3 @@ public record UserCreateDto(
 );
 
 
-public record UserResponseDto(
-    Guid Id,
-    string Name,
-    string Email,
-    DateTime UpdatedAt
-);

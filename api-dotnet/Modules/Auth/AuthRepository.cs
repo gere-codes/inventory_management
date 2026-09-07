@@ -19,13 +19,11 @@ internal class AuthRepository : IAuthRepository
 
     public async Task CreateAsync(User user)
     {
-        user.CreatedAt = DateTime.UtcNow;
-        user.UpdatedAt = DateTime.UtcNow;
 
         await _context.Users.AddAsync(user);
         await _context.SaveChangesAsync();
     }
-    
+
 
     public async Task<User?> FindByEmailAsync(string email)
     {

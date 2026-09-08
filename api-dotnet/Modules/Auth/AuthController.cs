@@ -30,4 +30,24 @@ public class AuthController : ControllerBase
         return Ok(clientResponse);
         
     }
+
+    [HttpPost("login")]
+    public async Task<ActionResult<AuthResponseDTO>> Login([FromBody] LoginRequestDTO loginData)
+    {
+        var result = await _authService.LoginAsync(loginData);
+
+         var cookieOptions = new CookieOptions
+        {
+            HttpOnly = true,                
+            Secure = true,                  
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTime.UtcNow.AddDays(7) 
+        };
+
+         Response.Cookies.Append("refreshToken", result.RefreshToken, cookieOptions);
+
+        var clientResponse = new ClientAuthResponseDto(result.AccessToken, result.User);
+
+        return Ok(clientResponse);
+    }
 }

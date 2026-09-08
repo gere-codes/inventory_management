@@ -8,6 +8,9 @@ builder.Services.AddEndpointsApiExplorer();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString)); 
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();

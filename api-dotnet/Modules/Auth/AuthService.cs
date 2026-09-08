@@ -26,7 +26,6 @@ public interface IAuthService{
     
     {
 
-        try{
             if (registerData.Password != registerData.ConfirmPassword)
             {
                 throw new ArgumentException("Passwords do not match.");
@@ -68,13 +67,10 @@ public interface IAuthService{
                 )
             };
                        
-        }
-
-        catch(Exception ex)
-        {
-            throw new AppError(ex.Message, 500 );
-        }
     }
+
+     
+    
 
 
    private string GenerateToken(string userId, string configKey, TimeSpan expiration)

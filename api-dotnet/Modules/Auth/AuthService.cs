@@ -5,10 +5,12 @@ using BCrypt.Net;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.BearerToken;
 
 public interface IAuthService{
     Task<AuthResponseDTO> RegisterAsync(RegisterRequestDTO registerData);
     Task<AuthResponseDTO> LoginAsync(LoginRequestDTO loginData);
+    Task<RefreshResponseDTO> RefreshAsync(Guid refreshData);
 }
  class AuthService : IAuthService
 {
@@ -98,6 +100,16 @@ public interface IAuthService{
             )
         };
     }
+
+
+    public async Task<RefreshResponseDTO> RefreshAsync(Guid refreshData)
+    {
+        
+        var accessToken = GenerateToken(refreshData.ToString(), "Jwt:AccessTokenKey", TimeSpan.FromMinutes(15));
+        var refreshToken = GenerateToken(refreshData.ToString(), "Jwt:RefreshTokenKey", TimeSpan.FromDays(7));
+
+        return new RefreshResponseDTO(accessToken, refreshToken);
+    }   
     
 
 

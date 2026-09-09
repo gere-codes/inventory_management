@@ -1,3 +1,6 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
@@ -50,4 +53,21 @@ public class AuthController : ControllerBase
 
         return Ok(clientResponse);
     }
-}
+
+    [HttpPost("refresh")]
+    [Authorize] 
+    public async Task<ActionResult<RefreshClientResponseDTO>> Refresh()
+        {
+            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value 
+                            ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+
+            if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
+            {
+                throw new UnauthorizedAccessException("Invalid token payload.");
+            }
+
+            var result = await _authService.RefreshAsync(userId);
+
+            return Ok(new RefreshClientResponseDTO(result.AccessToken));
+        }
+    }

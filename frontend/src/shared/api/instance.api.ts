@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const BASE_URL = import.meta.env.VITE_BASE || 'http://localhost:5000/api';
+export const BASE_URL = import.meta.env.VITE_BASE;
 
 // public instance
 export const publicInstance = axios.create({

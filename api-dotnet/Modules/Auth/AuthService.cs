@@ -79,6 +79,7 @@ public interface IAuthService{
         
         string hashedPassword = existingUser?.Password ?? dummyHash;
         bool isValidPassword = BCrypt.Net.BCrypt.Verify(loginData.Password, hashedPassword);
+        Console.WriteLine("login called");
 
         if (existingUser == null || !isValidPassword)
         {

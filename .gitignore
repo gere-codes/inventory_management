@@ -72,3 +72,13 @@ Thumbs.db
 
 # Swagger UI generated files
 swagger/
+
+
+# User secrets and sensitive config files
+secrets.json
+appsettings.Development.json
+appsettings.Production.json
+appsettings.Staging.json
+appsettings.*.json
+JwtSettings.cs
+Configuration/JwtSettings.cs

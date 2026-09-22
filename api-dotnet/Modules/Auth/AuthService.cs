@@ -1,16 +1,14 @@
 
 using System.Security.Claims;
 using System.Text;
-using BCrypt.Net;
-using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.Authentication.BearerToken;
+using Microsoft.AspNetCore.SignalR;
 
 public interface IAuthService{
     Task<AuthResponseDTO> RegisterAsync(RegisterRequestDTO registerData);
     Task<AuthResponseDTO> LoginAsync(LoginRequestDTO loginData);
-    Task<RefreshResponseDTO> RefreshAsync(Guid refreshData);
+    Task<RefreshResponseDTO> RefreshAsync(string refreshData);
 }
  class AuthService : IAuthService
 {
@@ -103,15 +101,45 @@ public interface IAuthService{
     }
 
 
-    public async Task<RefreshResponseDTO> RefreshAsync(Guid refreshData)
-    {
-        
-        var accessToken = GenerateToken(refreshData.ToString(), "Jwt:AccessTokenKey", TimeSpan.FromMinutes(15));
-        var refreshToken = GenerateToken(refreshData.ToString(), "Jwt:RefreshTokenKey", TimeSpan.FromDays(7));
-
-        return new RefreshResponseDTO(accessToken, refreshToken);
-    }   
     
+
+    public async Task<RefreshResponseDTO> RefreshAsync(string refreshString)
+{
+        var key = _configuration["Jwt:RefreshTokenKey"] ?? throw new UnauthorizedAccessException("Invalid refresh token");
+        var validationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
+        ValidateIssuer = false,      
+        ValidateAudience = false,    
+        ValidateLifetime = true,    
+        ClockSkew = TimeSpan.Zero
+    };
+
+    try
+    {
+        var handler = new JwtSecurityTokenHandler();
+
+        
+        var principal = handler.ValidateToken(
+            refreshString,
+            validationParameters,
+            out SecurityToken validatedToken);
+
+        var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (string.IsNullOrEmpty(userId))
+            throw new UnauthorizedAccessException("Invalid token payload.");
+
+        var accessToken = GenerateToken(userId, "Jwt:AccessTokenKey", TimeSpan.FromMinutes(15));
+
+        return new RefreshResponseDTO(accessToken);
+    }
+    catch (SecurityTokenException)
+    {
+        throw new UnauthorizedAccessException("Invalid or expired refresh token.");
+    }
+}
 
 
    private string GenerateToken(string userId, string configKey, TimeSpan expiration)

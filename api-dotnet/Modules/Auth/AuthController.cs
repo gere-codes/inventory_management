@@ -54,20 +54,23 @@ public class AuthController : ControllerBase
         return Ok(clientResponse);
     }
 
+
     [HttpPost("refresh")]
-    [Authorize] 
     public async Task<ActionResult<RefreshClientResponseDTO>> Refresh()
         {
-            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value 
-                            ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
 
-            if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
-            {
-                throw new UnauthorizedAccessException("Invalid token payload.");
-            }
+            if (!Request.Cookies.TryGetValue("refreshToken", out var refreshToken))
+        {
+            return Unauthorized(new { message = "Refresh token is missing." });
+        }
 
-            var result = await _authService.RefreshAsync(userId);
+        var newAccessToken = await _authService.RefreshAsync(refreshToken);
 
-            return Ok(new RefreshClientResponseDTO(result.AccessToken));
+        if (newAccessToken == null)
+        {
+            return Unauthorized(new { message = "Invalid or expired refresh token." });
+        }
+
+        return Ok(new { accessToken = newAccessToken });
         }
     }

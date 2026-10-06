@@ -1,4 +1,3 @@
-// Product repository
 using Microsoft.EntityFrameworkCore;
 
 public interface IProductRepository{
@@ -14,10 +13,16 @@ internal class ProductRepository : IProductRepository
     {
         _context = context;
     }
+
     public async Task<Product?> GetProductByIdAsync(Guid id)
     {
       return await _context.Products.FirstOrDefaultAsync<Product>((p) => p.Id == id);
 
+    }
+
+    public async Task<IEnumerable<Product>> FindManyAndCountAsync()
+    {
+        return await _context.Products.ToListAsync();
     }
 
 }

@@ -1,5 +1,3 @@
-// create product controlelr
-
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
@@ -12,4 +10,15 @@ public class ProductController : ControllerBase
     {
         _productService = productService;
     }
+
+    // public async Task<IActionResult> GetProductById(Guid id){}
+    [HttpGet]
+    public async Task<IActionResult> getCollection(bool isPaginated = true, int page = 1, int limit = 10, string search = null, string sortBy = "featured")
+    {
+        Console.WriteLine(isPaginated);
+        var products = await _productService.FindManyAndCountAsync();
+        return Ok(products);
+    }
+
+
 }

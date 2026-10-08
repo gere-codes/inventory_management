@@ -1,4 +1,4 @@
 public record ClientAuthResponseDto(
-    string accessToken,
+    string AccessToken,
     UserResponseDto User
 );

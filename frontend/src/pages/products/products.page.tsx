@@ -1,4 +1,3 @@
-import {} from 'react';
 import { SearchBar, Pagination } from '@common';
 import { ProductTable, useProductHandlers, useProductFilter, useProductStats, ProductsStats } from '@products';
 import { Button } from '@ui';

@@ -64,13 +64,13 @@ public class AuthController : ControllerBase
             return Unauthorized(new { message = "Refresh token is missing." });
         }
 
-        var newAccessToken = await _authService.RefreshAsync(refreshToken);
+        var accessToken = await _authService.RefreshAsync(refreshToken);
 
-        if (newAccessToken == null)
+        if (accessToken == null)
         {
             return Unauthorized(new { message = "Invalid or expired refresh token." });
         }
 
-        return Ok(new { accessToken = newAccessToken });
+        return Ok(accessToken);
         }
     }

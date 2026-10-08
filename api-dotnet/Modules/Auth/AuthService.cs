@@ -104,42 +104,47 @@ public interface IAuthService{
     
 
     public async Task<RefreshResponseDTO> RefreshAsync(string refreshString)
-{
+    {
         var key = _configuration["Jwt:RefreshTokenKey"] ?? throw new UnauthorizedAccessException("Invalid refresh token");
+        var issuer = _configuration["Jwt:Issuer"] ?? throw new InvalidOperationException("Jwt:Issuer not configured.");
+        var audience = _configuration["Jwt:Audience"] ?? throw new InvalidOperationException("Jwt:Audience not configured.");
+
         var validationParameters = new TokenValidationParameters
-    {
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
-        ValidateIssuer = false,      
-        ValidateAudience = false,    
-        ValidateLifetime = true,    
-        ClockSkew = TimeSpan.Zero
-    };
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
+            ValidateIssuer = true,      
+            ValidIssuer = issuer,      
+            ValidateAudience = true,    
+            ValidAudience = audience,   
+            ValidateLifetime = true,    
+            ClockSkew = TimeSpan.Zero
+        };
 
-    try
-    {
-        var handler = new JwtSecurityTokenHandler();
+        try
+        {
+            var handler = new JwtSecurityTokenHandler();
 
-        
-        var principal = handler.ValidateToken(
-            refreshString,
-            validationParameters,
-            out SecurityToken validatedToken);
+            
+            var principal = handler.ValidateToken(
+                refreshString,
+                validationParameters,
+                out SecurityToken validatedToken);
 
-        var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-        if (string.IsNullOrEmpty(userId))
-            throw new UnauthorizedAccessException("Invalid token payload.");
+            if (string.IsNullOrEmpty(userId))
+                throw new UnauthorizedAccessException("Invalid token payload.");
 
-        var accessToken = GenerateToken(userId, "Jwt:AccessTokenKey", TimeSpan.FromMinutes(15));
+            var accessToken = GenerateToken(userId, "Jwt:AccessTokenKey", TimeSpan.FromMinutes(15));
 
-        return new RefreshResponseDTO(accessToken);
+            return new RefreshResponseDTO(accessToken);
+        }
+        catch (SecurityTokenException)
+        {
+            throw new UnauthorizedAccessException("Invalid or expired refresh token.");
+        }
     }
-    catch (SecurityTokenException)
-    {
-        throw new UnauthorizedAccessException("Invalid or expired refresh token.");
-    }
-}
 
 
    private string GenerateToken(string userId, string configKey, TimeSpan expiration)
@@ -147,10 +152,18 @@ public interface IAuthService{
         var secretKey = _configuration[configKey] ?? throw new InvalidOperationException($"{configKey} not configured.");
         var key = Encoding.UTF8.GetBytes(secretKey);
 
+
+        var claims = new List<Claim>
+        {
+            new Claim(JwtRegisteredClaimNames.Sub, userId),
+        };
+
         var tokenHandler = new JwtSecurityTokenHandler();
         var tokenDescriptor = new SecurityTokenDescriptor
         {
-            Subject = new ClaimsIdentity(new[] { new Claim(JwtRegisteredClaimNames.Sub, userId) }),
+            Subject = new ClaimsIdentity(claims),
+            Issuer = _configuration["Jwt:Issuer"],          
+            Audience = _configuration["Jwt:Audience"],       
             Expires = DateTime.UtcNow.Add(expiration),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };

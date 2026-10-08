@@ -2,7 +2,7 @@
 public interface IProductService
 {
      Task<Product?> GetProductByIdAsync(Guid id);
-     Task<IEnumerable<Product>> FindManyAndCountAsync();
+     Task<TCollectionResult<Product>> FindManyAndCountAsync(ContextDto context, QueryDto query);
 }
     
 public class ProductService : IProductService
@@ -20,8 +20,8 @@ public class ProductService : IProductService
             return await _productRepository.GetProductByIdAsync(id);
         }
 
-        public async Task<IEnumerable<Product>> FindManyAndCountAsync()
+        public async Task<TCollectionResult<Product>> FindManyAndCountAsync(ContextDto context, QueryDto query)
         {
-            return await _productRepository.FindManyAndCountAsync();
+            return await _productRepository.FindManyAndCountAsync(context, query);
         }
     }

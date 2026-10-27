@@ -21,7 +21,7 @@ public class Category
 
     [Column("slug")]
     [MaxLength(100)]
-    public string slug { get; set; }
+    public string Slug { get; set; }
 
     [Column("description")]
     [MaxLength(1000)]

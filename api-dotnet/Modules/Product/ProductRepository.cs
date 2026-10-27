@@ -1,8 +1,9 @@
+using System.Security.Cryptography;
 using Microsoft.EntityFrameworkCore;
 
 public interface IProductRepository{
     Task<Product?> GetProductByIdAsync(Guid id);
-    Task<TCollectionResult<Product>> FindManyAndCountAsync(ContextDto context, QueryDto query);
+    Task<TCollectionResult<ProductResponseDtos>> FindManyAndCountAsync(ContextDto context, QueryDto query);
 }
 
 internal class ProductRepository : IProductRepository
@@ -20,13 +21,19 @@ internal class ProductRepository : IProductRepository
 
     }
 
-    public async Task<TCollectionResult<Product>> FindManyAndCountAsync(ContextDto context, QueryDto query)
+    private string GetStockStatus(int qty){
+        if(qty <= 0) return "Out of Stock";
+        else if(qty <= 5) return "Low Stock";
+        return "In Stock";
+    }
+
+    public async Task<TCollectionResult<ProductResponseDtos>> FindManyAndCountAsync(ContextDto context, QueryDto query)
     {
         IQueryable<Product> products = _context.Products.AsNoTracking();
 
         if(context.Scope != "Admin"){
             if(string.IsNullOrWhiteSpace(context.UserId)){
-                return new TCollectionResult<Product>(
+                return new TCollectionResult<ProductResponseDtos>(
                     items:[],
                     pagination:new TPagination(
                         Page:1, 
@@ -68,11 +75,17 @@ internal class ProductRepository : IProductRepository
 
         products = query.SortBy.ToLower() switch
         {
-            "priceAsc" => products.OrderBy(product => product.Price),
+            "priceAsc" => products.
+            OrderBy(product => product.Price)
+            .ThenBy(p => p.Id),
 
-            "priceDesc" => products.OrderByDescending(product => product.Price),
+            "priceDesc" => products
+            .OrderByDescending(product => product.Price)
+            .ThenBy(p => p.Id),
 
-            "featured" => products.OrderByDescending(product => product.CreatedAt),
+            "featured" => products
+            .OrderByDescending(product => product.CreatedAt)
+            .ThenBy(p => p.Id),
 
             _ => products.OrderByDescending(product => product.CreatedAt),
         };
@@ -85,10 +98,35 @@ internal class ProductRepository : IProductRepository
                 .Take(limit);
         }
 
-        var items  = await products.ToListAsync();
+        var items  = await products
+        .Select(p => new ProductResponseDtos{
+            Id = p.Id.ToString(),
+            Name = p.Name,
+            Price = p.Price,
+            Quantity = p.Quantity,
+            Description = p.Description,
+            CategoryId = p.CategoryId.ToString(),
+
+            Category = new CategoryResponseDto
+            {
+                Id = p.Category.Id.ToString(),
+                Name = p.Category.Name,
+                Slug = p.Category.Slug
+            },
+
+            Images = p.Images,
+            CreatedAt = p.CreatedAt,
+            UpdatedAt = p.UpdatedAt
+        })
+        .ToListAsync();
+
+        foreach (var item in items)
+        {
+            item.Status = GetStockStatus(item.Quantity);
+        }
 
 
-        var collection = new TCollectionResult<Product>(items, pagination);
+        var collection = new TCollectionResult<ProductResponseDtos>(items, pagination);
         return collection;
     }
 

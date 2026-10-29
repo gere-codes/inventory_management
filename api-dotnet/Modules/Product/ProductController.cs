@@ -26,7 +26,10 @@ public class ProductController : ControllerBase
         var context = new ContextDto(userId, userRole);
 
         var products = await _productService.FindManyAndCountAsync(context, options);
-        return Ok(products);
+        return Ok(new {
+            Success= true,
+            payload= products
+        });
     }
 
 

@@ -104,6 +104,7 @@ internal class ProductRepository : IProductRepository
             Name = p.Name,
             Price = p.Price,
             Quantity = p.Quantity,
+            Sku = p.Sku,
             Description = p.Description,
             CategoryId = p.CategoryId.ToString(),
 
